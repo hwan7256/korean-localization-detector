@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLD — 해외 SaaS 국내 로컬라이징 탐지기</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header class="global-header">
+    <div class="header-left">
+        <h1 class="logo">KLD</h1>
+        <span class="tagline">Overseas Micro-SaaS → Korean Market Opportunity Scanner</span>
+    </div>
+    <div class="header-stats" id="header-stats">
+        <div class="stat-item">
+            <span class="stat-num" id="stat-total">0</span>
+            <span class="stat-label">Collected</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" id="stat-analyzed">0</span>
+            <span class="stat-label">Analyzed</span>
+        </div>
+        <div class="stat-item accent">
+            <span class="stat-num" id="stat-high">0</span>
+            <span class="stat-label">Viable (70+)</span>
+        </div>
+    </div>
+</header>
+
+<div class="content-layout">
+
+    <!-- 좌측: 카드 리스트 -->
+    <section class="card-grid">
+        <div class="filter-bar">
+            <select id="source-filter">
+                <option value="">All Sources</option>
+            </select>
+            <select id="score-filter">
+                <option value="0">All Scores</option>
+                <option value="70">70+ (Viable)</option>
+                <option value="50">50+ (Review)</option>
+            </select>
+            <label class="free-toggle">
+                <input type="checkbox" id="free-only"> Free tier only
+            </label>
+            <span class="result-count" id="result-count">0 results</span>
+        </div>
+
+        <div class="cards-container" id="service-list">
+            <!-- JS 렌더링 -->
+        </div>
+    </section>
+
+    <!-- 우측: OPPORTUNITY BRIEF -->
+    <aside class="brief-panel" id="brief-panel">
+        <div class="brief-empty">
+            <h3>OPPORTUNITY BRIEF</h3>
+            <p>Select a service to view the localization analysis.</p>
+        </div>
+    </aside>
+
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
