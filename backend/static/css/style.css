@@ -125,15 +125,6 @@ body {
     background: #1f1f1f;
     color: var(--text-muted);
 }
-.tier-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-.tier-free { background: var(--accent-green-bg); color: var(--accent-green); }
-.tier-pro { background: #312e81; color: #a5b4fc; }
 
 .card-summary { font-size: 1.3rem; color: var(--text-muted); line-height: 1.5; }
 
@@ -187,15 +178,19 @@ body {
 .brief-service-url { font-size: 1.2rem; color: var(--accent-green); margin-bottom: 2rem; display: block; word-break: break-all; }
 .brief-service-url:hover { text-decoration: underline; }
 
-.pro-blur {
-    position: relative;
-    padding: 2rem;
+.template-box {
     background: var(--surface-hover);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    text-align: center;
-    color: var(--text-dim);
+    padding: 1.5rem;
+    overflow-x: auto;
 }
-.pro-blur strong { color: var(--text-primary); }
+.template-box pre {
+    font-size: 1.1rem;
+    color: var(--text-body);
+    white-space: pre-wrap;
+    word-break: break-all;
+}
 
 /* === Responsive === */
 @media (max-width: 768px) {

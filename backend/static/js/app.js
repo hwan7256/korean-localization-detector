@@ -67,9 +67,6 @@ function renderCard(s) {
         scoreText = score;
     }
 
-    const tierClass = s.free_tier ? 'tier-free' : 'tier-pro';
-    const tierLabel = s.free_tier ? 'FREE' : 'PRO';
-
     return `
     <div class="service-card" data-id="${s.id}" onclick="selectService(${s.id})">
         <div class="card-header">
@@ -79,7 +76,6 @@ function renderCard(s) {
         <div class="card-summary">${esc(s.summary_ko || s.description || 'Awaiting analysis...')}</div>
         <div class="card-meta">
             <span class="source-tag">${esc(s.source)}</span>
-            <span class="tier-tag ${tierClass}">${tierLabel}</span>
             ${s.analyzed_at ? `<span>${timeAgo(s.analyzed_at)}</span>` : ''}
         </div>
     </div>`;
@@ -161,16 +157,13 @@ function renderBrief(data) {
             <p>${esc(r.monetization_ko)}</p>
         </div>` : ''}
 
-        ${!r.free_tier && full ? `
+        ${full ? `
         <div class="brief-section">
-            <h4>Integration Template (PRO)</h4>
-            <div class="pro-blur">
-                <pre style="text-align:left;font-size:1.1rem;color:var(--text-body);overflow-x:auto;">${esc(JSON.stringify(full, null, 2))}</pre>
+            <h4>Integration Template</h4>
+            <div class="template-box">
+                <pre>${esc(JSON.stringify(full, null, 2))}</pre>
             </div>
-        </div>` : (r.free_tier && r.template_code ? `
-        <div class="brief-section">
-            <p style="color:var(--text-dim);text-align:center;">Integration template available with <strong>PRO</strong> subscription.</p>
-        </div>` : '')}
+        </div>` : ''}
     `;
 }
 
@@ -200,7 +193,6 @@ function timeAgo(ts) {
 // === Event Listeners ===
 document.getElementById('source-filter').addEventListener('change', fetchServices);
 document.getElementById('score-filter').addEventListener('change', fetchServices);
-document.getElementById('free-only').addEventListener('change', fetchServices);
 
 // Esc key to close (not needed with side panel, but good UX)
 document.addEventListener('keydown', e => {
