@@ -90,9 +90,9 @@ function renderRow(s, isFirst) {
     // Title color: green if selected or high score, else gold
     const titleClass = isGreen ? 'cell-title active' : 'cell-title normal';
 
-    // Score color
-    const scoreColorClass = (score >= 70) ? '' : 'gold';
-    const fillClass = (score >= 70) ? 'green' : 'gold';
+    // Score color: selected always green, otherwise based on threshold
+    const scoreColorClass = isGreen ? '' : 'gold';
+    const fillClass = isGreen ? 'green' : 'gold';
 
     // Status button
     let statusClass, statusText;
@@ -208,9 +208,19 @@ function renderDetail(data) {
             <p>${esc(r.regulatory_risks)}</p>
         </div>` : ''}
 
-        ${(r && r.competitor_analysis) ? `
+        ${(r && r.monetization_ko) ? `
         <div class="detail-section">
             <h4>Next Actions</h4>
+            <p>${esc(r.monetization_ko)}</p>
+        </div>` : ((r && r.localization_reason) ? `
+        <div class="detail-section">
+            <h4>Next Actions</h4>
+            <p>${esc(r.localization_reason)}</p>
+        </div>` : '')}
+
+        ${(r && r.competitor_analysis) ? `
+        <div class="detail-section">
+            <h4>Competition</h4>
             <p>${esc(r.competitor_analysis)}</p>
         </div>` : ''}
 
