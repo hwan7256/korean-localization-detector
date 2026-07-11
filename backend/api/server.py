@@ -23,14 +23,10 @@ if os.path.isdir(STATIC_DIR):
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return """
-<!DOCTYPE html>
-<html lang="ko">
-<head><meta charset="UTF-8"><title>KLD API</title></head>
-<body style="background:#0f0f0f;color:#e0e0e0;font-family:sans-serif;padding:2rem;">
-<h1>KLD - Korean Localization Detector</h1>
-<p>API server running. <a href="/dashboard" style="color:#4ade80;">Dashboard</a></p>
-</body></html>"""
+    fp = os.path.join(STATIC_DIR, "landing.html")
+    if os.path.exists(fp):
+        return open(fp).read()
+    return HTMLResponse("<h1>KLD</h1>", status_code=200)
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
