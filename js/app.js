@@ -1,5 +1,3 @@
-/* KLD Dashboard — Triage Table (exact mockup spec) */
-
 const API = 'https://api.kld.etfsimulator.blog';
 let allServices = [];
 let selectedId = null;
@@ -33,219 +31,252 @@ async function fetchSources() {
 }
 
 async function fetchServices() {
+    const src = document.getElementById('source-filter').value;
+    const minS = document.getElementById('score-filter').value;
+    const minC = document.getElementById('conf-filter').value;
+    const q = document.getElementById('search-input').value.toLowerCase();
+
+    let url = `${API}/api/services?limit=100`;
+    if (src) url += `&source=${encodeURIComponent(src)}`;
+    if (minS > 0) url += `&min_score=${minS}`;
+
     try {
-        const r = await fetch(`${API}/api/services`);
+        const r = await fetch(url);
         const d = await r.json();
-        allServices = d.services;
-        renderTable();
+        let items = d.services || [];
+        if (q) items = items.filter(s => (s.name || '').toLowerCase().includes(q));
+        if (minC > 0) items = items.filter(s => (s.confidence || 0) >= parseFloat(minC));
+        allServices = items;
+        document.getElementById('result-count').textContent = `${items.length} results`;
+        sortAndRender();
     } catch(e) {
-        console.error('Fetch error:', e);
+        document.getElementById('result-count').textContent = 'Error';
     }
 }
 
-// === Render Table ===
-function renderTable() {
-    const scoreTh = parseInt(document.getElementById('score-filter').value) || 0;
-    const confTh = parseFloat(document.getElementById('conf-filter').value) || 0;
-    const src = document.getElementById('source-filter').value;
-    const status = document.getElementById('status-filter').value;
-    const search = (document.getElementById('search-input').value || '').toLowerCase();
-
-    let filtered = allServices.filter(s => {
-        if (s.score === null || s.score === undefined) return false;
-        if (s.score < scoreTh) return false;
-        if ((s.confidence ?? 0) < confTh) return false;
-        if (src && s.source !== src) return false;
-        if (status === 'reviewed' && s.status !== 'reviewed') return false;
-        if (search && !s.name.toLowerCase().includes(search)) return false;
-        return true;
-    });
-
-    // Sort
-    filtered.sort((a, b) => {
+// === Sorting ===
+function sortAndRender() {
+    const sorted = [...allServices].sort((a, b) => {
         let va, vb;
         switch (currentSort) {
-            case 'name': va = a.name; vb = b.name; break;
-            case 'score': va = a.score || 0; vb = b.score || 0; break;
+            case 'name': va = (a.name||'').toLowerCase(); vb = (b.name||'').toLowerCase(); return sortDesc ? vb.localeCompare(va) : va.localeCompare(vb);
             case 'confidence': va = a.confidence || 0; vb = b.confidence || 0; break;
             case 'upside': va = a.upside || 0; vb = b.upside || 0; break;
-            default: return 0;
+            default: va = getScore(a); vb = getScore(b); break;
         }
-        if (typeof va === 'string') return sortDesc ? vb.localeCompare(va) : va.localeCompare(vb);
         return sortDesc ? vb - va : va - vb;
     });
+    renderTable(sorted);
+}
 
-    document.getElementById('result-count').textContent = `${filtered.length} results`;
+function getScore(s) { return s.score || s.localization_score || 0; }
 
+function renderTable(items) {
     const tbody = document.getElementById('table-body');
-    tbody.innerHTML = filtered.map(s => {
-        const score = s.score || 0;
-        const scoreClass = score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low';
-        const conf = Math.round((s.confidence || 0) * 100);
-        const up = Math.round((s.upside || 0) * 100);
-        const isSelected = selectedId === s.id;
-
-        return `<tr class="${isSelected ? 'selected' : ''}" onclick="selectService(${s.id})">
-            <td class="service-name" style="font-weight:600">${esc(s.name)}</td>
-            <td>
-                <div class="score-cell">
-                    <div class="score-bar"><div class="score-bar-fill ${scoreClass}" style="width:${score}%"></div></div>
-                    <span class="score-num ${scoreClass}">${score}</span>
-                </div>
-            </td>
-            <td>
-                <div class="mini-bar"><div class="mini-bar-fill conf" style="width:${conf}%"></div></div>
-                <span class="mini-val">${conf}%</span>
-            </td>
-            <td>
-                <div class="mini-bar"><div class="mini-bar-fill upside" style="width:${up}%"></div></div>
-                <span class="mini-val">${up}%</span>
-            </td>
-            <td><span class="status-dot ${s.status === 'reviewed' ? 'reviewed' : ''}"></span></td>
-            <td><a href="${esc(s.url)}" target="_blank" class="open-link" onclick="event.stopPropagation()">↗</a></td>
-        </tr>`;
-    }).join('');
+    tbody.innerHTML = items.map(s => renderRow(s)).join('');
+    if (selectedId) {
+        const row = tbody.querySelector(`tr[data-id="${selectedId}"]`);
+        if (row) row.classList.add('selected');
+    }
 }
 
-function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderRow(s) {
+    const score = getScore(s);
+    const conf = s.confidence || 0.5;
+    const upside = s.upside || 0.5;
+    const isSelected = selectedId === s.id;
+    const titleClass = isSelected ? 'cell-title active' : 'cell-title normal';
+    const fillClass = isSelected ? 'green' : (score >= 65 ? 'green' : 'gold');
 
-// === Select Service ===
-function selectService(id) {
+    let statusClass, statusText;
+    if (score >= 70) { statusClass = 'viable'; statusText = 'Viable'; }
+    else if (score >= 40) { statusClass = 'review'; statusText = 'Review'; }
+    else if (score > 0) { statusClass = 'low'; statusText = 'Low'; }
+    else { statusClass = ''; statusText = ''; }
+
+    return `
+    <tr data-id="${s.id}" onclick="selectService(${s.id})" class="${isSelected ? 'selected' : ''}">
+        <td><span class="${titleClass}">${esc(s.name)}</span></td>
+        <td>
+            <div class="cell-score-block">
+                <span class="cell-score-val">${score}/100</span>
+                <div class="cell-score-track"><div class="cell-score-fill ${fillClass}" style="width:${score}%"></div></div>
+            </div>
+        </td>
+        <td>
+            <div class="cell-metric-block">
+                <span class="cell-metric-val">${Math.round(conf*100)}%</span>
+                <div class="cell-metric-track"><div class="cell-metric-fill" style="width:${Math.round(conf*100)}%"></div></div>
+            </div>
+        </td>
+        <td>
+            <div class="cell-metric-block">
+                <span class="cell-metric-val">${Math.round(upside*100)}%</span>
+                <div class="cell-metric-track"><div class="cell-metric-fill" style="width:${Math.round(upside*100)}%"></div></div>
+            </div>
+        </td>
+        <td>${statusText ? `<span class="status-btn ${statusClass}">${statusText}</span>` : ''}</td>
+        <td>${s.url ? `<a class="open-link" href="${esc(s.url)}" target="_blank" onclick="event.stopPropagation()">Open</a>` : ''}</td>
+    </tr>`;
+}
+
+// === Select Service → Detail Panel ===
+async function selectService(id) {
     selectedId = id;
-    renderTable();
-    fetchReport(id);
-}
+    renderTable(allServices);
 
-async function fetchReport(id) {
-    const panel = document.getElementById('detail-panel');
-    panel.innerHTML = '<div class="detail-empty"><p>Loading...</p></div>';
     try {
         const r = await fetch(`${API}/api/report/${id}`);
         const d = await r.json();
         renderDetail(d);
     } catch(e) {
-        panel.innerHTML = '<div class="detail-empty"><p>Error loading report</p></div>';
+        document.getElementById('detail-panel').innerHTML = '<div class="detail-empty"><p>Failed to load</p></div>';
     }
 }
 
-function renderDetail(d) {
-    const svc = d.service || {};
-    const rep = d.report || {};
-    const score = rep.localization_score || 0;
-    const scoreClass = score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low';
+function renderDetail(data) {
+    const svc = data.service || {};
+    const r = data.report || {};
+    const score = r ? (r.localization_score || 0) : 0;
+    const conf = r.confidence || 0.5;
+    const upside = r.upside || 0.5;
+    const boldness = r.boldness || 0.5;
 
-    const panel = document.getElementById('detail-panel');
-    panel.innerHTML = `<div class="detail-content">
-        <div class="big-score">
-            <span class="big-score-num ${scoreClass}">${score}</span>
-            <span class="big-score-label">/100 local score</span>
+    const sections = [];
+
+    // Score header
+    sections.push(`
+        <div class="detail-title">${esc(svc.name)}</div>
+        ${svc.url ? `<a class="detail-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)} ↗</a>` : ''}
+        <div class="detail-score-row">
+            <span class="detail-big-score">${score}<span class="denom">/100</span></span>
+            <div class="detail-score-bar"><div class="detail-score-fill" style="width:${score}%"></div></div>
         </div>
-        <div class="detail-meta">${esc(svc.name)} · ${esc(svc.source || '')}</div>
+    `);
 
-        <div class="metric-group">
-            <div class="metric-row">
-                <span class="metric-label">Confidence</span>
-                <div class="metric-bar"><div class="metric-fill conf" style="width:${Math.round((rep.confidence||0)*100)}%"></div></div>
-                <span class="metric-val">${Math.round((rep.confidence||0)*100)}</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">Upside</span>
-                <div class="metric-bar"><div class="metric-fill upside" style="width:${Math.round((rep.upside||0)*100)}%"></div></div>
-                <span class="metric-val">${Math.round((rep.upside||0)*100)}</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">Boldness</span>
-                <div class="metric-bar"><div class="metric-fill boldness" style="width:${Math.round((rep.boldness||0)*100)}%"></div></div>
-                <span class="metric-val">${Math.round((rep.boldness||0)*100)}</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">Total</span>
-                <div class="metric-bar"><div class="metric-fill total" style="width:${score}%"></div></div>
-                <span class="metric-val">${score}</span>
-            </div>
-        </div>
-
+    // Metrics
+    sections.push(`
         <div class="detail-section">
-            <h3>Summary</h3>
-            <p>${esc(rep.summary || 'No summary available.')}</p>
+            <h4>Confidence Assessment</h4>
+            <div class="detail-metrics">
+                <div class="detail-metric-row">
+                    <span class="detail-metric-label">Confidence</span>
+                    <div class="detail-metric-track"><div class="detail-metric-fill green" style="width:${Math.round(conf*100)}%"></div></div>
+                    <span class="detail-metric-val">${Math.round(conf*100)}%</span>
+                </div>
+                <div class="detail-metric-row">
+                    <span class="detail-metric-label">Upside</span>
+                    <div class="detail-metric-track"><div class="detail-metric-fill orange" style="width:${Math.round(upside*100)}%"></div></div>
+                    <span class="detail-metric-val">${Math.round(upside*100)}%</span>
+                </div>
+                <div class="detail-metric-row">
+                    <span class="detail-metric-label">Boldness</span>
+                    <div class="detail-metric-track"><div class="detail-metric-fill blue" style="width:${Math.round(boldness*100)}%"></div></div>
+                    <span class="detail-metric-val">${Math.round(boldness*100)}%</span>
+                </div>
+            </div>
         </div>
+    `);
 
-        <div class="detail-section" id="risk-section">
-            <h3>Risk Factors</h3>
-            <ul class="risk-list">${renderRisks(rep.risk_factors)}</ul>
-        </div>
-
-        <div class="detail-section">
-            <h3>Next Actions</h3>
-            <ul class="action-list">${renderActions(rep.next_actions)}</ul>
-        </div>
-
-        <button class="review-btn" onclick="markReviewed(${svc.id})">
-            ${svc.status === 'reviewed' ? '✓ Reviewed' : 'Mark Reviewed'}
-        </button>
-    </div>`;
-}
-
-function renderRisks(risks) {
-    if (!risks) return '<li>No specific risks identified</li>';
-    try {
-        const arr = typeof risks === 'string' ? JSON.parse(risks) : risks;
-        return arr.map(r => `<li>⚠ ${esc(typeof r === 'string' ? r : r.risk || r)}</li>`).join('');
-    } catch(e) {
-        return `<li>⚠ ${esc(String(risks))}</li>`;
+    // Rich content sections
+    if (r.summary_ko || r.summary) {
+        sections.push(`<div class="detail-section"><h4>Summary</h4><p>${esc(r.summary_ko || r.summary)}</p></div>`);
     }
-}
 
-function renderActions(actions) {
-    if (!actions) return '<li>No actions suggested</li>';
-    try {
-        const arr = typeof actions === 'string' ? JSON.parse(actions) : actions;
-        return arr.map((a, i) =>
-            `<li><span class="action-num">${i+1}.</span><span>${esc(typeof a === 'string' ? a : a.action || a)}</span></li>`
-        ).join('');
-    } catch(e) {
-        return `<li><span class="action-num">1.</span><span>${esc(String(actions))}</span></li>`;
+    if (r.localization_reason) {
+        sections.push(`<div class="detail-section"><h4>Localization Reason</h4><p>${esc(r.localization_reason)}</p></div>`);
     }
+
+    if (r.competitor_analysis) {
+        sections.push(`<div class="detail-section"><h4>Competitor Analysis</h4><p>${esc(r.competitor_analysis)}</p></div>`);
+    }
+
+    if (r.monetization_ko) {
+        sections.push(`<div class="detail-section"><h4>Monetization Strategy</h4><p>${esc(r.monetization_ko)}</p></div>`);
+    }
+
+    if (r.estimated_dev_time) {
+        sections.push(`<div class="detail-section"><h4>Estimated Dev Time</h4><p>${esc(r.estimated_dev_time)}</p></div>`);
+    }
+
+    if (r.regulatory_risks || r.risk_factors) {
+        sections.push(`<div class="detail-section"><h4>Risk Factors</h4><p>${esc(r.regulatory_risks || r.risk_factors)}</p></div>`);
+    }
+
+    // Required Korean APIs
+    if (r.required_korean_apis) {
+        let apis = r.required_korean_apis;
+        if (typeof apis === 'string') {
+            try { apis = JSON.parse(apis); } catch(e) { apis = [apis]; }
+        }
+        if (Array.isArray(apis) && apis.length > 0) {
+            const apiList = apis.map(a => {
+                const name = typeof a === 'string' ? a : (a.name || '');
+                const reason = typeof a === 'object' ? (a.reason || a.necessity || '') : '';
+                return `<li><strong>${esc(name)}</strong>${reason ? ` — ${esc(reason)}` : ''}</li>`;
+            }).join('');
+            sections.push(`<div class="detail-section"><h4>Required Korean APIs</h4><ul class="api-list">${apiList}</ul></div>`);
+        }
+    }
+
+    if (r.next_actions) {
+        sections.push(`<div class="detail-section"><h4>Next Actions</h4><p>${esc(r.next_actions)}</p></div>`);
+    }
+
+    // Close
+    sections.push(`
+        <div class="detail-actions">
+            <button class="detail-close" onclick="closeDetail()">Close</button>
+        </div>
+    `);
+
+    document.getElementById('detail-panel').innerHTML = `<div class="detail-content">${sections.join('')}</div>`;
 }
 
-async function markReviewed(id) {
-    try {
-        await fetch(`${API}/api/review/${id}`, { method: 'POST' });
-        const svc = allServices.find(s => s.id === id);
-        if (svc) svc.status = 'reviewed';
-        renderTable();
-        if (selectedId === id) fetchReport(id);
-    } catch(e) {}
+function closeDetail() {
+    selectedId = null;
+    renderTable(allServices);
+    document.getElementById('detail-panel').innerHTML = '<div class="detail-empty"><p>Select an item to view analysis</p></div>';
 }
 
-// === Sort ===
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.sortable').forEach(th => {
-        th.addEventListener('click', () => {
-            const col = th.dataset.sort;
-            if (currentSort === col) {
-                sortDesc = !sortDesc;
-            } else {
-                currentSort = col;
-                sortDesc = true;
-            }
-            document.querySelectorAll('.sortable').forEach(h => {
-                h.classList.remove('active-sort');
-                h.querySelector('.sort-arrow').textContent = '▲';
-            });
-            th.classList.add('active-sort');
-            th.querySelector('.sort-arrow').textContent = sortDesc ? '▼' : '▲';
-            renderTable();
-        });
+// === Sort Headers ===
+document.querySelectorAll('.triage-table th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+        const sortKey = th.dataset.sort;
+        if (currentSort === sortKey) { sortDesc = !sortDesc; }
+        else { currentSort = sortKey; sortDesc = sortKey === 'name' ? false : true; }
+        updateSortHeaders();
+        sortAndRender();
     });
-
-    // Filters
-    ['source-filter','score-filter','conf-filter','status-filter'].forEach(id => {
-        document.getElementById(id).addEventListener('change', renderTable);
-    });
-    document.getElementById('search-input').addEventListener('input', renderTable);
-    
-    fetchStats();
-    fetchSources();
-    fetchServices();
 });
+
+function updateSortHeaders() {
+    document.querySelectorAll('.triage-table th.sortable').forEach(th => {
+        th.classList.remove('active-sort', 'desc');
+        if (th.dataset.sort === currentSort) {
+            th.classList.add('active-sort');
+            if (sortDesc) th.classList.add('desc');
+        }
+    });
+}
+
+// === Filters ===
+document.getElementById('source-filter').addEventListener('change', fetchServices);
+document.getElementById('score-filter').addEventListener('change', fetchServices);
+document.getElementById('conf-filter').addEventListener('change', fetchServices);
+document.getElementById('status-filter').addEventListener('change', fetchServices);
+document.getElementById('search-input').addEventListener('input', fetchServices);
+
+// === Keyboard ===
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+// === Utilities ===
+function esc(text) {
+    if (!text) return '';
+    const d = document.createElement('div'); d.textContent = text; return d.innerHTML;
+}
+
+// === Init ===
+fetchStats();
+fetchSources();
+fetchServices();

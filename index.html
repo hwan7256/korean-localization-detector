@@ -4,86 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KLD — Korean Localization Detector</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --bg: #121212; --bg-card: #1a1a1a; --green: #3FBE6F;
+            --gold: #D4A83C; --blue: #3D84F0; --text: #ddd;
+            --text-dim: #888; --border: #2a2a2a;
+            --font: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.6; }
+
+        /* Hero */
+        .hero {
+            min-height:85vh; display:flex; flex-direction:column; justify-content:center;
+            align-items:center; text-align:center; padding:40px 20px;
+            background:radial-gradient(ellipse at 50% 30%, rgba(63,190,111,0.08) 0%, transparent 70%);
+            position:relative; overflow:hidden;
+        }
+        .hero::before {
+            content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.008) 2px, rgba(255,255,255,0.008) 4px);
+        }
+        .hero-badge {
+            display:inline-block; padding:6px 16px; border:1px solid var(--green);
+            border-radius:20px; color:var(--green); font-size:0.8rem; margin-bottom:24px;
+            letter-spacing:1px;
+        }
+        .hero h1 {
+            font-size:clamp(2rem, 5vw, 3.5rem); font-weight:800; line-height:1.2;
+            background:linear-gradient(135deg, #fff 0%, var(--green) 50%, var(--gold) 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            margin-bottom:20px; max-width:700px;
+        }
+        .hero p {
+            font-size:1.1rem; color:var(--text-dim); max-width:520px; margin-bottom:36px;
+        }
+        .hero-cta {
+            display:inline-flex; gap:12px;
+        }
+        .btn-primary {
+            padding:14px 32px; background:var(--green); color:#111; font-weight:700;
+            font-size:0.95rem; border:none; border-radius:6px; cursor:pointer;
+            text-decoration:none; transition:all 0.2s;
+            box-shadow:0 0 30px rgba(63,190,111,0.3);
+        }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(63,190,111,0.5); }
+        .btn-secondary {
+            padding:14px 32px; background:transparent; color:var(--text);
+            border:1px solid var(--border); border-radius:6px; font-weight:600;
+            text-decoration:none; transition:all 0.2s;
+        }
+        .btn-secondary:hover { border-color:var(--text-dim); }
+
+        /* Stats strip */
+        .stats-strip {
+            display:flex; justify-content:center; gap:60px; padding:32px 20px;
+            border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+            background:var(--bg-card);
+        }
+        .stat-num { font-size:2rem; font-weight:700; color:var(--green); }
+        .stat-label { font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; }
+
+        /* Features */
+        .section { padding:80px 20px; max-width:960px; margin:0 auto; }
+        .section h2 {
+            font-size:1.8rem; font-weight:700; text-align:center; margin-bottom:12px;
+        }
+        .section .subtitle {
+            text-align:center; color:var(--text-dim); margin-bottom:48px; font-size:0.95rem;
+        }
+        .features-grid {
+            display:grid; grid-template-columns:repeat(3, 1fr); gap:24px;
+        }
+        .feature-card {
+            background:var(--bg-card); border:1px solid var(--border);
+            border-radius:10px; padding:28px; transition:all 0.2s;
+        }
+        .feature-card:hover { border-color:var(--green); }
+        .feature-icon { font-size:1.8rem; margin-bottom:16px; }
+        .feature-card h3 { font-size:1rem; margin-bottom:8px; }
+        .feature-card p { font-size:0.85rem; color:var(--text-dim); line-height:1.5; }
+
+        /* Steps */
+        .steps-list { display:flex; flex-direction:column; gap:20px; }
+        .step-item {
+            display:flex; gap:20px; align-items:flex-start;
+            background:var(--bg-card); border:1px solid var(--border);
+            border-radius:10px; padding:24px;
+        }
+        .step-num {
+            width:40px; height:40px; border-radius:50%; background:var(--green);
+            color:#111; display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:1.1rem; flex-shrink:0;
+        }
+        .step-item h3 { font-size:1rem; margin-bottom:4px; }
+        .step-item p { font-size:0.85rem; color:var(--text-dim); }
+
+        /* Bottom CTA */
+        .cta-section {
+            text-align:center; padding:60px 20px;
+            border-top:1px solid var(--border);
+        }
+        .cta-section h2 { font-size:1.6rem; margin-bottom:12px; }
+        .cta-section p { color:var(--text-dim); margin-bottom:28px; }
+
+        /* Footer */
+        footer {
+            padding:20px; text-align:center; color:var(--text-dim); font-size:0.75rem;
+            border-top:1px solid var(--border);
+        }
+
+        @media (max-width:768px) {
+            .features-grid { grid-template-columns:1fr; }
+            .stats-strip { gap:32px; }
+            .hero h1 { font-size:1.8rem; }
+            .hero-cta { flex-direction:column; align-items:center; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Top Header -->
-<header class="top-header">
-    <div class="header-brand">
-        <span class="logo">KLD</span>
-        <span class="tagline">Korean Localization Detector</span>
+<!-- Hero -->
+<section class="hero">
+    <span class="hero-badge">Micro SaaS × Korean Market</span>
+    <h1>해외 검증 SaaS,<br>한국에서도 통할까?</h1>
+    <p>Product Hunt · Hacker News에서 뜨는 마이크로 SaaS를 자동 수집하고, 한국 시장 로컬라이징 적합도를 AI로 분석합니다. 카톡 로그인, 국내 결제 연동 시 예상 개발 기간과 규제 리스크까지 한눈에.</p>
+    <div class="hero-cta">
+        <a href="dashboard.html" class="btn-primary">지금 분석 보기</a>
+        <a href="#how" class="btn-secondary">어떻게 작동하나요?</a>
     </div>
-    <div class="header-search">
-        <input type="text" class="search-input" placeholder="Search..." id="search-input">
-    </div>
-    <div class="header-stats">
-        <div class="stat-item">
-            <span class="stat-val" id="stat-total">43</span>
-            <span class="stat-label">COLLECTED</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-val" id="stat-analyzed">43</span>
-            <span class="stat-label">ANALYZED</span>
-        </div>
-        <div class="stat-badge" id="stat-queue">
-            <span class="badge-circle">1</span>
-            <span class="stat-label">QUEUE</span>
-        </div>
-    </div>
-</header>
+</section>
 
-<!-- Filter Bar -->
-<div class="filter-bar">
-    <select id="source-filter"><option value="">All sources</option></select>
-    <select id="score-filter">
-        <option value="0" selected>Score &gt; 0</option>
-        <option value="50">Score &gt; 50</option>
-        <option value="70">Score &gt; 70</option>
-    </select>
-    <select id="conf-filter">
-        <option value="0" selected>Confidence &gt;= 0</option>
-        <option value="0.5">Confidence &gt;= 0.5</option>
-        <option value="0.7">Confidence &gt;= 0.7</option>
-    </select>
-    <select id="status-filter">
-        <option value="" selected>Not reviewed</option>
-        <option value="reviewed">Reviewed</option>
-    </select>
-    <span class="result-count" id="result-count">43 results</span>
+<!-- Stats -->
+<div class="stats-strip">
+    <div><div class="stat-num" id="hero-total">43</div><div class="stat-label">수집된 서비스</div></div>
+    <div><div class="stat-num" id="hero-analyzed">43</div><div class="stat-label">분석 완료</div></div>
+    <div><div class="stat-num" id="hero-score">42</div><div class="stat-label">평균 점수</div></div>
 </div>
 
-<!-- Main Content: 2-Panel Layout -->
-<div class="content-layout">
-
-    <!-- Left: Table Panel (~55%) -->
-    <section class="table-panel">
-        <div class="table-scroll">
-            <table class="triage-table" id="triage-table">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-sort="name">Title <span class="sort-arrow">▲</span></th>
-                        <th class="sortable active-sort" data-sort="score">Score <span class="sort-arrow">▲</span></th>
-                        <th class="sortable" data-sort="confidence">Confidence <span class="sort-arrow">▲</span></th>
-                        <th class="sortable" data-sort="upside">Upside <span class="sort-arrow">▲</span></th>
-                        <th>Status</th>
-                        <th style="width:50px"></th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
+<!-- Features -->
+<section class="section">
+    <h2>3초 만에 기회 포착</h2>
+    <p class="subtitle">해외에서 검증된 비즈니스 모델을 발견하고, 한국 진출 가능성을 정량화합니다</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>자동 수집</h3>
+            <p>Reddit, Product Hunt, Hacker News 등에서 최근 화제가 된 마이크로 SaaS를 24시간 자동 크롤링합니다.</p>
         </div>
-    </section>
-
-    <!-- Right: Detail Panel (~45%) -->
-    <aside class="detail-panel" id="detail-panel">
-        <div class="detail-empty">
-            <p>Select an item to view analysis</p>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Triage Score</h3>
+            <p>Score · Confidence · Upside · Boldness 4개 축으로 한국 진출 잠재력을 평가하고, 정렬·필터로 기회를 빠르게 탐색합니다.</p>
         </div>
-    </aside>
+        <div class="feature-card">
+            <div class="feature-icon">🇰🇷</div>
+            <h3>로컬 분석</h3>
+            <p>필요한 국내 API(카카오·토스결제), 규제 리스크, 경쟁사 분석, 예상 개발 기간까지 상세 리포트를 제공합니다.</p>
+        </div>
+    </div>
+</section>
 
+<!-- How it works -->
+<section class="section" id="how">
+    <h2>어떻게 작동하나요?</h2>
+    <p class="subtitle">4단계로 해외 SaaS의 한국 시장 적합도를 평가합니다</p>
+    <div class="steps-list">
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div>
+                <h3>해외 소스에서 서비스 수집</h3>
+                <p>Product Hunt, Hacker News 등에서 최근 인기 마이크로 SaaS를 자동 수집합니다.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div>
+                <h3>DeepSeek AI 분석</h3>
+                <p>서비스 설명과 시장 데이터를 기반으로 로컬라이제이션 가능성, 필요 API, 규제 장벽, 경쟁 환경을 평가합니다.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div>
+                <h3>Triage Table 탐색</h3>
+                <p>Score, Confidence, Upside로 정렬·필터링하며 가장 유망한 기회를 빠르게 발견하세요.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div>
+                <h3>실행 가능한 인사이트</h3>
+                <p>예상 개발 기간, 필요한 국내 API 연동 코드를 참고해 즉시 개발에 착수할 수 있습니다.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+    <h2>지금 바로 기회를 발견하세요</h2>
+    <p>43개의 해외 마이크로 SaaS가 분석 완료되었습니다.</p>
+    <a href="dashboard.html" class="btn-primary">대시보드 열기</a>
 </div>
 
-<script src="js/app.js"></script>
+<footer>
+    KLD — Korean Localization Detector · Built with FastAPI + DeepSeek
+</footer>
+
+<script>
+fetch('https://api.kld.etfsimulator.blog/api/stats')
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById('hero-total').textContent = d.total_services || 43;
+        document.getElementById('hero-analyzed').textContent = d.total_analyzed || 43;
+        document.getElementById('hero-score').textContent = Math.round(d.avg_localization_score) || 42;
+    }).catch(() => {});
+</script>
+
 </body>
 </html>
