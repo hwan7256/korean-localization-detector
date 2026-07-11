@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLD — 해외 SaaS 국내 로컬라이징 탐지기</title>
+    <title>KLD — Korean Localization Detector</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -11,50 +11,53 @@
 <header class="global-header">
     <div class="header-left">
         <h1 class="logo">KLD</h1>
-        <span class="tagline">Overseas Micro-SaaS → Korean Market Opportunity Scanner</span>
+        <span class="tagline">Korean Localization Detector</span>
     </div>
-    <div class="header-stats" id="header-stats">
-        <div class="stat-item">
-            <span class="stat-num" id="stat-total">0</span>
-            <span class="stat-label">Collected</span>
+    <div class="header-center">
+        <input type="text" class="search-bar" placeholder="Search..." id="search-input">
+    </div>
+    <div class="header-right">
+        <div class="header-indicator">
+            <span class="indicator-num" id="stat-total">0</span>
+            <span class="indicator-label">Collected</span>
         </div>
-        <div class="stat-item">
-            <span class="stat-num" id="stat-analyzed">0</span>
-            <span class="stat-label">Analyzed</span>
+        <div class="header-indicator">
+            <span class="indicator-num" id="stat-analyzed">0</span>
+            <span class="indicator-label">Analyzed</span>
         </div>
-        <div class="stat-item accent">
-            <span class="stat-num" id="stat-high">0</span>
-            <span class="stat-label">Viable (70+)</span>
+        <div class="header-indicator">
+            <span class="indicator-num accent" id="stat-high">0</span>
+            <span class="indicator-label">Viable</span>
         </div>
     </div>
 </header>
 
+<nav class="sub-nav">
+    <select id="source-filter">
+        <option value="">All Sources</option>
+    </select>
+    <select id="score-filter">
+        <option value="0">All Scores</option>
+        <option value="70">70+ (Viable)</option>
+        <option value="50">50+ (Review)</option>
+    </select>
+    <span class="result-count" id="result-count">0 results</span>
+</nav>
+
 <div class="content-layout">
 
-    <!-- 좌측: 카드 리스트 -->
-    <section class="card-grid">
-        <div class="filter-bar">
-            <select id="source-filter">
-                <option value="">All Sources</option>
-            </select>
-            <select id="score-filter">
-                <option value="0">All Scores</option>
-                <option value="70">70+ (Viable)</option>
-                <option value="50">50+ (Review)</option>
-            </select>
-            <span class="result-count" id="result-count">0 results</span>
-        </div>
-
-        <div class="cards-container" id="service-list">
-            <!-- JS 렌더링 -->
+    <!-- Left: Numbered List -->
+    <section class="list-panel">
+        <div class="list-container" id="service-list">
+            <!-- JS rendering -->
         </div>
     </section>
 
-    <!-- 우측: OPPORTUNITY BRIEF -->
+    <!-- Right: Analyst Report Brief -->
     <aside class="brief-panel" id="brief-panel">
         <div class="brief-empty">
             <h3>OPPORTUNITY BRIEF</h3>
-            <p>Select a service to view the localization analysis.</p>
+            <p>Select an item to view the full localization analysis.</p>
         </div>
     </aside>
 

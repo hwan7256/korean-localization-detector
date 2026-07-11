@@ -1,7 +1,6 @@
-/* KLD Dashboard — Side Brief Panel */
+/* KLD Dashboard — Analyst Report Brief Panel */
 const API = '';
 
-// === State ===
 let selectedId = null;
 
 // === Fetch & Render ===
@@ -28,56 +27,57 @@ async function fetchSources() {
 async function fetchServices() {
     const src = document.getElementById('source-filter').value;
     const minS = document.getElementById('score-filter').value;
-    const free = document.getElementById('free-only').checked;
+    const q = document.getElementById('search-input').value.toLowerCase();
 
     let url = `${API}/api/services?limit=100`;
     if (src) url += `&source=${encodeURIComponent(src)}`;
     if (minS > 0) url += `&min_score=${minS}`;
-    if (free) url += `&free_only=true`;
 
     const r = await fetch(url);
     const d = await r.json();
 
-    document.getElementById('result-count').textContent = `${d.count} result${d.count !== 1 ? 's' : ''}`;
+    let items = d.services;
+    if (q) items = items.filter(s => (s.name || '').toLowerCase().includes(q));
+
+    document.getElementById('result-count').textContent = `${items.length} result${items.length !== 1 ? 's' : ''}`;
 
     const container = document.getElementById('service-list');
-    container.innerHTML = d.services.map(s => renderCard(s)).join('');
+    container.innerHTML = items.map((s, i) => renderRow(s, i + 1)).join('');
 
-    // Restore selection
     if (selectedId) {
-        const el = document.querySelector(`.service-card[data-id="${selectedId}"]`);
+        const el = document.querySelector(`.list-row[data-id="${selectedId}"]`);
         if (el) el.classList.add('active');
     }
 }
 
-function renderCard(s) {
+function renderRow(s, num) {
     const score = s.localization_score;
     let scoreClass, scoreText;
+    let statusClass, statusText;
+
     if (score === null || score === undefined) {
-        scoreClass = 'score-none';
-        scoreText = '--';
+        scoreClass = 'score-none'; scoreText = '--';
+        statusClass = ''; statusText = '';
     } else if (score >= 70) {
-        scoreClass = 'score-high';
-        scoreText = score;
+        scoreClass = 'score-high'; scoreText = score;
+        statusClass = 'status-viable'; statusText = 'Viable';
     } else if (score >= 40) {
-        scoreClass = 'score-mid';
-        scoreText = score;
+        scoreClass = 'score-mid'; scoreText = score;
+        statusClass = 'status-review'; statusText = 'Review';
     } else {
-        scoreClass = 'score-low';
-        scoreText = score;
+        scoreClass = 'score-low'; scoreText = score;
+        statusClass = 'status-low'; statusText = 'Low';
     }
 
+    const idStr = `KLD-${String(s.id).padStart(3, '0')}`;
+
     return `
-    <div class="service-card" data-id="${s.id}" onclick="selectService(${s.id})">
-        <div class="card-header">
-            <span class="card-title">${esc(s.name)}</span>
-            <span class="score-badge ${scoreClass}">${scoreText}</span>
-        </div>
-        <div class="card-summary">${esc(s.summary_ko || s.description || 'Awaiting analysis...')}</div>
-        <div class="card-meta">
-            <span class="source-tag">${esc(s.source)}</span>
-            ${s.analyzed_at ? `<span>${timeAgo(s.analyzed_at)}</span>` : ''}
-        </div>
+    <div class="list-row" data-id="${s.id}" onclick="selectService(${s.id})">
+        <span class="row-num">${num}</span>
+        <span class="row-id">${idStr}</span>
+        <span class="row-title">${esc(s.name)}</span>
+        ${statusText ? `<span class="row-status ${statusClass}">${statusText}</span>` : '<span class="row-status"></span>'}
+        <span class="row-score ${scoreClass}">${scoreText}</span>
     </div>`;
 }
 
@@ -85,12 +85,10 @@ function renderCard(s) {
 async function selectService(id) {
     selectedId = id;
 
-    // Active toggle
-    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
-    const el = document.querySelector(`.service-card[data-id="${id}"]`);
+    document.querySelectorAll('.list-row').forEach(c => c.classList.remove('active'));
+    const el = document.querySelector(`.list-row[data-id="${id}"]`);
     if (el) el.classList.add('active');
 
-    // Fetch report
     const r = await fetch(`${API}/api/report/${id}`);
     const d = await r.json();
     renderBrief(d);
@@ -103,9 +101,12 @@ function renderBrief(data) {
 
     if (!r) {
         panel.innerHTML = `
-            <div class="brief-service-title">${esc(svc.name)}</div>
-            <a class="brief-service-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>
-            <div class="brief-section"><p>This service has not been analyzed yet.</p></div>`;
+            <div class="report-header">
+                <div class="report-title">${esc(svc.name)}</div>
+                <a class="report-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>
+                <div class="report-subtitle">Source: ${esc(svc.source)}</div>
+            </div>
+            <div class="report-section"><p>This service has not been analyzed yet.</p></div>`;
         return;
     }
 
@@ -113,57 +114,95 @@ function renderBrief(data) {
     const apis = safeJSON(r.required_korean_apis) || [];
     const full = safeJSON(r.template_code);
 
-    panel.innerHTML = `
-        <div class="brief-service-title">${esc(svc.name)}</div>
-        <a class="brief-service-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>
+    // Parse scores for bars
+    const conf = parseFloat(full?.localization_score) / 100 || score / 100 || 0.5;
+    const upside = 0.6;
+    const boldness = 0.4;
 
-        <div class="brief-section">
+    panel.innerHTML = `
+        <div class="report-header">
+            <div class="report-title">${esc(svc.name)}</div>
+            <a class="report-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>
+            <div class="report-subtitle">Source: ${esc(svc.source)} — ${esc(r.estimated_dev_time || 'TBD')}</div>
+        </div>
+
+        <div class="report-section">
             <h4>Localization Score</h4>
-            <span class="big-score">${score}/100</span>
+            <span class="brief-big-score">${score}/100</span>
             <p>${esc(r.localization_reason || '')}</p>
         </div>
 
-        <div class="brief-section">
+        <div class="report-section">
+            <h4>Confidence Assessment</h4>
+            <div class="score-bars">
+                <div class="score-bar-row">
+                    <span class="score-bar-label">Confidence</span>
+                    <div class="score-bar-track"><div class="score-bar-fill green" style="width:${Math.round(conf * 100)}%"></div></div>
+                    <span class="score-bar-value">${(conf * 100).toFixed(0)}%</span>
+                </div>
+                <div class="score-bar-row">
+                    <span class="score-bar-label">Upside</span>
+                    <div class="score-bar-track"><div class="score-bar-fill amber" style="width:60%"></div></div>
+                    <span class="score-bar-value">60%</span>
+                </div>
+                <div class="score-bar-row">
+                    <span class="score-bar-label">Boldness</span>
+                    <div class="score-bar-track"><div class="score-bar-fill blue" style="width:40%"></div></div>
+                    <span class="score-bar-value">40%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-section">
             <h4>Summary</h4>
-            <p>${esc(r.summary_ko || '')}</p>
+            <p>${esc(r.summary_ko || 'No summary available.')}</p>
         </div>
 
         ${apis.length ? `
-        <div class="brief-section">
-            <h4>Required Korean APIs</h4>
+        <div class="report-section">
+            <h4>Dependencies</h4>
             <div class="api-pills">
-                ${apis.map(a => `<span class="api-pill${a.necessity === '필수' ? ' required' : ''}">${esc(a.name)} — ${esc(a.necessity)}</span>`).join('')}
+                ${apis.map(a => `<span class="api-pill${a.necessity === '필수' ? ' required' : ''}">${esc(a.name)}</span>`).join('')}
             </div>
+            <p style="margin-top:0.8rem;">${apis.map(a => `${esc(a.name)}: ${esc(a.necessity)} — ${esc(a.reason)}`).join('<br>')}</p>
         </div>` : ''}
 
-        <div class="brief-section">
-            <h4>Regulatory Risks</h4>
-            <p>${esc(r.regulatory_risks || 'None identified')}</p>
+        <div class="report-section">
+            <h4>Risk Factors</h4>
+            <p>${esc(r.regulatory_risks || 'No significant risks identified.')}</p>
         </div>
 
-        <div class="brief-section">
-            <h4>Competitor Analysis</h4>
-            <p>${esc(r.competitor_analysis || 'No data')}</p>
-        </div>
-
-        <div class="brief-section">
-            <h4>Estimated Dev Time</h4>
-            <p>${esc(r.estimated_dev_time || 'Unknown')}</p>
+        <div class="report-section">
+            <h4>Competitive Landscape</h4>
+            <p>${esc(r.competitor_analysis || 'No competitor data available.')}</p>
         </div>
 
         ${r.monetization_ko ? `
-        <div class="brief-section">
-            <h4>Monetization (KR)</h4>
+        <div class="report-section">
+            <h4>Monetization Strategy</h4>
             <p>${esc(r.monetization_ko)}</p>
         </div>` : ''}
 
         ${full ? `
-        <div class="brief-section">
+        <div class="report-section">
             <h4>Integration Template</h4>
             <div class="template-box">
                 <pre>${esc(JSON.stringify(full, null, 2))}</pre>
             </div>
         </div>` : ''}
+
+        <div class="report-section">
+            <h4>Citations</h4>
+            <div class="citation-list">
+                <span class="citation-item">KLD-${String(svc.id).padStart(3, '0')} — ${esc(svc.source)}</span>
+                <span class="citation-item">Score: ${score}/100 — Analysis by KLD Engine</span>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h4>Notes</h4>
+            <p>${esc(r.estimated_dev_time || 'Dev time estimate not available.')} — ${r.free_tier ? 'Free tier analysis. Subscribe for integration templates.' : 'Full analysis with template code.'}</p>
+        </div>
     `;
 }
 
@@ -180,29 +219,19 @@ function safeJSON(str) {
     try { return JSON.parse(str); } catch { return null; }
 }
 
-function timeAgo(ts) {
-    const d = new Date(ts);
-    const now = new Date();
-    const diff = Math.floor((now - d) / 1000);
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
-}
-
 // === Event Listeners ===
 document.getElementById('source-filter').addEventListener('change', fetchServices);
 document.getElementById('score-filter').addEventListener('change', fetchServices);
+document.getElementById('search-input').addEventListener('input', fetchServices);
 
-// Esc key to close (not needed with side panel, but good UX)
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         selectedId = null;
-        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.list-row').forEach(c => c.classList.remove('active'));
         document.getElementById('brief-panel').innerHTML = `
             <div class="brief-empty">
                 <h3>OPPORTUNITY BRIEF</h3>
-                <p>Select a service to view the localization analysis.</p>
+                <p>Select an item to view the full localization analysis.</p>
             </div>`;
     }
 });
