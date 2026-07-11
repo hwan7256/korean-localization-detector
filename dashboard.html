@@ -35,7 +35,7 @@
         .table-scroll { flex:1; overflow-y:auto; overflow-x:hidden; }
         .table-scroll::-webkit-scrollbar { width:4px; }
         .table-scroll::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-        table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:580px; }
+        table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:680px; }
         thead { position:sticky; top:0; z-index:2; background:var(--surface); }
         th { text-align:left; padding:12px 14px; font-size:0.7rem; font-weight:600; color:var(--text3); letter-spacing:0.5px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none; transition:color 0.15s; }
         th:hover { color:var(--text2); }
@@ -66,6 +66,17 @@
         .status.l { background:rgba(255,255,255,0.04); color:var(--text3); }
         .open { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--blue-dim); color:var(--blue); text-decoration:none; font-size:0.75rem; font-weight:700; transition:all 0.15s; }
         .open:hover { background:var(--blue); color:#fff; }
+        .cat { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.65rem; font-weight:600; letter-spacing:0.3px; }
+        .cat.dev { background:rgba(61,132,240,0.12); color:var(--blue); }
+        .cat.ai { background:rgba(155,89,182,0.12); color:#9B59B6; }
+        .cat.data { background:rgba(52,152,219,0.12); color:#3498DB; }
+        .cat.prod { background:rgba(46,204,113,0.12); color:#2ECC71; }
+        .cat.mkt { background:rgba(230,126,34,0.12); color:#E67E22; }
+        .cat.fin { background:rgba(231,76,60,0.12); color:#E74C3C; }
+        .cat.comm { background:rgba(26,188,156,0.12); color:#1ABC9C; }
+        .cat.des { background:rgba(241,196,15,0.12); color:#F1C40F; }
+        .cat.sec { background:rgba(149,165,166,0.12); color:#95A5A6; }
+        .cat.etc { background:rgba(255,255,255,0.05); color:var(--text3); }
         .detail { flex:1; background:var(--surface); overflow-y:auto; padding:32px; }
         .detail::-webkit-scrollbar { width:4px; }
         .detail::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
@@ -107,9 +118,9 @@
     <span class="logo">KLD</span>
     <a href="index.html" class="back">← 랜딩으로</a>
     <div class="header-meta">
-        <div class="meta-item"><div class="meta-val" id="stat-total">43</div><div class="meta-label">수집</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-analyzed">43</div><div class="meta-label">분석</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-queue">1</div><div class="meta-label">대기</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-total">144</div><div class="meta-label">수집</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-analyzed">87</div><div class="meta-label">분석</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-queue">57</div><div class="meta-label">대기</div></div>
     </div>
 </header>
 
@@ -117,8 +128,9 @@
     <select id="source-filter"><option value="">전체 소스</option></select>
     <select id="score-filter"><option value="0">점수 전체</option><option value="50">점수 50+</option><option value="70">점수 70+</option></select>
     <select id="conf-filter"><option value="0">신뢰도 전체</option><option value="0.5">신뢰도 50%+</option><option value="0.7">신뢰도 70%+</option></select>
+    <select id="category-filter"><option value="">전체 카테고리</option></select>
     <input type="text" id="search-input" placeholder="서비스 검색...">
-    <span class="count" id="result-count">43개 결과</span>
+    <span class="count" id="result-count">144개 결과</span>
 </div>
 
 <div class="main">
@@ -129,6 +141,7 @@
                     <tr>
                         <th class="sorted desc" data-sort="score">점수 <span class="arrow">▾</span></th>
                         <th data-sort="name">서비스명 <span class="arrow">▾</span></th>
+                        <th>카테고리</th>
                         <th data-sort="confidence">신뢰도 <span class="arrow">▾</span></th>
                         <th data-sort="upside">성장성 <span class="arrow">▾</span></th>
                         <th>상태</th>
@@ -169,8 +182,9 @@ async function fetchServices() {
     const src = document.getElementById('source-filter').value;
     const minS = document.getElementById('score-filter').value;
     const minC = document.getElementById('conf-filter').value;
+    const cat = document.getElementById('category-filter').value;
     const q = (document.getElementById('search-input').value||'').toLowerCase();
-    let url = `${API}/api/services?limit=100`;
+    let url = `${API}/api/services?limit=200`;
     if (src) url += `&source=${encodeURIComponent(src)}`;
     if (minS>0) url += `&min_score=${minS}`;
     try {
@@ -178,8 +192,13 @@ async function fetchServices() {
         let items = d.services||[];
         if (q) items = items.filter(s => (s.name||'').toLowerCase().includes(q));
         if (minC>0) items = items.filter(s => (s.confidence||0) >= parseFloat(minC));
+        if (cat) items = items.filter(s => (s.category||'기타') === cat);
         allServices = items;
         document.getElementById('result-count').textContent = `${items.length}개 결과`;
+        if (!document.getElementById('category-filter').dataset.loaded) {
+            populateCategories();
+            document.getElementById('category-filter').dataset.loaded = '1';
+        }
         render();
     } catch(e){ document.getElementById('result-count').textContent = '오류'; }
 }
@@ -205,6 +224,7 @@ function render() {
         return `<tr data-id="${s.id}" onclick="select(${s.id})" class="${sel?'selected':''}">
             <td><div class="score-cell"><span class="score-num ${sn}">${sc}</span><div class="bar"><div class="bar-fill ${sn}" style="width:${sc}%"></div></div></div></td>
             <td class="name ${sel||sc>=65?'green':''}">${esc(s.name)}</td>
+            <td>${catBadge(s.category)}</td>
             <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(cf*100)}%</span><div class="bar"><div class="bar-fill b" style="width:${Math.round(cf*100)}%"></div></div></div></td>
             <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(up*100)}%</span><div class="bar"><div class="bar-fill y" style="width:${Math.round(up*100)}%"></div></div></div></td>
             <td>${stt?`<span class="status ${stc}">${stt}</span>`:''}</td>
@@ -258,6 +278,18 @@ function closeDetail() {
 
 function esc(t) { if(!t)return''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
+function catBadge(c) {
+    const map = {'AI/ML':'ai','개발도구':'dev','데이터/분석':'data','생산성':'prod','마케팅':'mkt','금융/결제':'fin','커뮤니케이션':'comm','디자인':'des','보안':'sec'};
+    const cls = map[c||''] || 'etc';
+    return `<span class="cat ${cls}">${esc(c||'기타')}</span>`;
+}
+
+function populateCategories() {
+    const cats = [...new Set(allServices.map(s => s.category||'기타'))].sort();
+    const sel = document.getElementById('category-filter');
+    cats.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+
 document.querySelectorAll('th[data-sort]').forEach(th => {
     th.addEventListener('click', () => {
         const k = th.dataset.sort;
@@ -272,6 +304,7 @@ document.getElementById('source-filter').addEventListener('change', fetchService
 document.getElementById('score-filter').addEventListener('change', fetchServices);
 document.getElementById('conf-filter').addEventListener('change', fetchServices);
 document.getElementById('search-input').addEventListener('input', fetchServices);
+document.getElementById('category-filter').addEventListener('change', fetchServices);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDetail(); });
 
 fetchStats(); fetchSources(); fetchServices();
