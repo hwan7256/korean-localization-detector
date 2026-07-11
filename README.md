@@ -1,4 +1,4 @@
-# 🔍 Korean Localization Detector (KLD)
+#  Korean Localization Detector (KLD)
 
 > 해외에서 검증된 마이크로 SaaS를 발굴하고, 한국 시장 로컬라이징 적합도를 분석해주는 대시보드
 
