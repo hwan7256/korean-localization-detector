@@ -1,4 +1,4 @@
-/* KLD Dashboard — Triage Table */
+/* KLD Dashboard — Master-Detail Triage Table */
 
 const API = '';
 let allServices = [];
@@ -10,8 +10,8 @@ let sortDesc = true;
 async function fetchStats() {
     const r = await fetch(`${API}/api/stats`);
     const d = await r.json();
-    document.getElementById('stat-total').textContent = d.total_services || 0;
-    document.getElementById('stat-high').textContent = d.high_potential_count || 0;
+    document.getElementById('stat-total')?.setAttribute('data-count', d.total_services || 0);
+    document.getElementById('stat-high')?.setAttribute('data-count', d.high_potential_count || 0);
 }
 
 async function fetchSources() {
@@ -56,22 +56,8 @@ function sortAndRender() {
                 va = (a.name || '').toLowerCase();
                 vb = (b.name || '').toLowerCase();
                 return sortDesc ? vb.localeCompare(va) : va.localeCompare(vb);
-            case 'confidence':
-                va = deriveConfidence(a);
-                vb = deriveConfidence(b);
-                break;
-            case 'upside':
-                va = deriveUpside(a);
-                vb = deriveUpside(b);
-                break;
-            case 'boldness':
-                va = deriveBoldness(a);
-                vb = deriveBoldness(b);
-                break;
-            case 'total':
-                va = deriveTotal(a);
-                vb = deriveTotal(b);
-                break;
+            case 'confidence': va = deriveConfidence(a); vb = deriveConfidence(b); break;
+            case 'upside': va = deriveUpside(a); vb = deriveUpside(b); break;
             case 'score':
             default:
                 va = a.localization_score || 0;
@@ -98,56 +84,33 @@ function renderRow(s) {
     const score = s.localization_score || 0;
     const confidence = deriveConfidence(s);
     const upside = deriveUpside(s);
-    const boldness = deriveBoldness(s);
-    const total = deriveTotal(s);
+
+    let scoreClass = 'cell-score';
+    if (score < 40) scoreClass = 'cell-score-low';
+    else if (score < 70) scoreClass = 'cell-score-mid';
+
+    let statusHtml = '';
+    if (score >= 70) statusHtml = '<span class="status-badge status-viable">Viable</span>';
+    else if (score >= 40) statusHtml = '<span class="status-badge status-review">Review</span>';
+    else if (score > 0) statusHtml = '<span class="status-badge status-low">Low</span>';
 
     return `
     <tr data-id="${s.id}" onclick="selectService(${s.id})">
-        <td class="col-check"><input type="checkbox" onclick="event.stopPropagation()"></td>
+        <td><span class="${scoreClass}">${score || '--'}</span></td>
         <td><span class="cell-name">${esc(s.name)}</span></td>
-        <td>
-            <div class="cell-progress">
-                <div class="progress-track"><div class="progress-fill" style="width:${score}%"></div></div>
-                <span class="score-frac">${score}/100</span>
-            </div>
-        </td>
-        <td>
-            <div class="cell-progress">
-                <div class="progress-track"><div class="progress-fill" style="width:${Math.round(confidence * 100)}%"></div></div>
-                <span class="progress-val">${confidence.toFixed(2)}</span>
-            </div>
-        </td>
-        <td>
-            <div class="cell-progress">
-                <div class="progress-track"><div class="progress-fill" style="width:${Math.round(upside * 100)}%"></div></div>
-                <span class="progress-val">${upside.toFixed(2)}</span>
-            </div>
-        </td>
-        <td>
-            <div class="cell-progress">
-                <div class="progress-track"><div class="progress-fill" style="width:${Math.round(boldness * 100)}%"></div></div>
-                <span class="progress-val">${boldness.toFixed(2)}</span>
-            </div>
-        </td>
-        <td>
-            <div class="cell-progress">
-                <div class="progress-track"><div class="progress-fill" style="width:${Math.round(total * 100)}%"></div></div>
-                <span class="progress-val">${total.toFixed(2)}</span>
-            </div>
-        </td>
-        <td class="col-status"><span class="status-ok">✓</span></td>
+        <td><span class="cell-metric">${confidence.toFixed(2)}</span></td>
+        <td><span class="cell-metric">${upside.toFixed(2)}</span></td>
+        <td class="cell-status">${statusHtml}</td>
     </tr>`;
 }
 
 // === Derived Metrics ===
 function deriveConfidence(s) {
-    // Score-based confidence — higher score = more confident
     const score = s.localization_score || 0;
     return clamp(score / 100, 0.1, 0.99);
 }
 
 function deriveUpside(s) {
-    // Higher for services with higher revenue_estimate
     const rev = parseFloat(s.revenue_estimate) || 0;
     if (rev > 50000) return 0.85;
     if (rev > 20000) return 0.72;
@@ -156,7 +119,6 @@ function deriveUpside(s) {
 }
 
 function deriveBoldness(s) {
-    // Higher boldness for lower score (more risky/contrarian)
     const score = s.localization_score || 0;
     if (score < 30) return 0.75;
     if (score < 50) return 0.55;
@@ -171,7 +133,7 @@ function deriveTotal(s) {
     return clamp((c * 0.4 + u * 0.35 + b * 0.25), 0.05, 0.99);
 }
 
-// === Select Service ===
+// === Select Service → Update Detail Panel ===
 async function selectService(id) {
     selectedId = id;
 
@@ -188,10 +150,7 @@ function renderDetail(data) {
     const panel = document.getElementById('detail-panel');
     const svc = data.service;
     const r = data.report;
-
-    // Use service from allServices for full data (has localization_score etc.)
     const fullSvc = allServices.find(s => s.id === svc.id) || svc;
-    // Score comes from report
     const score = r ? (r.localization_score || 0) : (fullSvc.localization_score || 0);
     const conf = deriveConfidence(fullSvc);
     const upside = deriveUpside(fullSvc);
@@ -200,12 +159,17 @@ function renderDetail(data) {
 
     panel.innerHTML = `
     <div class="detail-content">
-        <div class="detail-header-name">${esc(svc.name)}</div>
+        <div class="detail-header">
+            <div>
+                <div class="detail-title">${esc(svc.name)}</div>
+                ${svc.url ? `<a class="detail-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>` : ''}
+            </div>
+        </div>
 
         <div>
-            <div class="detail-big-score">${score}<span class="denom">/100</span></div>
-            <div class="progress-track" style="margin-top:0.5rem;">
-                <div class="progress-fill" style="width:${score}%"></div>
+            <div class="detail-score-label">Localization Score</div>
+            <div class="detail-score-block">
+                <span class="detail-big-score">${score}<span class="denom">/100</span></span>
             </div>
         </div>
 
@@ -233,18 +197,25 @@ function renderDetail(data) {
         </div>
 
         <div class="detail-section">
-            <h4>Summary</h4>
-            <p>${esc((r && r.summary_ko) || 'No summary available.')}</p>
+            <h4>Verdict</h4>
+            <p>${esc(r ? r.localization_reason || 'Not yet analyzed.' : 'Not yet analyzed.')}</p>
         </div>
 
+        ${(r && r.summary_ko) ? `
         <div class="detail-section">
-            <h4>Risk Factors</h4>
-            <p>${esc((r && r.regulatory_risks) || 'No significant risks identified.')}</p>
-        </div>
+            <h4>Summary</h4>
+            <p>${esc(r.summary_ko)}</p>
+        </div>` : ''}
+
+        ${(r && r.regulatory_risks) ? `
+        <div class="detail-section">
+            <h4>Risks</h4>
+            <p>${esc(r.regulatory_risks)}</p>
+        </div>` : ''}
 
         ${(r && r.competitor_analysis) ? `
         <div class="detail-section">
-            <h4>Competitive Landscape</h4>
+            <h4>Competition</h4>
             <p>${esc(r.competitor_analysis)}</p>
         </div>` : ''}
 
@@ -265,7 +236,9 @@ function renderDetail(data) {
             </div>
         </div>
 
-        <button class="detail-close" onclick="closeDetail()">Close</button>
+        <div class="detail-actions">
+            <button class="detail-close" onclick="closeDetail()">Close</button>
+        </div>
     </div>`;
 }
 
@@ -274,7 +247,7 @@ function closeDetail() {
     document.querySelectorAll('#table-body tr').forEach(r => r.classList.remove('selected'));
     document.getElementById('detail-panel').innerHTML = `
         <div class="detail-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#909195" stroke-width="1" opacity="0.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             <p>Select an item to view analysis</p>
         </div>`;
 }
@@ -304,14 +277,6 @@ function updateSortHeaders() {
     });
 }
 
-// === Select All ===
-document.getElementById('select-all').addEventListener('click', function() {
-    const checked = this.checked;
-    document.querySelectorAll('#table-body input[type="checkbox"]').forEach(cb => {
-        cb.checked = checked;
-    });
-});
-
 // === Filters ===
 document.getElementById('source-filter').addEventListener('change', fetchServices);
 document.getElementById('score-filter').addEventListener('change', fetchServices);
@@ -335,6 +300,5 @@ function clamp(v, min, max) {
 }
 
 // === Init ===
-fetchStats();
 fetchSources();
 fetchServices();
