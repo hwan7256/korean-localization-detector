@@ -2,61 +2,354 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KLD 대시보드</title>
-    <style>:root{--bg:#080808;--surface:#111;--surface2:#161616;--green:#3FBE6F;--green-dim:rgba(63,190,111,0.08);--gold:#D4A83C;--gold-dim:rgba(212,168,60,0.08);--blue:#3D84F0;--blue-dim:rgba(61,132,240,0.1);--text:#e4e4e4;--text2:#aaa;--text3:#666;--border:rgba(255,255,255,0.05);--border2:rgba(255,255,255,0.08);--font:'Inter',-apple-system,'Segoe UI',sans-serif}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;height:100vh;display:flex;flex-direction:column;overflow:hidden}.header{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}.logo{font-size:1.2rem;font-weight:800;color:var(--green);letter-spacing:0.5px;text-decoration:none}.logo:hover{opacity:0.8}.back{font-size:0.78rem;color:var(--text3);text-decoration:none;transition:color 0.2s;margin-right:auto}.back:hover{color:var(--green)}.header-meta{display:flex;gap:28px;align-items:center}.meta-item{text-align:right}.meta-val{font-weight:700;font-size:1rem}.meta-label{font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}.toolbar{display:flex;align-items:center;gap:10px;padding:10px 28px;border-bottom:1px solid var(--border);flex-shrink:0}.toolbar select,.toolbar input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:6px;font-size:0.8rem;font-family:inherit;outline:none;transition:border-color 0.2s}.toolbar select:focus,.toolbar input:focus{border-color:var(--green)}.toolbar input{width:200px}.toolbar .count{margin-left:auto;font-size:0.78rem;color:var(--text3)}.main{display:flex;flex:1;overflow:hidden}.table-wrap{flex:0 0 54%;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}.table-scroll{flex:1;overflow-y:auto;overflow-x:hidden}.table-scroll::-webkit-scrollbar{width:4px}.table-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:680px}thead{position:sticky;top:0;z-index:2;background:var(--surface)}th{text-align:left;padding:12px 14px;font-size:0.7rem;font-weight:600;color:var(--text3);letter-spacing:0.5px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:color 0.15s}th:hover{color:var(--text2)}th.sorted{color:var(--green)!important}th .arrow{font-size:0.55rem;margin-left:4px;display:inline-block;transition:transform 0.2s}th.desc .arrow{transform:rotate(180deg)}td{padding:11px 14px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.82rem}tr{cursor:pointer;transition:background 0.12s}tr:hover{background:rgba(255,255,255,0.02)}tr.selected{background:var(--green-dim)}tr.selected .name{color:var(--green)}.name{font-weight:600;color:var(--gold)}.name.green{color:var(--green)}.score-cell{display:flex;align-items:center;gap:8px}.score-num{font-weight:700;font-size:0.85rem;min-width:36px;text-align:right}.score-num.g{color:var(--green)}.score-num.y{color:var(--gold)}.score-num.d{color:var(--text2)}.bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;min-width:24px}.bar-fill{height:100%;border-radius:2px;transition:width 0.3s}.bar-fill.g{background:var(--green)}.bar-fill.y{background:var(--gold)}.bar-fill.b{background:var(--blue)}.bar-fill.d{background:var(--text3)}.status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:600;letter-spacing:0.5px}.status.v{background:var(--green-dim);color:var(--green)}.status.r{background:var(--gold-dim);color:var(--gold)}.status.l{background:rgba(255,255,255,0.04);color:var(--text3)}.open{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--blue-dim);color:var(--blue);text-decoration:none;font-size:0.75rem;font-weight:700;transition:all 0.15s}.open:hover{background:var(--blue);color:#fff}.cat{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid rgba(255,255,255,0.04)}.cat.dev{background:rgba(61,132,240,0.12);color:var(--blue);border-color:rgba(61,132,240,0.15)}.cat.ai{background:rgba(155,89,182,0.12);color:#9B59B6;border-color:rgba(155,89,182,0.15)}.cat.data{background:rgba(52,152,219,0.12);color:#3498DB;border-color:rgba(52,152,219,0.15)}.cat.prod{background:rgba(46,204,113,0.12);color:#2ECC71;border-color:rgba(46,204,113,0.15)}.cat.mkt{background:rgba(230,126,34,0.12);color:#E67E22;border-color:rgba(230,126,34,0.15)}.cat.fin{background:rgba(231,76,60,0.12);color:#E74C3C;border-color:rgba(231,76,60,0.15)}.cat.comm{background:rgba(26,188,156,0.12);color:#1ABC9C;border-color:rgba(26,188,156,0.15)}.cat.des{background:rgba(241,196,15,0.12);color:#F1C40F;border-color:rgba(241,196,15,0.15)}.cat.sec,.cat.security{background:rgba(149,165,166,0.12);color:#bdc3c7;border-color:rgba(149,165,166,0.15)}.cat.etc{background:rgba(255,255,255,0.04);color:var(--text3);border-color:rgba(255,255,255,0.03)}.detail{flex:1;background:var(--surface);overflow-y:auto;padding:32px}.detail::-webkit-scrollbar{width:4px}.detail::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}.detail-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:0.95rem}.detail-content{animation:fade 0.25s ease}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.detail-title{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}.detail-link{display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--blue);text-decoration:none;margin-bottom:20px;padding:4px 10px;background:var(--blue-dim);border-radius:5px;transition:all 0.15s}.detail-link:hover{background:var(--blue);color:#fff}.detail-link .arrow-icon{font-size:0.7rem}.detail-score{display:flex;align-items:center;gap:16px;margin-bottom:28px}.detail-big{font-size:3.5rem;font-weight:800;color:var(--green);letter-spacing:-0.02em}.detail-big sub{font-size:1.2rem;color:var(--text3);font-weight:400}.detail-score-bar{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}.detail-score-fill{height:100%;border-radius:2px;background:var(--green);transition:width 0.5s ease}.metrics{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}.metric-row{display:flex;align-items:center;gap:12px}.metric-label{width:72px;font-size:0.78rem;color:var(--text3);flex-shrink:0}.metric-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}.metric-fill{height:100%;border-radius:3px;transition:width 0.4s}.metric-fill.c{background:var(--blue)}.metric-fill.u{background:var(--gold)}.metric-fill.b{background:#9B59B6}.metric-val{width:40px;text-align:right;font-weight:700;font-size:0.85rem}.sec{padding:18px 0;border-top:1px solid var(--border)}.sec h4{font-size:0.7rem;font-weight:600;color:var(--text3);letter-spacing:1px;margin-bottom:10px}.sec p{font-size:0.9rem;color:var(--text);line-height:1.75}.sec ul{list-style:none;padding:0}.sec ul li{padding:6px 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid var(--border);line-height:1.6}.sec ul li:last-child{border-bottom:none}.close-btn{margin-top:20px;padding:8px 20px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:0.82rem;cursor:pointer;transition:all 0.15s}.close-btn:hover{border-color:var(--text3);color:var(--text)}@media(max-width:900px){.main{flex-direction:column}.table-wrap{flex:0 0 50%;border-right:none;border-bottom:1px solid var(--border)}.detail{flex:1}}</style>
+    <style>
+:root{--bg:#080808;--surface:#111;--surface2:#161616;--green:#3FBE6F;--green-dim:rgba(63,190,111,0.08);--gold:#D4A83C;--gold-dim:rgba(212,168,60,0.08);--blue:#3D84F0;--blue-dim:rgba(61,132,240,0.1);--text:#e4e4e4;--text2:#aaa;--text3:#666;--border:rgba(255,255,255,0.05);--border2:rgba(255,255,255,0.08);--font:'Inter',-apple-system,'Segoe UI',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5}
+.header{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-size:1.2rem;font-weight:800;color:var(--green);letter-spacing:0.5px;text-decoration:none}
+.logo:hover{opacity:0.8}
+.back{font-size:0.78rem;color:var(--text3);text-decoration:none;transition:color 0.2s;margin-right:auto}
+.back:hover{color:var(--green)}
+.header-meta{display:flex;gap:28px;align-items:center}
+.meta-item{text-align:right}
+.meta-val{font-weight:700;font-size:1rem}
+.meta-label{font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
+.toolbar{display:flex;align-items:center;gap:10px;padding:10px 28px;border-bottom:1px solid var(--border);flex-shrink:0}
+.toolbar select,.toolbar input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:6px;font-size:0.8rem;font-family:inherit;outline:none;transition:border-color 0.2s}
+.toolbar select:focus,.toolbar input:focus{border-color:var(--green)}
+.toolbar input{width:200px}
+.toolbar .count{margin-left:auto;font-size:0.78rem;color:var(--text3)}
+.main{display:flex;flex:1;height:calc(100vh - 120px);overflow:hidden}
+.table-wrap{flex:0 0 54%;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}
+.table-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.table-scroll::-webkit-scrollbar{width:4px}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:680px}
+thead{position:sticky;top:0;z-index:2;background:var(--surface)}
+th{text-align:left;padding:12px 14px;font-size:0.7rem;font-weight:600;color:var(--text3);letter-spacing:0.5px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:color 0.15s;white-space:nowrap}
+th:hover{color:var(--text2)}
+th.sorted{color:var(--green)!important}
+th .arrow{font-size:0.55rem;margin-left:4px;display:inline-block;transition:transform 0.2s}
+th.desc .arrow{transform:rotate(180deg)}
+th .hint{font-size:0.5rem;color:var(--text3);font-weight:400;margin-left:4px;opacity:0.6}
+td{padding:11px 14px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.82rem}
+tr{cursor:pointer;transition:background 0.12s}
+tr:hover{background:rgba(255,255,255,0.02)}
+tr.selected{background:var(--green-dim)}
+tr.selected .name{color:var(--green)}
+.name{font-weight:600;color:var(--gold)}
+.name.green{color:var(--green)}
+.score-cell{display:flex;align-items:center;gap:8px}
+.score-num{font-weight:700;font-size:0.85rem;min-width:36px;text-align:right}
+.score-num.g{color:var(--green)}.score-num.y{color:var(--gold)}.score-num.d{color:var(--text2)}
+.bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;min-width:24px}
+.bar-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.bar-fill.g{background:var(--green)}.bar-fill.y{background:var(--gold)}.bar-fill.b{background:var(--blue)}.bar-fill.d{background:var(--text3)}
+.status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:600;letter-spacing:0.5px}
+.status.v{background:var(--green-dim);color:var(--green)}
+.status.r{background:var(--gold-dim);color:var(--gold)}
+.status.l{background:rgba(255,255,255,0.04);color:var(--text3)}
+.open{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--blue-dim);color:var(--blue);text-decoration:none;font-size:0.75rem;font-weight:700;transition:all 0.15s}
+.open:hover{background:var(--blue);color:#fff}
+.cat{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid rgba(255,255,255,0.04)}
+.cat.dev{background:rgba(61,132,240,0.12);color:var(--blue);border-color:rgba(61,132,240,0.15)}
+.cat.ai{background:rgba(155,89,182,0.12);color:#9B59B6;border-color:rgba(155,89,182,0.15)}
+.cat.data{background:rgba(52,152,219,0.12);color:#3498DB;border-color:rgba(52,152,219,0.15)}
+.cat.prod{background:rgba(46,204,113,0.12);color:#2ECC71;border-color:rgba(46,204,113,0.15)}
+.cat.mkt{background:rgba(230,126,34,0.12);color:#E67E22;border-color:rgba(230,126,34,0.15)}
+.cat.fin{background:rgba(231,76,60,0.12);color:#E74C3C;border-color:rgba(231,76,60,0.15)}
+.cat.comm{background:rgba(26,188,156,0.12);color:#1ABC9C;border-color:rgba(26,188,156,0.15)}
+.cat.des{background:rgba(241,196,15,0.12);color:#F1C40F;border-color:rgba(241,196,15,0.15)}
+.cat.sec,.cat.security{background:rgba(149,165,166,0.12);color:#bdc3c7;border-color:rgba(149,165,166,0.15)}
+.cat.etc{background:rgba(255,255,255,0.04);color:var(--text3);border-color:rgba(255,255,255,0.03)}
+.detail{flex:1;background:var(--surface);overflow-y:auto;padding:32px}
+.detail::-webkit-scrollbar{width:4px}
+.detail::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.detail-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:0.95rem}
+.detail-content{animation:fade 0.25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.detail-title{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+.detail-link{display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--blue);text-decoration:none;margin-bottom:20px;padding:4px 10px;background:var(--blue-dim);border-radius:5px;transition:all 0.15s}
+.detail-link:hover{background:var(--blue);color:#fff}
+.detail-link .arrow-icon{font-size:0.7rem}
+.detail-score{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.detail-big{font-size:3.5rem;font-weight:800;color:var(--green);letter-spacing:-0.02em}
+.detail-big sub{font-size:1.2rem;color:var(--text3);font-weight:400}
+.detail-score-bar{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+.detail-score-fill{height:100%;border-radius:2px;background:var(--green);transition:width 0.5s ease}
+.metrics{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.metric-row{display:flex;align-items:center;gap:12px}
+.metric-label{width:72px;font-size:0.78rem;color:var(--text3);flex-shrink:0}
+.metric-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.metric-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.metric-fill.c{background:var(--blue)}.metric-fill.u{background:var(--gold)}.metric-fill.b{background:#9B59B6}
+.metric-val{width:40px;text-align:right;font-weight:700;font-size:0.85rem}
+.sec{padding:18px 0;border-top:1px solid var(--border)}
+.sec h4{font-size:0.7rem;font-weight:600;color:var(--text3);letter-spacing:1px;margin-bottom:10px}
+.sec p{font-size:0.9rem;color:var(--text);line-height:1.75}
+.sec ul{list-style:none;padding:0}
+.sec ul li{padding:6px 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid var(--border);line-height:1.6}
+.sec ul li:last-child{border-bottom:none}
+.close-btn{margin-top:20px;padding:8px 20px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:0.82rem;cursor:pointer;transition:all 0.15s}
+.close-btn:hover{border-color:var(--text3);color:var(--text)}
+
+/* ====== MOBILE ====== */
+@media(max-width:768px){
+    body{overflow-x:hidden}
+    .header{padding:10px 14px;gap:12px}
+    .back{display:none}
+    .header-meta{gap:14px}
+    .meta-val{font-size:0.9rem}
+    .meta-item{text-align:center}
+    /* 모바일에서는 meta-label 대신 의미있는 한글 레이블 */
+    .meta-label{font-size:0.6rem;letter-spacing:0.5px;text-transform:none}
+    .toolbar{padding:8px 10px;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:wrap}
+    .toolbar select{font-size:0.72rem;padding:6px 8px}
+    .toolbar input{width:120px;font-size:0.72rem;padding:6px 8px}
+    .toolbar .count{font-size:0.7rem}
+    .main{flex-direction:column;height:auto;min-height:calc(100vh - 120px)}
+    .table-wrap{flex:1;border-right:none;border-bottom:1px solid var(--border)}
+    .detail{display:none}
+
+    /* 카드 리스트 */
+    #mobile-list{display:flex;flex-direction:column;gap:1px;background:var(--border)}
+    .card{background:var(--surface);padding:14px 14px;cursor:pointer;transition:background 0.12s;display:flex;flex-direction:column;gap:8px;-webkit-tap-highlight-color:transparent}
+    .card:active{background:var(--green-dim)}
+    .card-top{display:flex;align-items:center;gap:10px}
+    .card-score{font-size:1.5rem;font-weight:800;min-width:48px;letter-spacing:-0.02em}
+    .card-score.g{color:var(--green)}.card-score.y{color:var(--gold)}.card-score.d{color:var(--text2)}
+    .card-name{font-weight:600;font-size:0.9rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .card-meta{display:flex;align-items:center;gap:12px;font-size:0.72rem;color:var(--text3)}
+    .card-meta b{color:var(--text);font-weight:600}
+    .card-bottom{display:flex;align-items:center;gap:8px}
+
+    /* 바텀시트 */
+    .sheet-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:100;display:none;-webkit-tap-highlight-color:transparent}
+    .sheet-drawer{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:75vh;background:var(--surface);z-index:101;border-radius:16px 16px 0 0;overflow-y:auto;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);padding:20px 18px 32px;min-height:200px}
+    .sheet-drawer.open{transform:translateY(0)}
+    .sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+    .sheet-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .sheet-score{font-size:2rem;font-weight:800;color:var(--green);letter-spacing:-0.02em}
+    .sheet-name{font-size:1.1rem;font-weight:700;flex:1}
+    .sheet-link{display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--blue);text-decoration:none;padding:5px 10px;background:var(--blue-dim);border-radius:5px;white-space:nowrap}
+    .sheet-link:active{background:var(--blue);color:#fff}
+    .sheet-metrics{display:flex;gap:12px;margin-bottom:18px}
+    .sheet-metric{flex:1;text-align:center;padding:10px 6px;background:var(--surface2);border-radius:8px}
+    .sheet-metric .num{font-size:1.2rem;font-weight:700}
+    .sheet-metric .num.c{color:var(--blue)}.sheet-metric .num.u{color:var(--gold)}.sheet-metric .num.b{color:#9B59B6}
+    .sheet-metric .lbl{font-size:0.6rem;color:var(--text3);margin-top:3px;letter-spacing:0.5px}
+    .sheet-close{display:block;width:100%;padding:12px;margin-top:16px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:8px;font-size:0.9rem;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+    .sheet-close:active{border-color:var(--green);color:var(--text)}
+}
+
+/* 데스크톱에선 모바일 요소 숨김 */
+@media(min-width:769px){
+    #mobile-list{display:none}
+    .sheet-overlay,.sheet-drawer{display:none!important}
+}
+    </style>
 </head>
 <body>
 <header class="header">
     <span class="logo">KLD</span>
     <a href="index.html" class="back">← 랜딩으로</a>
     <div class="header-meta">
-        <div class="meta-item"><div class="meta-val" id="stat-total">144</div><div class="meta-label">수집</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-analyzed">143</div><div class="meta-label">분석</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-queue">1</div><div class="meta-label">대기</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-total">-</div><div class="meta-label">총 수집</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-analyzed">-</div><div class="meta-label">분석 완료</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-queue">-</div><div class="meta-label">분석 대기</div></div>
     </div>
 </header>
 <div class="toolbar">
     <select id="source-filter"><option value="">전체 소스</option></select>
-    <select id="score-filter"><option value="0">점수 전체</option><option value="50">점수 50+</option><option value="70">점수 70+</option></select>
-    <select id="conf-filter"><option value="0">신뢰도 전체</option><option value="0.5">신뢰도 50%+</option><option value="0.7">신뢰도 70%+</option></select>
+    <select id="score-filter"><option value="0">점수 전체</option><option value="50">50+</option><option value="70">70+</option></select>
+    <select id="conf-filter"><option value="0">신뢰도 전체</option><option value="0.5">50%+</option><option value="0.7">70%+</option></select>
     <select id="category-filter"><option value="">전체 카테고리</option></select>
     <input type="text" id="search-input" placeholder="서비스 검색...">
-    <span class="count" id="result-count">144개 결과</span>
+    <span class="count" id="result-count">-</span>
 </div>
 <div class="main">
-    <div class="table-wrap"><div class="table-scroll"><table><thead><tr>
-        <th class="sorted desc" data-sort="score">점수 <span class="arrow">▾</span></th>
-        <th data-sort="name">서비스명 <span class="arrow">▾</span></th>
-        <th>카테고리</th>
-        <th data-sort="confidence">신뢰도 <span class="arrow">▾</span></th>
-        <th data-sort="upside">성장성 <span class="arrow">▾</span></th>
-        <th>상태</th>
-        <th style="width:44px"></th>
-    </tr></thead><tbody id="table-body"></tbody></table></div></div>
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table><thead><tr>
+                <th class="sorted desc" data-sort="score">점수 <span class="hint">현지화 기회</span> <span class="arrow">▾</span></th>
+                <th data-sort="name">서비스명 <span class="arrow">▾</span></th>
+                <th>카테고리</th>
+                <th data-sort="confidence">신뢰도 <span class="hint">분석 정확도</span> <span class="arrow">▾</span></th>
+                <th data-sort="upside">성장성 <span class="hint">시장 확장</span> <span class="arrow">▾</span></th>
+                <th>상태</th>
+                <th style="width:44px"></th>
+            </tr></thead><tbody id="table-body"></tbody></table>
+        </div>
+        <!-- 모바일 카드 리스트 -->
+        <div id="mobile-list"></div>
+    </div>
     <div class="detail" id="detail-panel"><div class="detail-empty">왼쪽에서 분석할 서비스를 선택하세요</div></div>
 </div>
+
+<!-- 바텀시트 (모바일 전용) -->
+<div class="sheet-overlay" id="sheet-overlay"></div>
+<div class="sheet-drawer" id="sheet-drawer"><div class="sheet-handle"></div><div id="sheet-content"></div></div>
+
 <script>
 const API='https://api.kld.lat';
 let allServices=[],selectedId=null,currentSort='score',sortDesc=true;
+
+fetchStats();fetchSources();fetchServices();
+
 async function fetchStats(){try{const d=await(await fetch(`${API}/api/stats`)).json();document.getElementById('stat-total').textContent=d.total_services||0;document.getElementById('stat-analyzed').textContent=d.total_analyzed||0;document.getElementById('stat-queue').textContent=Math.max(0,(d.total_services||0)-(d.total_analyzed||0))}catch(e){}}
+
 async function fetchSources(){try{const d=await(await fetch(`${API}/api/sources`)).json();const sel=document.getElementById('source-filter');d.sources.forEach(s=>{const o=document.createElement('option');o.value=s.source;o.textContent=s.source;sel.appendChild(o)})}catch(e){}}
-async function fetchServices(){const src=document.getElementById('source-filter').value,minS=document.getElementById('score-filter').value,minC=document.getElementById('conf-filter').value,cat=document.getElementById('category-filter').value,q=(document.getElementById('search-input').value||'').toLowerCase();let url=`${API}/api/services?limit=200`;if(src)url+=`&source=${encodeURIComponent(src)}`;if(minS>0)url+=`&min_score=${minS}`;try{const d=await(await fetch(url)).json();let items=d.services||[];if(q)items=items.filter(s=>(s.name||'').toLowerCase().includes(q));if(minC>0)items=items.filter(s=>(s.confidence||0)>=parseFloat(minC));if(cat)items=items.filter(s=>(s.category||'기타')===cat);allServices=items;document.getElementById('result-count').textContent=`${items.length}개 결과`;if(!document.getElementById('category-filter').dataset.loaded){populateCategories();document.getElementById('category-filter').dataset.loaded='1'}render()}catch(e){document.getElementById('result-count').textContent='오류'}}
+
+async function fetchServices(){const src=document.getElementById('source-filter').value,minS=document.getElementById('score-filter').value,minC=document.getElementById('conf-filter').value,cat=document.getElementById('category-filter').value,q=(document.getElementById('search-input').value||'').toLowerCase();let url=`${API}/api/services?limit=200`;if(src)url+=`&source=${encodeURIComponent(src)}`;if(minS>0)url+=`&min_score=${minS}`;try{const d=await(await fetch(url)).json();let items=d.services||[];if(q)items=items.filter(s=>(s.name||'').toLowerCase().includes(q));if(minC>0)items=items.filter(s=>(s.confidence||0)>=parseFloat(minC));if(cat)items=items.filter(s=>(s.category||'기타')===cat);allServices=items;document.getElementById('result-count').textContent=items.length+'개 결과';if(!document.getElementById('category-filter').dataset.loaded){populateCategories();document.getElementById('category-filter').dataset.loaded='1'}render()}catch(e){document.getElementById('result-count').textContent='오류'}}
+
 const G=s=>s.score||s.localization_score||0;
-function render(){const sorted=[...allServices].sort((a,b)=>{let va,vb;if(currentSort==='name'){va=(a.name||'').toLowerCase();vb=(b.name||'').toLowerCase();return sortDesc?vb.localeCompare(va):va.localeCompare(vb)}if(currentSort==='confidence'){va=a.confidence||0;vb=b.confidence||0}else if(currentSort==='upside'){va=a.upside||0;vb=b.upside||0}else{va=G(a);vb=G(b)}return sortDesc?vb-va:va-vb});document.getElementById('table-body').innerHTML=sorted.map(s=>{const sc=G(s),cf=s.confidence||0.5,up=s.upside||0.5,sel=selectedId===s.id,sn=sc>=70?'g':sc>=40?'y':'d';let stc,stt;if(sc>=70){stc='v';stt='유망'}else if(sc>=40){stc='r';stt='검토'}else if(sc>0){stc='l';stt='낮음'}else{stc='';stt=''}return `<tr data-id="${s.id}" onclick="select(${s.id})" class="${sel?'selected':''}"><td><div class="score-cell"><span class="score-num ${sn}">${sc}</span><div class="bar"><div class="bar-fill ${sn}" style="width:${sc}%"></div></div></div></td><td class="name ${sel||sc>=65?'green':''}">${esc(s.name)}</td><td>${catBadge(s.category)}</td><td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(cf*100)}%</span><div class="bar"><div class="bar-fill b" style="width:${Math.round(cf*100)}%"></div></div></div></td><td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(up*100)}%</span><div class="bar"><div class="bar-fill y" style="width:${Math.round(up*100)}%"></div></div></div></td><td>${stt?`<span class="status ${stc}">${stt}</span>`:''}</td><td>${s.url?`<a class="open" href="${esc(s.url)}" target="_blank" onclick="event.stopPropagation()" title="서비스 열기">↗</a>`:''}</td></tr>`}).join('')}
-async function select(id){selectedId=id;render();const p=document.getElementById('detail-panel');p.innerHTML='<div class="detail-empty">불러오는 중...</div>';try{const d=await(await fetch(`${API}/api/report/${id}`)).json(),svc=d.service||{},r=d.report||{},sc=r.localization_score||0,cf=r.confidence||0.5,up=r.upside||0.5,bo=r.boldness||0.5,secs=[];secs.push(`<div class="detail-title">${esc(svc.name)}</div>`);if(svc.url)secs.push(`<a class="detail-link" href="${esc(svc.url)}" target="_blank"><span class="arrow-icon">↗</span> 서비스 바로가기</a>`);secs.push(`<div class="detail-score"><span class="detail-big">${sc}<sub>/100</sub></span><div class="detail-score-bar"><div class="detail-score-fill" style="width:${sc}%"></div></div></div><div class="metrics"><div class="metric-row"><span class="metric-label">신뢰도</span><div class="metric-track"><div class="metric-fill c" style="width:${Math.round(cf*100)}%"></div></div><span class="metric-val">${Math.round(cf*100)}%</span></div><div class="metric-row"><span class="metric-label">성장성</span><div class="metric-track"><div class="metric-fill u" style="width:${Math.round(up*100)}%"></div></div><span class="metric-val">${Math.round(up*100)}%</span></div><div class="metric-row"><span class="metric-label">대담성</span><div class="metric-track"><div class="metric-fill b" style="width:${Math.round(bo*100)}%"></div></div><span class="metric-val">${Math.round(bo*100)}%</span></div></div>`);const add=(t,c)=>{if(c)secs.push(`<div class="sec"><h4>${t}</h4><p>${esc(c)}</p></div>`)};add('요약',r.summary_ko||r.summary);add('현지화 근거',r.localization_reason);add('경쟁 분석',r.competitor_analysis);add('수익화 전략',r.monetization_ko);add('예상 개발 기간',r.estimated_dev_time);add('리스크 요인',r.regulatory_risks||r.risk_factors);if(r.required_korean_apis){let apis=r.required_korean_apis;if(typeof apis==='string')try{apis=JSON.parse(apis)}catch(e){apis=[apis]}if(Array.isArray(apis)&&apis.length)secs.push(`<div class="sec"><h4>필요 국내 API</h4><ul>${apis.map(a=>`<li><strong>${esc(typeof a==='string'?a:a.name||'')}</strong>${typeof a==='object'&&a.reason?` — ${esc(a.reason)}`:''}</li>`).join('')}</ul></div>`)}secs.push(`<button class="close-btn" onclick="closeDetail()">닫기</button>`);p.innerHTML=`<div class="detail-content">${secs.join('')}</div>`}catch(e){p.innerHTML='<div class="detail-empty">불러오기 실패</div>'}}
+
+function render(){
+    const sorted=[...allServices].sort((a,b)=>{
+        let va,vb;
+        if(currentSort==='name'){va=(a.name||'').toLowerCase();vb=(b.name||'').toLowerCase();return sortDesc?vb.localeCompare(va):va.localeCompare(vb)}
+        if(currentSort==='confidence'){va=a.confidence||0;vb=b.confidence||0}
+        else if(currentSort==='upside'){va=a.upside||0;vb=b.upside||0}
+        else{va=G(a);vb=G(b)}
+        return sortDesc?vb-va:va-vb;
+    });
+    // 데스크톱 테이블
+    document.getElementById('table-body').innerHTML=sorted.map(s=>{
+        const sc=G(s),cf=s.confidence||0.5,up=s.upside||0.5,sel=selectedId===s.id,sn=sc>=70?'g':sc>=40?'y':'d';
+        let stc,stt;
+        if(sc>=70){stc='v';stt='유망'}else if(sc>=40){stc='r';stt='검토'}else if(sc>0){stc='l';stt='낮음'}else{stc='';stt=''}
+        return `<tr data-id="${s.id}" onclick="select(${s.id})" class="${sel?'selected':''}">
+            <td><div class="score-cell"><span class="score-num ${sn}">${sc}</span><div class="bar"><div class="bar-fill ${sn}" style="width:${sc}%"></div></div></div></td>
+            <td class="name ${sel||sc>=65?'green':''}">${esc(s.name)}</td>
+            <td>${catBadge(s.category)}</td>
+            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(cf*100)}%</span><div class="bar"><div class="bar-fill b" style="width:${Math.round(cf*100)}%"></div></div></div></td>
+            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(up*100)}%</span><div class="bar"><div class="bar-fill y" style="width:${Math.round(up*100)}%"></div></div></div></td>
+            <td>${stt?`<span class="status ${stc}">${stt}</span>`:''}</td>
+            <td>${s.url?`<a class="open" href="${esc(s.url)}" target="_blank" onclick="event.stopPropagation()" title="서비스 열기">↗</a>`:''}</td>
+        </tr>`;
+    }).join('');
+    // 모바일 카드 리스트
+    document.getElementById('mobile-list').innerHTML=sorted.map(s=>{
+        const sc=G(s),cf=s.confidence||0.5,up=s.upside||0.5,sn=sc>=70?'g':sc>=40?'y':'d';
+        return `<div class="card" onclick="openSheet(${s.id})">
+            <div class="card-top">
+                <span class="card-score ${sn}">${sc}</span>
+                <span class="card-name">${esc(s.name)}</span>
+                ${catBadge(s.category)}
+            </div>
+            <div class="card-meta">
+                <span>현지화 점수 <b>${sc}</b></span>
+                <span>·</span>
+                <span>신뢰도 <b>${Math.round(cf*100)}%</b></span>
+                <span>·</span>
+                <span>성장성 <b>${Math.round(up*100)}%</b></span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// 데스크톱 상세보기
+async function select(id){
+    selectedId=id;render();
+    if(window.innerWidth<=768){return} // 모바일은 시트 사용
+    const p=document.getElementById('detail-panel');
+    p.innerHTML='<div class="detail-empty">불러오는 중...</div>';
+    try{
+        const d=await(await fetch(`${API}/api/report/${id}`)).json(),svc=d.service||{},r=d.report||{};
+        p.innerHTML=buildDetail(svc,r);
+    }catch(e){p.innerHTML='<div class="detail-empty">불러오기 실패</div>'}
+}
+
+// 모바일 바텀시트
+async function openSheet(id){
+    const overlay=document.getElementById('sheet-overlay');
+    const drawer=document.getElementById('sheet-drawer');
+    const content=document.getElementById('sheet-content');
+    overlay.style.display='block';
+    drawer.style.display='block';
+    content.innerHTML='<div style="text-align:center;padding:24px;color:var(--text3)">불러오는 중...</div>';
+    // 강제 리플로우 후 애니메이션
+    drawer.offsetHeight;
+    drawer.classList.add('open');
+    try{
+        const d=await(await fetch(`${API}/api/report/${id}`)).json(),svc=d.service||{},r=d.report||{};
+        content.innerHTML=`
+            <div class="sheet-header">
+                <span class="sheet-score">${r.localization_score||0}</span>
+                <span class="sheet-name">${esc(svc.name)}</span>
+                ${svc.url?`<a class="sheet-link" href="${esc(svc.url)}" target="_blank">↗ 열기</a>`:''}
+            </div>
+            <div class="sheet-metrics">
+                <div class="sheet-metric"><div class="num c">${Math.round((r.confidence||0.5)*100)}%</div><div class="lbl">신뢰도</div></div>
+                <div class="sheet-metric"><div class="num u">${Math.round((r.upside||0.5)*100)}%</div><div class="lbl">성장성</div></div>
+                <div class="sheet-metric"><div class="num b">${Math.round((r.boldness||0.5)*100)}%</div><div class="lbl">대담성</div></div>
+            </div>
+            ${buildSec('요약',r.summary_ko||r.summary)}
+            ${buildSec('현지화 근거',r.localization_reason)}
+            ${buildSec('경쟁 분석',r.competitor_analysis)}
+            ${buildSec('수익화 전략',r.monetization_ko)}
+            ${buildSec('예상 개발 기간',r.estimated_dev_time)}
+            ${buildSec('리스크 요인',r.regulatory_risks||r.risk_factors)}
+            <button class="sheet-close" onclick="closeSheet()">닫기</button>
+        `;
+    }catch(e){content.innerHTML='<div style="text-align:center;padding:24px;color:var(--text2)">불러오기 실패</div>'}
+}
+
+function closeSheet(){
+    const drawer=document.getElementById('sheet-drawer');
+    const overlay=document.getElementById('sheet-overlay');
+    drawer.classList.remove('open');
+    setTimeout(()=>{
+        overlay.style.display='none';
+        drawer.style.display='none';
+    },300);
+}
+
+// 오버레이/핸들 클릭으로 닫기
+document.getElementById('sheet-overlay').addEventListener('click',closeSheet);
+
+function buildDetail(svc,r){
+    const sc=r.localization_score||0,cf=r.confidence||0.5,up=r.upside||0.5,bo=r.boldness||0.5;
+    let s='';
+    s+=`<div class="detail-title">${esc(svc.name)}</div>`;
+    if(svc.url)s+=`<a class="detail-link" href="${esc(svc.url)}" target="_blank"><span class="arrow-icon">↗</span> 서비스 바로가기</a>`;
+    s+=`<div class="detail-score"><span class="detail-big">${sc}<sub>/100</sub></span><div class="detail-score-bar"><div class="detail-score-fill" style="width:${sc}%"></div></div></div>`;
+    s+=`<div class="metrics">
+        <div class="metric-row"><span class="metric-label">신뢰도</span><div class="metric-track"><div class="metric-fill c" style="width:${Math.round(cf*100)}%"></div></div><span class="metric-val">${Math.round(cf*100)}%</span></div>
+        <div class="metric-row"><span class="metric-label">성장성</span><div class="metric-track"><div class="metric-fill u" style="width:${Math.round(up*100)}%"></div></div><span class="metric-val">${Math.round(up*100)}%</span></div>
+        <div class="metric-row"><span class="metric-label">대담성</span><div class="metric-track"><div class="metric-fill b" style="width:${Math.round(bo*100)}%"></div></div><span class="metric-val">${Math.round(bo*100)}%</span></div>
+    </div>`;
+    s+=buildSec('요약',r.summary_ko||r.summary);
+    s+=buildSec('현지화 근거',r.localization_reason);
+    s+=buildSec('경쟁 분석',r.competitor_analysis);
+    s+=buildSec('수익화 전략',r.monetization_ko);
+    s+=buildSec('예상 개발 기간',r.estimated_dev_time);
+    s+=buildSec('리스크 요인',r.regulatory_risks||r.risk_factors);
+    s+=`<button class="close-btn" onclick="closeDetail()">닫기</button>`;
+    return `<div class="detail-content">${s}</div>`;
+}
+
+function buildSec(title,content){
+    if(!content)return'';
+    return `<div class="sec"><h4>${title}</h4><p>${esc(content)}</p></div>`;
+}
+
 function closeDetail(){selectedId=null;render();document.getElementById('detail-panel').innerHTML='<div class="detail-empty">왼쪽에서 분석할 서비스를 선택하세요</div>'}
 function esc(t){if(!t)return'';const d=document.createElement('div');d.textContent=t;return d.innerHTML}
-function catBadge(c){const m={'AI/ML':'ai','개발도구':'dev','데이터/분석':'data','생산성':'prod','마케팅':'mkt','금융/결제':'fin','커뮤니케이션':'comm','디자인':'des','보안':'security'};const cls=m[c||'']||'etc';return `<span class="cat ${cls}">${esc(c||'기타')}</span>`}
+function catBadge(c){const m={'AI/ML':'ai','개발도구':'dev','데이터/분석':'data','생산성':'prod','마케팅':'mkt','금융/결제':'fin','커뮤니케이션':'comm','디자인':'des','보안':'security'};const cls=m[c||'']||'etc';return`<span class="cat ${cls}">${esc(c||'기타')}</span>`}
 function populateCategories(){const cats=[...new Set(allServices.map(s=>s.category||'기타'))].sort(),sel=document.getElementById('category-filter');cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)})}
+
 document.querySelectorAll('th[data-sort]').forEach(th=>{th.addEventListener('click',()=>{const k=th.dataset.sort;if(currentSort===k)sortDesc=!sortDesc;else{currentSort=k;sortDesc=true}document.querySelectorAll('th').forEach(h=>h.classList.remove('sorted','desc'));th.classList.add('sorted');if(sortDesc)th.classList.add('desc');render()})});
+
 document.getElementById('source-filter').addEventListener('change',fetchServices);
 document.getElementById('score-filter').addEventListener('change',fetchServices);
 document.getElementById('conf-filter').addEventListener('change',fetchServices);
 document.getElementById('search-input').addEventListener('input',fetchServices);
 document.getElementById('category-filter').addEventListener('change',fetchServices);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
-fetchStats();fetchSources();fetchServices();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();closeDetail()}});
 </script>
 </body>
 </html>
