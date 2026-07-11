@@ -124,7 +124,7 @@ body {
 }
 .table-scroll {
     flex: 1;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 /* === Triage Table === */
@@ -139,12 +139,12 @@ body {
 }
 .triage-table th {
     background: var(--bg-surface);
-    padding: 0.8rem 1rem;
-    font-size: 1.0rem;
+    padding: 0.6rem 0.7rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-align: left;
     white-space: nowrap;
     user-select: none;
@@ -158,9 +158,9 @@ body {
 .triage-table th.active-sort.desc .sort-arrow { display: inline-block; transform: rotate(180deg); }
 
 .triage-table td {
-    padding: 0.8rem 1rem;
+    padding: 0.6rem 0.7rem;
     border-bottom: 1px solid var(--border-subtle);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     vertical-align: middle;
     white-space: nowrap;
     overflow: hidden;
@@ -176,8 +176,8 @@ body {
 .cell-title.normal { color: var(--accent-gold); }
 
 /* Cell: Score with inline progress bar */
-.cell-score-block { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-.cell-score-val { font-weight: 700; font-size: 1.2rem; color: var(--accent-green); min-width: 4.5rem; }
+.cell-score-block { display: flex; align-items: center; gap: 5px; min-width: 100px; }
+.cell-score-val { font-weight: 700; font-size: 1.1rem; color: var(--accent-green); min-width: 4rem; }
 .cell-score-val.gold { color: var(--accent-gold); }
 .cell-score-track {
     flex: 1; min-width: 40px; height: 5px;
