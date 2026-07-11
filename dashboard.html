@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLD Dashboard</title>
+    <title>KLD 대시보드</title>
     <style>
         :root {
             --bg: #080808; --surface: #111; --surface2: #161616;
             --green: #3FBE6F; --green-dim: rgba(63,190,111,0.08);
             --gold: #D4A83C; --gold-dim: rgba(212,168,60,0.08);
             --blue: #3D84F0; --blue-dim: rgba(61,132,240,0.1);
-            --text: #e4e4e4; --text2: #999; --text3: #666;
+            --text: #e4e4e4; --text2: #aaa; --text3: #666;
             --border: rgba(255,255,255,0.05); --border2: rgba(255,255,255,0.08);
             --radius: 10px; --font: 'Inter',-apple-system,'Segoe UI',sans-serif;
         }
@@ -37,7 +37,7 @@
         .table-scroll::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
         table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:580px; }
         thead { position:sticky; top:0; z-index:2; background:var(--surface); }
-        th { text-align:left; padding:12px 14px; font-size:0.68rem; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:1.2px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none; transition:color 0.15s; }
+        th { text-align:left; padding:12px 14px; font-size:0.7rem; font-weight:600; color:var(--text3); letter-spacing:0.5px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none; transition:color 0.15s; }
         th:hover { color:var(--text2); }
         th.sorted { color:var(--green) !important; }
         th .arrow { font-size:0.55rem; margin-left:4px; display:inline-block; transition:transform 0.2s; }
@@ -59,7 +59,7 @@
         .bar-fill.g { background:var(--green); }
         .bar-fill.y { background:var(--gold); }
         .bar-fill.b { background:var(--blue); }
-        .status { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+        .status { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.65rem; font-weight:600; letter-spacing:0.5px; }
         .status.v { background:var(--green-dim); color:var(--green); }
         .status.r { background:var(--gold-dim); color:var(--gold); }
         .status.l { background:rgba(255,255,255,0.04); color:var(--text3); }
@@ -71,9 +71,10 @@
         .detail-empty { display:flex; align-items:center; justify-content:center; height:100%; color:var(--text3); font-size:0.95rem; }
         .detail-content { animation:fade 0.25s ease; }
         @keyframes fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
-        .detail-title { font-size:1.4rem; font-weight:700; margin-bottom:6px; line-height:1.3; }
-        .detail-url { display:inline-block; font-size:0.82rem; color:var(--blue); text-decoration:none; margin-bottom:20px; word-break:break-all; }
-        .detail-url:hover { text-decoration:underline; }
+        .detail-title { font-size:1.4rem; font-weight:700; margin-bottom:4px; line-height:1.3; }
+        .detail-link { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; color:var(--blue); text-decoration:none; margin-bottom:20px; padding:4px 10px; background:var(--blue-dim); border-radius:5px; transition:all 0.15s; }
+        .detail-link:hover { background:var(--blue); color:#fff; }
+        .detail-link .arrow-icon { font-size:0.7rem; }
         .detail-score { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
         .detail-big { font-size:3.5rem; font-weight:800; color:var(--green); letter-spacing:-0.02em; }
         .detail-big sub { font-size:1.2rem; color:var(--text3); font-weight:400; }
@@ -81,7 +82,7 @@
         .detail-score-fill { height:100%; border-radius:2px; background:var(--green); transition:width 0.5s ease; }
         .metrics { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
         .metric-row { display:flex; align-items:center; gap:12px; }
-        .metric-label { width:90px; font-size:0.78rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; }
+        .metric-label { width:72px; font-size:0.78rem; color:var(--text3); flex-shrink:0; }
         .metric-track { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
         .metric-fill { height:100%; border-radius:3px; transition:width 0.4s; }
         .metric-fill.c { background:var(--blue); }
@@ -89,10 +90,10 @@
         .metric-fill.b { background:#9B59B6; }
         .metric-val { width:40px; text-align:right; font-weight:700; font-size:0.85rem; }
         .sec { padding:18px 0; border-top:1px solid var(--border); }
-        .sec h4 { font-size:0.7rem; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; }
-        .sec p { font-size:0.88rem; color:var(--text2); line-height:1.7; }
+        .sec h4 { font-size:0.7rem; font-weight:600; color:var(--text3); letter-spacing:1px; margin-bottom:10px; }
+        .sec p { font-size:0.9rem; color:var(--text); line-height:1.75; }
         .sec ul { list-style:none; padding:0; }
-        .sec ul li { padding:6px 0; font-size:0.85rem; color:var(--text2); border-bottom:1px solid var(--border); line-height:1.5; }
+        .sec ul li { padding:6px 0; font-size:0.85rem; color:var(--text); border-bottom:1px solid var(--border); line-height:1.6; }
         .sec ul li:last-child { border-bottom:none; }
         .close-btn { margin-top:20px; padding:8px 20px; background:var(--surface2); border:1px solid var(--border); color:var(--text2); border-radius:6px; font-size:0.82rem; cursor:pointer; transition:all 0.15s; }
         .close-btn:hover { border-color:var(--text3); color:var(--text); }
@@ -103,20 +104,20 @@
 
 <header class="header">
     <span class="logo">KLD</span>
-    <a href="index.html" class="back">← Back to Landing</a>
+    <a href="index.html" class="back">← 랜딩으로</a>
     <div class="header-meta">
-        <div class="meta-item"><div class="meta-val" id="stat-total">43</div><div class="meta-label">Collected</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-analyzed">43</div><div class="meta-label">Analyzed</div></div>
-        <div class="meta-item"><div class="meta-val" id="stat-queue">1</div><div class="meta-label">Queue</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-total">43</div><div class="meta-label">수집</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-analyzed">43</div><div class="meta-label">분석</div></div>
+        <div class="meta-item"><div class="meta-val" id="stat-queue">1</div><div class="meta-label">대기</div></div>
     </div>
 </header>
 
 <div class="toolbar">
-    <select id="source-filter"><option value="">All Sources</option></select>
-    <select id="score-filter"><option value="0">Score > 0</option><option value="50">Score > 50</option><option value="70">Score > 70</option></select>
-    <select id="conf-filter"><option value="0">Conf ≥ 0</option><option value="0.5">Conf ≥ 0.5</option><option value="0.7">Conf ≥ 0.7</option></select>
-    <input type="text" id="search-input" placeholder="Search services...">
-    <span class="count" id="result-count">43 results</span>
+    <select id="source-filter"><option value="">전체 소스</option></select>
+    <select id="score-filter"><option value="0">점수 전체</option><option value="50">점수 50+</option><option value="70">점수 70+</option></select>
+    <select id="conf-filter"><option value="0">신뢰도 전체</option><option value="0.5">신뢰도 50%+</option><option value="0.7">신뢰도 70%+</option></select>
+    <input type="text" id="search-input" placeholder="서비스 검색...">
+    <span class="count" id="result-count">43개 결과</span>
 </div>
 
 <div class="main">
@@ -125,11 +126,11 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="sorted desc" data-sort="score">Score <span class="arrow">▾</span></th>
-                        <th data-sort="name">Title <span class="arrow">▾</span></th>
-                        <th data-sort="confidence">Conf <span class="arrow">▾</span></th>
-                        <th data-sort="upside">Upside <span class="arrow">▾</span></th>
-                        <th>Status</th>
+                        <th class="sorted desc" data-sort="score">점수 <span class="arrow">▾</span></th>
+                        <th data-sort="name">서비스명 <span class="arrow">▾</span></th>
+                        <th data-sort="confidence">신뢰도 <span class="arrow">▾</span></th>
+                        <th data-sort="upside">성장성 <span class="arrow">▾</span></th>
+                        <th>상태</th>
                         <th style="width:44px"></th>
                     </tr>
                 </thead>
@@ -138,7 +139,7 @@
         </div>
     </div>
     <div class="detail" id="detail-panel">
-        <div class="detail-empty">Select an item to view analysis</div>
+        <div class="detail-empty">왼쪽에서 분석할 서비스를 선택하세요</div>
     </div>
 </div>
 
@@ -177,9 +178,9 @@ async function fetchServices() {
         if (q) items = items.filter(s => (s.name||'').toLowerCase().includes(q));
         if (minC>0) items = items.filter(s => (s.confidence||0) >= parseFloat(minC));
         allServices = items;
-        document.getElementById('result-count').textContent = `${items.length} results`;
+        document.getElementById('result-count').textContent = `${items.length}개 결과`;
         render();
-    } catch(e){ document.getElementById('result-count').textContent = 'Error'; }
+    } catch(e){ document.getElementById('result-count').textContent = '오류'; }
 }
 
 const G = s => s.score||s.localization_score||0;
@@ -199,14 +200,14 @@ function render() {
         const sel = selectedId===s.id;
         const sn = sc>=70?'g':sc>=40?'y':'d';
         let stc,stt;
-        if (sc>=70) { stc='v'; stt='Viable'; } else if (sc>=40) { stc='r'; stt='Review'; } else if (sc>0) { stc='l'; stt='Low'; } else { stc=''; stt=''; }
+        if (sc>=70) { stc='v'; stt='유망'; } else if (sc>=40) { stc='r'; stt='검토'; } else if (sc>0) { stc='l'; stt='낮음'; } else { stc=''; stt=''; }
         return `<tr data-id="${s.id}" onclick="select(${s.id})" class="${sel?'selected':''}">
             <td><div class="score-cell"><span class="score-num ${sn}">${sc}</span><div class="bar"><div class="bar-fill ${sn}" style="width:${sc}%"></div></div></div></td>
             <td class="name ${sel||sc>=65?'green':''}">${esc(s.name)}</td>
-            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(cf*100)}</span><div class="bar"><div class="bar-fill b" style="width:${Math.round(cf*100)}%"></div></div></div></td>
-            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(up*100)}</span><div class="bar"><div class="bar-fill y" style="width:${Math.round(up*100)}%"></div></div></div></td>
+            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(cf*100)}%</span><div class="bar"><div class="bar-fill b" style="width:${Math.round(cf*100)}%"></div></div></div></td>
+            <td><div class="score-cell"><span class="score-num" style="color:var(--text3)">${Math.round(up*100)}%</span><div class="bar"><div class="bar-fill y" style="width:${Math.round(up*100)}%"></div></div></div></td>
             <td>${stt?`<span class="status ${stc}">${stt}</span>`:''}</td>
-            <td>${s.url?`<a class="open" href="${esc(s.url)}" target="_blank" onclick="event.stopPropagation()">↗</a>`:''}</td>
+            <td>${s.url?`<a class="open" href="${esc(s.url)}" target="_blank" onclick="event.stopPropagation()" title="서비스 열기">↗</a>`:''}</td>
         </tr>`;
     }).join('');
 }
@@ -214,38 +215,44 @@ function render() {
 async function select(id) {
     selectedId=id; render();
     const p = document.getElementById('detail-panel');
-    p.innerHTML = '<div class="detail-empty">Loading...</div>';
+    p.innerHTML = '<div class="detail-empty">불러오는 중...</div>';
     try {
         const d = await (await fetch(`${API}/api/report/${id}`)).json();
         const svc = d.service||{}, r = d.report||{};
         const sc = r.localization_score||0, cf=r.confidence||0.5, up=r.upside||0.5, bo=r.boldness||0.5;
         const secs = [];
-        secs.push(`<div class="detail-title">${esc(svc.name)}</div>${svc.url?`<a class="detail-url" href="${esc(svc.url)}" target="_blank">${esc(svc.url)}</a>`:''}<div class="detail-score"><span class="detail-big">${sc}<sub>/100</sub></span><div class="detail-score-bar"><div class="detail-score-fill" style="width:${sc}%"></div></div></div>`);
-        secs.push(`<div class="metrics"><div class="metric-row"><span class="metric-label">Confidence</span><div class="metric-track"><div class="metric-fill c" style="width:${Math.round(cf*100)}%"></div></div><span class="metric-val">${Math.round(cf*100)}</span></div><div class="metric-row"><span class="metric-label">Upside</span><div class="metric-track"><div class="metric-fill u" style="width:${Math.round(up*100)}%"></div></div><span class="metric-val">${Math.round(up*100)}</span></div><div class="metric-row"><span class="metric-label">Boldness</span><div class="metric-track"><div class="metric-fill b" style="width:${Math.round(bo*100)}%"></div></div><span class="metric-val">${Math.round(bo*100)}</span></div></div>`);
+        secs.push(`<div class="detail-title">${esc(svc.name)}</div>`);
+        if (svc.url) secs.push(`<a class="detail-link" href="${esc(svc.url)}" target="_blank"><span class="arrow-icon">↗</span> 서비스 바로가기</a>`);
+        secs.push(`<div class="detail-score"><span class="detail-big">${sc}<sub>/100</sub></span><div class="detail-score-bar"><div class="detail-score-fill" style="width:${sc}%"></div></div></div>`);
+        secs.push(`<div class="metrics">
+            <div class="metric-row"><span class="metric-label">신뢰도</span><div class="metric-track"><div class="metric-fill c" style="width:${Math.round(cf*100)}%"></div></div><span class="metric-val">${Math.round(cf*100)}%</span></div>
+            <div class="metric-row"><span class="metric-label">성장성</span><div class="metric-track"><div class="metric-fill u" style="width:${Math.round(up*100)}%"></div></div><span class="metric-val">${Math.round(up*100)}%</span></div>
+            <div class="metric-row"><span class="metric-label">대담성</span><div class="metric-track"><div class="metric-fill b" style="width:${Math.round(bo*100)}%"></div></div><span class="metric-val">${Math.round(bo*100)}%</span></div>
+        </div>`);
         const add = (t,c) => { if(c) secs.push(`<div class="sec"><h4>${t}</h4><p>${esc(c)}</p></div>`); };
-        add('Summary', r.summary_ko||r.summary);
-        add('Localization Reason', r.localization_reason);
-        add('Competitor Analysis', r.competitor_analysis);
-        add('Monetization Strategy', r.monetization_ko);
-        add('Estimated Dev Time', r.estimated_dev_time);
-        add('Risk Factors', r.regulatory_risks||r.risk_factors);
+        add('요약', r.summary_ko||r.summary);
+        add('현지화 근거', r.localization_reason);
+        add('경쟁 분석', r.competitor_analysis);
+        add('수익화 전략', r.monetization_ko);
+        add('예상 개발 기간', r.estimated_dev_time);
+        add('리스크 요인', r.regulatory_risks||r.risk_factors);
         if (r.required_korean_apis) {
             let apis = r.required_korean_apis;
             if (typeof apis==='string') try{apis=JSON.parse(apis);}catch(e){apis=[apis];}
             if (Array.isArray(apis)&&apis.length) {
-                secs.push(`<div class="sec"><h4>Required Korean APIs</h4><ul>${apis.map(a => `<li><strong>${esc(typeof a==='string'?a:a.name||'')}</strong>${typeof a==='object'&&a.reason?` — ${esc(a.reason)}`:''}</li>`).join('')}</ul></div>`);
+                secs.push(`<div class="sec"><h4>필요 국내 API</h4><ul>${apis.map(a => `<li><strong>${esc(typeof a==='string'?a:a.name||'')}</strong>${typeof a==='object'&&a.reason?` — ${esc(a.reason)}`:''}</li>`).join('')}</ul></div>`);
             }
         }
-        secs.push(`<button class="close-btn" onclick="closeDetail()">Close</button>`);
+        secs.push(`<button class="close-btn" onclick="closeDetail()">닫기</button>`);
         p.innerHTML = `<div class="detail-content">${secs.join('')}</div>`;
     } catch(e) {
-        p.innerHTML = '<div class="detail-empty">Failed to load</div>';
+        p.innerHTML = '<div class="detail-empty">불러오기 실패</div>';
     }
 }
 
 function closeDetail() {
     selectedId=null; render();
-    document.getElementById('detail-panel').innerHTML = '<div class="detail-empty">Select an item to view analysis</div>';
+    document.getElementById('detail-panel').innerHTML = '<div class="detail-empty">왼쪽에서 분석할 서비스를 선택하세요</div>';
 }
 
 function esc(t) { if(!t)return''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }

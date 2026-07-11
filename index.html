@@ -60,12 +60,12 @@
             font-weight:700; font-size:0.95rem; border:none; border-radius:8px;
             cursor:pointer; text-decoration:none; transition:all 0.25s;
             box-shadow:0 0 40px rgba(63,190,111,0.25);
-            position:relative; overflow:hidden;
+            position:relative; overflow:hidden; display:inline-block;
         }
         .btn-primary::after {
             content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
-            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition:left 0.5s;
+            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition:left 0.6s ease;
         }
         .btn-primary:hover { transform:translateY(-3px); box-shadow:0 0 60px rgba(63,190,111,0.4); }
         .btn-primary:hover::after { left:100%; }
@@ -176,7 +176,7 @@
     <p class="subtitle">해외에서 검증된 비즈니스 모델을 발견하고, 한국 진출 가능성을 정량화합니다</p>
     <div class="features-grid">
         <div class="feature-card reveal"><span class="feature-icon">🔍</span><h3>자동 수집</h3><p>Reddit, Product Hunt, Hacker News 등에서 최근 화제가 된 마이크로 SaaS를 24시간 자동 크롤링합니다.</p></div>
-        <div class="feature-card reveal"><span class="feature-icon">📊</span><h3>Triage Score</h3><p>Score · Confidence · Upside · Boldness 4개 축으로 한국 진출 잠재력을 평가하고 정렬·필터로 빠르게 탐색합니다.</p></div>
+        <div class="feature-card reveal"><span class="feature-icon">📊</span><h3>Triage Score</h3><p>점수 · 신뢰도 · 성장성 · 대담성 4개 축으로 한국 진출 잠재력을 평가하고 정렬·필터로 빠르게 탐색합니다.</p></div>
         <div class="feature-card reveal"><span class="feature-icon">🇰🇷</span><h3>로컬 분석</h3><p>카카오·토스결제 등 국내 API 연동, 규제 리스크, 경쟁 분석, 예상 개발 기간까지 상세 리포트를 제공합니다.</p></div>
     </div>
 </section>
@@ -187,7 +187,7 @@
     <div class="steps-list">
         <div class="step-item reveal"><div class="step-num">1</div><div class="step-content"><h3>해외 소스에서 서비스 수집</h3><p>Product Hunt, Hacker News 등에서 최근 인기 마이크로 SaaS를 자동 수집하고 수익·트래픽 데이터를 함께 가져옵니다.</p></div></div>
         <div class="step-item reveal"><div class="step-num">2</div><div class="step-content"><h3>DeepSeek AI 분석</h3><p>서비스 설명과 시장 데이터를 기반으로 로컬라이제이션 가능성, 필요 API, 규제 장벽, 경쟁 환경을 종합 평가합니다.</p></div></div>
-        <div class="step-item reveal"><div class="step-num">3</div><div class="step-content"><h3>Triage Table 탐색</h3><p>Score, Confidence, Upside로 정렬·필터링하며 가장 유망한 기회를 빠르게 발견할 수 있습니다.</p></div></div>
+        <div class="step-item reveal"><div class="step-num">3</div><div class="step-content"><h3>Triage Table 탐색</h3><p>점수, 신뢰도, 성장성으로 정렬·필터링하며 가장 유망한 기회를 빠르게 발견할 수 있습니다.</p></div></div>
         <div class="step-item reveal"><div class="step-num">4</div><div class="step-content"><h3>실행 가능한 인사이트</h3><p>예상 개발 기간, 필요 API 목록, 수익화 전략을 확인하고 즉시 개발에 착수하세요.</p></div></div>
     </div>
 </section>
