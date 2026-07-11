@@ -103,13 +103,13 @@ function renderRow(s, isFirst) {
 
     return `
     <tr data-id="${s.id}" onclick="selectService(${s.id})" class="${isSelected ? 'selected' : ''}">
+        <td><span class="${titleClass}">${esc(s.name)}</span></td>
         <td>
             <div class="cell-score-block">
                 <span class="cell-score-val ${scoreColorClass}">${score || '--'}/100</span>
                 <div class="cell-score-track"><div class="cell-score-fill ${fillClass}" style="width:${score}%"></div></div>
             </div>
         </td>
-        <td><span class="${titleClass}">${esc(s.name)}</span></td>
         <td>
             <div class="cell-metric-block">
                 <span class="cell-metric-val">${Math.round(conf*100)}%</span>
