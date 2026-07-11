@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLD — Korean Localization Detector</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Top Header -->
+<header class="top-header">
+    <div class="header-brand">
+        <span class="logo">KLD</span>
+        <span class="tagline">Korean Localization Detector</span>
+    </div>
+    <div class="header-search">
+        <input type="text" class="search-input" placeholder="Search..." id="search-input">
+    </div>
+    <div class="header-stats">
+        <div class="stat-item">
+            <span class="stat-val" id="stat-total">43</span>
+            <span class="stat-label">COLLECTED</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-val" id="stat-analyzed">43</span>
+            <span class="stat-label">ANALYZED</span>
+        </div>
+        <div class="stat-badge" id="stat-queue">
+            <span class="badge-circle">1</span>
+            <span class="stat-label">QUEUE</span>
+        </div>
+    </div>
+</header>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <select id="source-filter"><option value="">All sources</option></select>
+    <select id="score-filter">
+        <option value="0" selected>Score &gt; 0</option>
+        <option value="50">Score &gt; 50</option>
+        <option value="70">Score &gt; 70</option>
+    </select>
+    <select id="conf-filter">
+        <option value="0" selected>Confidence &gt;= 0</option>
+        <option value="0.5">Confidence &gt;= 0.5</option>
+        <option value="0.7">Confidence &gt;= 0.7</option>
+    </select>
+    <select id="status-filter">
+        <option value="" selected>Not reviewed</option>
+        <option value="reviewed">Reviewed</option>
+    </select>
+    <span class="result-count" id="result-count">43 results</span>
+</div>
+
+<!-- Main Content: 2-Panel Layout -->
+<div class="content-layout">
+
+    <!-- Left: Table Panel (~55%) -->
+    <section class="table-panel">
+        <div class="table-scroll">
+            <table class="triage-table" id="triage-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="name">Title <span class="sort-arrow">▲</span></th>
+                        <th class="sortable active-sort" data-sort="score">Score <span class="sort-arrow">▲</span></th>
+                        <th class="sortable" data-sort="confidence">Confidence <span class="sort-arrow">▲</span></th>
+                        <th class="sortable" data-sort="upside">Upside <span class="sort-arrow">▲</span></th>
+                        <th>Status</th>
+                        <th style="width:50px"></th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Right: Detail Panel (~45%) -->
+    <aside class="detail-panel" id="detail-panel">
+        <div class="detail-empty">
+            <p>Select an item to view analysis</p>
+        </div>
+    </aside>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
