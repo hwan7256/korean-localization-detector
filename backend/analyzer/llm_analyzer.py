@@ -53,6 +53,54 @@ URL: {url}
 
 국내 API 참고: 카카오 로그인/알림톡/페이, 토스페이먼츠, 포트원, 네이버 로그인/클라우드, PASS 인증, 모두싸인, 알리고, NHN Cloud Notification, 카카오맵"""
 
+SAAS_CHECK_PROMPT = """다음 GitHub 저장소가 실제 SaaS 제품/서비스인지 판단해주세요.
+SaaS란: 사용자가 구독/사용료를 내고 사용하는 클라우드 기반 소프트웨어 서비스.
+다음은 SaaS가 아닙니다: boilerplate, template, starter-kit, awesome-list, 프레임워크, 라이브러리, 학습자료, 개발도구 모음집, 설정 스크립트, 개인 블로그.
+
+서비스명: {name}
+설명: {description}
+
+"yes" 또는 "no" 한 단어로만 응답하세요."""
+
+
+def check_saas(service: dict) -> bool:
+    """값싼 호출로 SaaS 여부 판별 (max_tokens=5)"""
+    api_key = _get_api_key()
+    if not api_key:
+        raise ValueError("DEEPSEEK_API_KEY not set")
+
+    prompt = SAAS_CHECK_PROMPT.format(
+        name=service["name"],
+        description=(service.get("description") or "")[:300]
+    )
+
+    resp = requests.post(
+        API_URL,
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model": "deepseek-chat",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0,
+            "max_tokens": 5
+        },
+        timeout=20
+    )
+    resp.raise_for_status()
+    result = resp.json()["choices"][0]["message"]["content"].strip().lower()
+    return result == "yes"
+
+
+def save_not_saas(service_id: int):
+    """SaaS 아닌 서비스 마킹 (재분석 방지)"""
+    db = get_db()
+    db.execute("""
+        INSERT INTO analysis_reports
+        (service_id, localization_score, is_saas, summary_ko)
+        VALUES (?, 0, 0, 'not a saas product')
+    """, (service_id,))
+    db.commit()
+    db.close()
+
 
 def analyze_service(service: dict) -> dict:
     """단일 서비스 분석"""
@@ -98,10 +146,10 @@ def save_analysis(service_id: int, analysis: dict, free_tier: bool = True):
     db = get_db()
     db.execute("""
         INSERT INTO analysis_reports
-        (service_id, localization_score, summary_ko, localization_reason,
+        (service_id, localization_score, is_saas, summary_ko, localization_reason,
          required_korean_apis, regulatory_risks, competitor_analysis,
          estimated_dev_time, monetization_ko, template_code, free_tier)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         service_id,
         analysis.get("localization_score", 0),
@@ -120,7 +168,7 @@ def save_analysis(service_id: int, analysis: dict, free_tier: bool = True):
 
 
 def analyze_unanalyzed_services(limit: int = 5) -> int:
-    """미분석 서비스 분석 (무료 2개, 나머지는 유료로 마킹)"""
+    """미분석 서비스 분석. SaaS 먼저 체크 후 분석. No면 건너뜀."""
     db = get_db()
     services = db.execute("""
         SELECT s.* FROM discovered_services s
@@ -136,17 +184,29 @@ def analyze_unanalyzed_services(limit: int = 5) -> int:
         return 0
 
     analyzed = 0
+    skipped = 0
     for svc in services:
         try:
-            analysis = analyze_service(dict(svc))
-            free = analyzed < 2  # 처음 2개만 무료
+            svc_dict = dict(svc)
+            # 1. SaaS 여부 먼저 체크 (저렴)
+            is_saas = check_saas(svc_dict)
+            if not is_saas:
+                save_not_saas(svc["id"])
+                skipped += 1
+                print(f"  [{svc['name'][:45]}...] ❌ SaaS 아님 (스킵)")
+                continue
+
+            # 2. 진짜 SaaS만 전체 분석
+            analysis = analyze_service(svc_dict)
+            free = analyzed < 2
             save_analysis(svc["id"], analysis, free_tier=free)
             analyzed += 1
             score = analysis.get("localization_score", "?")
-            print(f"  [{svc['name'][:50]}...] score={score} {'FREE' if free else 'PRO'}")
+            print(f"  [{svc['name'][:45]}...] ✅ score={score} {'FREE' if free else 'PRO'}")
         except Exception as e:
-            print(f"  분석 실패 [{svc['name'][:50]}]: {e}")
+            print(f"  실패 [{svc['name'][:45]}]: {e}")
 
+    print(f"완료: 분석={analyzed}, 스킵={skipped}")
     return analyzed
 
 
