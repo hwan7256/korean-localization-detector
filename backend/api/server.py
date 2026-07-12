@@ -39,6 +39,7 @@ def index():
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
+@app.get("/dashboard.html", response_class=HTMLResponse)
 def dashboard():
     """대시보드 HTML 서빙"""
     fp = os.path.join(STATIC_DIR, "index.html")
