@@ -89,7 +89,8 @@ def list_services(
     where = " AND ".join(conds)
     query = f"""
         SELECT s.*, a.localization_score, a.summary_ko, a.localization_reason,
-               a.free_tier, a.created_at as analyzed_at
+               a.confidence, a.upside, a.boldness, a.competition_level,
+               a.free_tier, a.created_at as analyzed_at, s.is_saas
         FROM discovered_services s
         LEFT JOIN analysis_reports a ON s.id = a.service_id
         WHERE {where}

@@ -39,6 +39,7 @@ URL: {url}
     {{"name": "API명", "necessity": "필수/권장/불필요", "reason": "이유"}}
   ],
   "regulatory_risks": "한국 규제 리스크 분석 (개인정보보호법, 전자상거래법 등)",
+  "competition_level": "\"none\"|\"weak\"|\"strong\" (국내 경쟁 강도 — none: 국내 유사 서비스 없음, weak: 일부 경쟁 있으나 차별화 가능, strong: 국내 경쟁 심함)",
   "competitor_analysis": "국내 유사 서비스 및 경쟁 구도",
   "estimated_dev_time": "1인 개발 기준 예상 개발 기간",
   "monetization_ko": "한국 시장 맞춤 수익화 전략 제안",
@@ -99,9 +100,10 @@ def save_analysis(service_id: int, analysis: dict, free_tier: bool = True):
     db.execute("""
         INSERT INTO analysis_reports
         (service_id, localization_score, summary_ko, localization_reason,
-         required_korean_apis, regulatory_risks, competitor_analysis,
-         estimated_dev_time, monetization_ko, template_code, free_tier)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         required_korean_apis, regulatory_risks, competition_level, competitor_analysis,
+         estimated_dev_time, monetization_ko, template_code, free_tier,
+         confidence, upside, boldness)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         service_id,
         analysis.get("localization_score", 0),
@@ -109,11 +111,15 @@ def save_analysis(service_id: int, analysis: dict, free_tier: bool = True):
         analysis.get("localization_reason", ""),
         json.dumps(analysis.get("required_korean_apis", []), ensure_ascii=False),
         analysis.get("regulatory_risks", ""),
+        analysis.get("competition_level", "weak"),
         analysis.get("competitor_analysis", ""),
         analysis.get("estimated_dev_time", ""),
         analysis.get("monetization_ko", ""),
         json.dumps(analysis, ensure_ascii=False),
-        1 if free_tier else 0
+        1 if free_tier else 0,
+        analysis.get("confidence", 0.5),
+        analysis.get("upside", 0.5),
+        analysis.get("boldness", 0.5)
     ))
     db.commit()
     db.close()
