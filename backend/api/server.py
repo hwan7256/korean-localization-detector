@@ -2,6 +2,7 @@
 import os
 import json
 from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from backend.db import get_db, init_db
@@ -9,6 +10,14 @@ from backend.db import get_db, init_db
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "backend", "static")
 
 app = FastAPI(title="KLD - Korean Localization Detector", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://kld.lat", "https://kld.etfsimulator.blog", "http://kld.etfsimulator.blog"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -57,7 +66,7 @@ def get_stats():
 
 @app.get("/api/services")
 def list_services(
-    limit: int = Query(50, ge=1, le=100),
+    limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     source: str = Query(None),
     min_score: int = Query(0, ge=0, le=100),
