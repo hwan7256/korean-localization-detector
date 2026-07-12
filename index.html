@@ -3,169 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLD — Korean Localization Detector</title>
+    <title>KLD — 해외 SaaS 한국 진출 분석기</title>
+    <meta name="description" content="GitHub, Dev.to, ProductHunt 등 5개 채널에서 마이크로 SaaS를 수집하고 한국 시장 적합도를 AI로 분석합니다.">
     <style>
         :root {
-            --bg: #0a0a0a; --bg-card: #111; --green: #3FBE6F;
-            --gold: #D4A83C; --blue: #3D84F0; --text: #e0e0e0;
-            --text-dim: #777; --border: #1a1a1a;
+            --bg: #080c0a; --surface: #0e1410;
+            --green: #3FBE6F; --green-dim: rgba(63,190,111,0.08);
+            --gold: #D4A83C;
+            --text: #e8ece9; --text2: #88968c; --text3: #5a665e;
+            --border: rgba(255,255,255,0.04); --border2: rgba(255,255,255,0.07);
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; }
         body {
-            background:var(--bg); color:var(--text);
-            font-family:'Inter',-apple-system,'Segoe UI',sans-serif;
-            line-height:1.6; overflow-x:hidden;
+            background:var(--bg); color:var(--text); font-family:var(--font);
+            font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+            overflow-x:hidden;
         }
+        .container { max-width:1100px; margin:0 auto; padding:0 24px; }
+
         #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
 
         .hero {
-            min-height:100vh; display:flex; flex-direction:column;
-            justify-content:center; align-items:center; text-align:center;
-            padding:60px 20px; position:relative; z-index:1;
+            min-height:100dvh; display:flex; align-items:center;
+            padding:0 0 80px; position:relative; z-index:1;
         }
+        .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; padding-top:40px; }
         .hero-glow {
-            position:absolute; width:600px; height:600px;
-            background:radial-gradient(circle, rgba(63,190,111,0.12) 0%, transparent 70%);
-            top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none;
+            position:absolute; width:700px; height:700px;
+            background:radial-gradient(circle at 30% 50%, rgba(63,190,111,0.07) 0%, transparent 60%);
+            top:50%; left:0; transform:translateY(-50%); pointer-events:none;
         }
         .hero-badge {
-            display:inline-block; padding:8px 20px; border:1px solid rgba(63,190,111,0.4);
-            border-radius:30px; color:var(--green); font-size:0.8rem;
-            letter-spacing:2px; margin-bottom:32px;
-            backdrop-filter:blur(10px); background:rgba(63,190,111,0.05);
-            animation:fadeInUp 0.8s ease;
+            display:inline-flex; align-items:center; gap:8px;
+            padding:5px 14px; border-radius:20px;
+            background:var(--green-dim); border:1px solid rgba(63,190,111,0.15);
+            color:var(--green); font-size:0.75rem; font-weight:600;
+            letter-spacing:0.04em; margin-bottom:28px;
         }
+        .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 2s ease infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         .hero h1 {
-            font-size:clamp(2.2rem,6vw,4rem); font-weight:800; line-height:1.15;
-            max-width:800px; margin-bottom:24px;
-            background:linear-gradient(135deg, #fff 0%, var(--green) 45%, var(--gold) 100%);
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-            background-clip:text;
-            animation:fadeInUp 0.8s 0.15s ease both;
+            font-size:clamp(2.4rem,5vw,3.6rem); font-weight:800;
+            line-height:1.08; letter-spacing:-0.03em; margin-bottom:24px;
         }
+        .hero h1 em { font-style:normal; color:var(--green); }
         .hero p {
-            font-size:1.15rem; color:var(--text-dim); max-width:560px;
-            margin-bottom:40px; line-height:1.7;
-            animation:fadeInUp 0.8s 0.3s ease both;
+            font-size:1.05rem; color:var(--text2); max-width:480px;
+            line-height:1.7; margin-bottom:36px;
         }
-        .hero-cta {
-            display:inline-flex; gap:14px; animation:fadeInUp 0.8s 0.45s ease both;
+        .hero-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+        .btn {
+            display:inline-flex; align-items:center; gap:8px;
+            padding:14px 28px; border-radius:8px; font-weight:600;
+            font-size:0.92rem; text-decoration:none; cursor:pointer;
+            transition:all 0.2s ease; border:none;
         }
-        .btn-primary {
-            padding:16px 36px; background:var(--green); color:#0a0a0a;
-            font-weight:700; font-size:0.95rem; border:none; border-radius:8px;
-            cursor:pointer; text-decoration:none; transition:all 0.25s;
-            box-shadow:0 0 40px rgba(63,190,111,0.25);
-            position:relative; overflow:hidden; display:inline-block;
-        }
-        .btn-primary::after {
-            content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
-            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition:left 0.6s ease;
-        }
-        .btn-primary:hover { transform:translateY(-3px); box-shadow:0 0 60px rgba(63,190,111,0.4); }
-        .btn-primary:hover::after { left:100%; }
-        .btn-secondary {
-            padding:16px 36px; background:transparent; color:var(--text);
-            border:1px solid rgba(255,255,255,0.15); border-radius:8px;
-            font-weight:600; text-decoration:none; transition:all 0.25s;
-            backdrop-filter:blur(10px);
-        }
+        .btn:active { transform:scale(0.97); }
+        .btn-primary { background:var(--green); color:#080c0a; }
+        .btn-primary:hover { background:#6ee7a7; transform:translateY(-1px); }
+        .btn-secondary { background:transparent; color:var(--text); border:1px solid var(--border2); }
         .btn-secondary:hover { border-color:var(--green); color:var(--green); }
-
-        @keyframes fadeInUp {
-            from { opacity:0; transform:translateY(30px); }
-            to   { opacity:1; transform:translateY(0); }
+        .hero-visual {
+            position:relative; display:flex; align-items:center; justify-content:center;
         }
+        .hero-card {
+            background:var(--surface); border:1px solid var(--border2); border-radius:14px;
+            padding:28px; width:100%; max-width:380px;
+        }
+        .hero-card .row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+        .hero-card .row:last-child { border-bottom:none; }
+        .hero-card .score { font-weight:800; font-size:1.2rem; color:var(--green); min-width:48px; font-variant-numeric:tabular-nums; }
+        .hero-card .name { font-weight:600; font-size:0.88rem; flex:1; }
+        .hero-card .tag { font-size:0.65rem; padding:3px 8px; border-radius:4px; background:var(--green-dim); color:var(--green); }
 
-        .stats-strip {
-            display:flex; justify-content:center; gap:80px;
-            padding:40px 20px;
+        .stats {
             border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-            background:var(--bg-card); position:relative; z-index:1;
+            background:var(--surface); padding:48px 0; position:relative; z-index:1;
         }
-        .stat-block { text-align:center; }
-        .stat-num { font-size:2.4rem; font-weight:800; color:var(--green); display:block; }
-        .stat-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:2px; margin-top:4px; }
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; text-align:center; }
+        .stat-value { font-size:2.8rem; font-weight:800; color:var(--green); letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+        .stat-label { font-size:0.72rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px; }
 
-        .section {
-            padding:100px 20px; max-width:1000px; margin:0 auto; position:relative; z-index:1;
-        }
-        .section h2 { font-size:2rem; font-weight:700; text-align:center; margin-bottom:16px; }
-        .section .subtitle { text-align:center; color:var(--text-dim); font-size:1rem; margin-bottom:56px; }
+        .section { padding:100px 0; position:relative; z-index:1; }
+        .section-label { font-size:0.72rem; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; }
+        .section h2 { font-size:2.4rem; font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-bottom:16px; }
+        .section .subtitle { color:var(--text2); font-size:1rem; max-width:560px; line-height:1.65; margin-bottom:64px; }
 
-        .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-        .feature-card {
-            background:var(--bg-card); border:1px solid var(--border);
-            border-radius:14px; padding:32px 28px; transition:all 0.3s;
-            position:relative; overflow:hidden;
+        .feature-row { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; margin-bottom:80px; }
+        .feature-row:last-child { margin-bottom:0; }
+        .feature-row.reverse .feature-visual { order:-1; }
+        .feature-num { font-size:0.7rem; font-weight:700; color:var(--green); letter-spacing:0.1em; margin-bottom:8px; }
+        .feature-text h3 { font-size:1.5rem; font-weight:700; margin-bottom:12px; letter-spacing:-0.01em; }
+        .feature-text p { color:var(--text2); line-height:1.7; font-size:0.95rem; }
+        .feature-visual {
+            background:var(--surface); border:1px solid var(--border2);
+            border-radius:14px; padding:24px;
         }
-        .feature-card::before {
-            content:''; position:absolute; top:0; left:0; right:0; height:2px;
-            background:linear-gradient(90deg, transparent, var(--green), transparent);
-            opacity:0; transition:opacity 0.3s;
-        }
-        .feature-card:hover {
-            border-color:rgba(63,190,111,0.3);
-            transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.4);
-        }
-        .feature-card:hover::before { opacity:1; }
-        .feature-icon { font-size:2.5rem; margin-bottom:20px; display:block; }
-        .feature-card h3 { font-size:1.1rem; margin-bottom:10px; font-weight:700; }
-        .feature-card p { font-size:0.9rem; color:var(--text-dim); line-height:1.6; }
+        .mini-table { display:flex; flex-direction:column; gap:8px; }
+        .mini-row { display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:6px; }
+        .mini-row .m-score { font-weight:700; color:var(--green); min-width:40px; font-size:0.85rem; font-variant-numeric:tabular-nums; }
+        .mini-row .m-name { flex:1; font-size:0.82rem; color:var(--text); }
+        .mini-row .m-bar { width:60px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
+        .mini-row .m-fill { height:100%; background:var(--green); border-radius:2px; }
 
-        .steps-list { display:flex; flex-direction:column; gap:16px; }
-        .step-item {
-            display:flex; gap:24px; align-items:flex-start;
-            background:var(--bg-card); border:1px solid var(--border);
-            border-radius:12px; padding:28px; transition:all 0.3s;
+        .steps-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border-radius:14px; overflow:hidden; }
+        .step-card {
+            background:var(--surface); padding:36px; position:relative;
+            transition:background 0.2s;
         }
-        .step-item:hover {
-            border-color:rgba(63,190,111,0.3); transform:translateX(4px);
-        }
-        .step-num {
-            width:48px; height:48px; border-radius:50%;
-            background:linear-gradient(135deg, var(--green), #2ea855);
-            color:#0a0a0a; display:flex; align-items:center; justify-content:center;
-            font-weight:800; font-size:1.2rem; flex-shrink:0;
-        }
-        .step-content h3 { font-size:1.05rem; margin-bottom:6px; }
-        .step-content p { font-size:0.9rem; color:var(--text-dim); line-height:1.5; }
+        .step-card:hover { background:rgba(255,255,255,0.015); }
+        .step-num { font-size:2.5rem; font-weight:800; color:var(--green); opacity:0.25; position:absolute; top:20px; right:28px; }
+        .step-card h3 { font-size:1.05rem; font-weight:700; margin-bottom:8px; }
+        .step-card p { color:var(--text2); font-size:0.9rem; line-height:1.6; }
 
-        .cta-section {
-            text-align:center; padding:80px 20px;
+        .cta {
+            text-align:center; padding:100px 0;
             border-top:1px solid var(--border); position:relative; z-index:1;
         }
-        .cta-section h2 { font-size:2rem; margin-bottom:14px; }
-        .cta-section p { color:var(--text-dim); font-size:1.05rem; margin-bottom:32px; }
+        .cta h2 { font-size:2.2rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:12px; }
+        .cta p { color:var(--text2); font-size:1rem; margin-bottom:32px; }
 
         footer {
-            padding:24px; text-align:center; color:var(--text-dim);
-            font-size:0.75rem; border-top:1px solid var(--border);
+            padding:24px 0; text-align:center; color:var(--text3);
+            font-size:0.72rem; border-top:1px solid var(--border);
             position:relative; z-index:1;
         }
+        footer a { color:var(--text2); text-decoration:none; }
+        footer a:hover { color:var(--green); }
 
-        .reveal {
-            opacity:0; transform:translateY(30px);
-            transition:all 0.7s cubic-bezier(0.16,1,0.3,1);
-        }
+        .reveal { opacity:0; transform:translateY(24px); transition:all 0.6s cubic-bezier(0.16,1,0.3,1); }
         .reveal.visible { opacity:1; transform:translateY(0); }
 
         @media (max-width:768px) {
-            .hero { padding:40px 16px; min-height:auto; }
+            .hero { min-height:auto; }
+            .hero-grid { grid-template-columns:1fr; gap:40px; padding-top:60px; }
+            .hero-visual { display:none; }
             .hero h1 { font-size:2rem; }
-            .hero p { font-size:0.95rem; }
-            .hero-glow { width:300px; height:300px; }
-            .hero-cta { flex-direction:column; align-items:stretch; gap:10px; }
-            .btn-primary, .btn-secondary { padding:12px 24px; font-size:0.85rem; text-align:center; width:100%; }
-            .features-grid { grid-template-columns:1fr; }
-            .stats-strip { gap:24px; flex-wrap:wrap; padding:24px 12px; }
-            .stat-num { font-size:1.6rem; }
-            .section { padding:60px 16px; }
-            .section h2 { font-size:1.5rem; }
-            .step-item { padding:20px; }
-            .hero-badge { font-size:0.7rem; padding:6px 14px; letter-spacing:1px; }
+            .hero-actions { flex-direction:column; align-items:stretch; }
+            .btn { justify-content:center; }
+            .stats-grid { grid-template-columns:repeat(3,1fr); gap:12px; }
+            .stat-value { font-size:1.8rem; }
+            .feature-row { grid-template-columns:1fr; gap:32px; }
+            .feature-row.reverse .feature-visual { order:0; }
+            .steps-grid { grid-template-columns:1fr; }
+            .section { padding:60px 0; }
+            .section h2 { font-size:1.8rem; }
+            .cta { padding:60px 0; }
+            .cta h2 { font-size:1.6rem; }
         }
     </style>
 </head>
@@ -174,46 +160,117 @@
 
 <section class="hero">
     <div class="hero-glow"></div>
-    <span class="hero-badge">GITHUB · DEV.TO · PRODUCT HUNT · HN · REDDIT</span>
-    <h1>해외 검증 SaaS,<br>한국에서도 통할까?</h1>
-    <p>GitHub Trending, Dev.to, Product Hunt, Hacker News, Reddit — 5개 플랫폼에서 마이크로 SaaS를 자동 수집하고 한국 시장 적합도를 AI로 분석합니다. 필요한 국내 API, 규제 리스크, 예상 개발 기간까지 한눈에.</p>
-    <div class="hero-cta"><a href="dashboard.html" class="btn-primary">지금 분석 보기</a><a href="#how" class="btn-secondary">어떻게 작동하나요?</a></div>
+    <div class="container hero-grid">
+        <div>
+            <div class="hero-badge"><span class="dot"></span>5개 플랫폼 실시간 수집 중</div>
+            <h1>해외에서 통한 SaaS,<br><em>한국에서는?</em></h1>
+            <p>GitHub, Dev.to, Product Hunt, Hacker News, Reddit에서 검증된 마이크로 SaaS를 찾아 한국 진출 가능성을 수치화합니다. 국내 경쟁 현황, 필요 API, 규제 리스크까지.</p>
+            <div class="hero-actions">
+                <a href="dashboard.html" class="btn btn-primary">지금 탐색하기</a>
+                <a href="#how" class="btn btn-secondary">분석 과정 보기</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="row"><span class="score">87</span><span class="name">Opula - 자산 추적</span><span class="tag">국내無</span></div>
+                <div class="row"><span class="score">72</span><span class="name">CiteReady - AI 최적화</span><span class="tag">국내無</span></div>
+                <div class="row"><span class="score">68</span><span class="name">Stager - 이벤트 관리</span><span class="tag">국내無</span></div>
+                <div class="row"><span class="score">65</span><span class="name">Recallendar - 일정 AI</span><span class="tag">약한경쟁</span></div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<div class="stats-strip">
-    <div class="stat-block"><span class="stat-num" id="hero-total">144</span><span class="stat-label">수집된 서비스</span></div>
-    <div class="stat-block"><span class="stat-num" id="hero-analyzed">143</span><span class="stat-label">분석 완료</span></div>
-    <div class="stat-block"><span class="stat-num" id="hero-score">43</span><span class="stat-label">평균 점수</span></div>
+<div class="stats">
+    <div class="container stats-grid">
+        <div><div class="stat-value" id="stat-total">144</div><div class="stat-label">수집된 서비스</div></div>
+        <div><div class="stat-value" id="stat-analyzed">143</div><div class="stat-label">분석 완료</div></div>
+        <div><div class="stat-value" id="stat-score">43</div><div class="stat-label">평균 점수</div></div>
+    </div>
 </div>
 
 <section class="section">
-    <h2>3초 만에 기회 포착</h2>
-    <p class="subtitle">해외에서 검증된 비즈니스 모델을 발견하고, 한국 진출 가능성을 정량화합니다</p>
-    <div class="features-grid">
-        <div class="feature-card reveal"><span class="feature-icon">🔍</span><h3>자동 수집</h3><p>GitHub Trending, Dev.to, Product Hunt, Hacker News, Reddit 등 5개 플랫폼에서 마이크로 SaaS를 24시간 자동 크롤링합니다.</p></div>
-        <div class="feature-card reveal"><span class="feature-icon">📊</span><h3>Triage Score</h3><p>점수 · 신뢰도 · 성장성 · 대담성 4개 축으로 한국 진출 잠재력을 평가하고 정렬·필터로 빠르게 탐색합니다.</p></div>
-        <div class="feature-card reveal"><span class="feature-icon">🇰🇷</span><h3>로컬 분석</h3><p>카카오·토스결제 등 국내 API 연동, 규제 리스크, 경쟁 분석, 예상 개발 기간까지 상세 리포트를 제공합니다.</p></div>
+    <div class="container">
+        <div class="section-label">핵심 기능</div>
+        <h2>찾는 게 아니라<br>걸러내는 겁니다</h2>
+        <p class="subtitle">수집된 서비스 중 진짜 기회만 남깁니다. 국내에 이미 있는 서비스, 현지화 가치가 낮은 글로벌 표준 도구는 자동 제외.</p>
+
+        <div class="feature-row reveal">
+            <div class="feature-text">
+                <div class="feature-num">필터 1</div>
+                <h3>국내 미출시 서비스 선별</h3>
+                <p>해외에서는 잘 나가지만 한국에는 아직 진출하지 않은 SaaS를 찾아냅니다. 토스, 카카오 같은 대기업이 이미 장악한 시장은 자동 필터링.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="mini-table">
+                    <div class="mini-row"><span class="m-score">87</span><span class="m-name">Opula</span><div class="m-bar"><div class="m-fill" style="width:87%"></div></div></div>
+                    <div class="mini-row"><span class="m-score">72</span><span class="m-name">CiteReady</span><div class="m-bar"><div class="m-fill" style="width:72%"></div></div></div>
+                    <div class="mini-row"><span class="m-score">68</span><span class="m-name">Stager</span><div class="m-bar"><div class="m-fill" style="width:68%"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-row reverse reveal">
+            <div class="feature-text">
+                <div class="feature-num">필터 2</div>
+                <h3>현지화 가치 판단</h3>
+                <p>한국 개발자들이 이미 불편함 없이 사용하는 글로벌 표준 도구는 걸러냅니다. testify, Prometheus 같은 오픈소스는 점수가 높아도 한국어판 만들 이유가 없습니다.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="mini-table">
+                    <div class="mini-row"><span class="m-score" style="color:var(--text3)">85</span><span class="m-name">testify</span><span style="color:var(--text3);font-size:0.7rem">현지화 가치 낮음</span></div>
+                    <div class="mini-row"><span class="m-score" style="color:var(--text3)">85</span><span class="m-name">Prometheus</span><span style="color:var(--text3);font-size:0.7rem">현지화 가치 낮음</span></div>
+                    <div class="mini-row"><span class="m-score">72</span><span class="m-name">CiteReady</span><span style="color:var(--green);font-size:0.7rem">국내 미출시</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="section" id="how">
-    <h2>어떻게 작동하나요?</h2>
-    <p class="subtitle">4단계로 해외 SaaS의 한국 시장 적합도를 평가합니다</p>
-    <div class="steps-list">
-        <div class="step-item reveal"><div class="step-num">1</div><div class="step-content"><h3>해외 소스에서 서비스 수집</h3><p>GitHub Trending, Dev.to, Product Hunt, Hacker News, Reddit 등 5개 플랫폼에서 최근 인기 마이크로 SaaS를 자동 수집합니다.</p></div></div>
-        <div class="step-item reveal"><div class="step-num">2</div><div class="step-content"><h3>DeepSeek AI 분석</h3><p>로컬라이제이션 가능성, 필요 API, 규제 장벽, 경쟁 환경을 종합 평가합니다.</p></div></div>
-        <div class="step-item reveal"><div class="step-num">3</div><div class="step-content"><h3>Triage Table 탐색</h3><p>점수, 신뢰도, 성장성으로 정렬·필터링하며 가장 유망한 기회를 빠르게 발견합니다.</p></div></div>
-        <div class="step-item reveal"><div class="step-num">4</div><div class="step-content"><h3>실행 가능한 인사이트</h3><p>예상 개발 기간, 필요 API 목록, 수익화 전략을 확인하고 즉시 개발에 착수하세요.</p></div></div>
+    <div class="container">
+        <div class="section-label">작동 방식</div>
+        <h2>4단계로 기회를 포착합니다</h2>
+        <p class="subtitle">스크래핑부터 AI 분석까지, 자동화된 파이프라인이 당신의 다음 프로젝트 후보를 찾아냅니다.</p>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-num">01</div>
+                <h3>글로벌 소스 수집</h3>
+                <p>GitHub Trending, Dev.to, Product Hunt, Hacker News, Reddit에서 실시간으로 마이크로 SaaS를 수집합니다.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">02</div>
+                <h3>AI 분석</h3>
+                <p>DeepSeek가 현지화 적합도, 필요 API, 규제 장벽, 경쟁 환경을 종합 평가해 점수화합니다.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">03</div>
+                <h3>Triage Table 탐색</h3>
+                <p>국내 미출시, 현지화 가치 기준으로 필터링하고 점수로 우선순위를 정합니다.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">04</div>
+                <h3>바로 실행</h3>
+                <p>예상 개발 기간, 필요 API 목록, 수익화 전략까지 확인하고 바로 개발에 착수하세요.</p>
+            </div>
+        </div>
     </div>
 </section>
 
-<div class="cta-section">
-    <h2>지금 바로 기회를 발견하세요</h2>
-    <p>144개의 해외 마이크로 SaaS가 수집되었습니다. 당신의 다음 프로젝트가 여기 있을지도 모릅니다.</p>
-    <a href="dashboard.html" class="btn-primary">대시보드 열기</a>
+<div class="cta">
+    <div class="container">
+        <h2>분석은 끝났습니다</h2>
+        <p>이제 어떤 SaaS를 한국에 들여올지 결정만 하면 됩니다.</p>
+        <a href="dashboard.html" class="btn btn-primary">대시보드 열기</a>
+    </div>
 </div>
 
-<footer>KLD — Korean Localization Detector · Built with FastAPI + DeepSeek</footer>
+<footer>
+    <div class="container">
+        KLD - Korean Localization Detector &middot; <a href="https://github.com/hwan7256/korean-localization-detector">GitHub</a>
+    </div>
+</footer>
 
 <script>
 const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
@@ -221,19 +278,18 @@ let particles=[];
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
 resize();window.addEventListener('resize',resize);
 class Particle{constructor(){this.reset();this.y=Math.random()*canvas.height}
-reset(){this.x=Math.random()*canvas.width;this.y=-10;this.size=Math.random()*2+0.5;this.speed=Math.random()*0.6+0.2;this.opacity=Math.random()*0.4+0.1;this.hue=Math.random()>0.7?145:0}
+reset(){this.x=Math.random()*canvas.width;this.y=-10;this.size=Math.random()*2+0.5;this.speed=Math.random()*0.6+0.2;this.opacity=Math.random()*0.35+0.08;this.hue=Math.random()>0.7?145:0}
 update(){this.y+=this.speed;if(this.y>canvas.height+10)this.reset()}
-draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=this.hue?`hsla(${this.hue},70%,60%,${this.opacity})`:`rgba(255,255,255,${this.opacity})`;ctx.fill()}}
-for(let i=0;i<80;i++)particles.push(new Particle());
+draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=this.hue?`hsla(${this.hue},65%,55%,${this.opacity})`:`rgba(255,255,255,${this.opacity})`;ctx.fill()}}
+for(let i=0;i<60;i++)particles.push(new Particle());
 function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(animate)}
 animate();
-const reveals=document.querySelectorAll('.reveal');
-new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.15}).observe.bind(null);
-reveals.forEach(el=>{new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.15}).observe(el)});
+const observer=new IntersectionObserver((e)=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 fetch('https://api.kld.lat/api/stats').then(r=>r.json()).then(d=>{
-document.getElementById('hero-total').textContent=d.total_services||144;
-document.getElementById('hero-analyzed').textContent=d.total_analyzed||143;
-document.getElementById('hero-score').textContent=Math.round(d.avg_localization_score)||43;
+document.getElementById('stat-total').textContent=d.total_services||144;
+document.getElementById('stat-analyzed').textContent=d.total_analyzed||143;
+document.getElementById('stat-score').textContent=Math.round(d.avg_localization_score)||43;
 }).catch(()=>{});
 </script>
 </body>
