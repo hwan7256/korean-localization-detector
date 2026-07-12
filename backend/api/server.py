@@ -74,7 +74,7 @@ def list_services(
 ):
     """서비스 목록 + 분석 결과"""
     db = get_db()
-    conds = ["1=1"]
+    conds = ["1=1", "s.is_saas != 0"]
     params = []
 
     if source:
@@ -90,6 +90,7 @@ def list_services(
     query = f"""
         SELECT s.*, a.localization_score, a.summary_ko, a.localization_reason,
                a.confidence, a.upside, a.boldness, a.competition_level,
+               a.localization_value,
                a.free_tier, a.created_at as analyzed_at, s.is_saas
         FROM discovered_services s
         LEFT JOIN analysis_reports a ON s.id = a.service_id
