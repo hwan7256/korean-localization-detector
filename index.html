@@ -3,137 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLD — 해외 SaaS 한국 진출 분석기</title>
-    <meta name="description" content="해외에서 검증된 SaaS의 한국 시장 적합도를 AI로 분석합니다.">
+    <meta name="description" content="KLD — 해외에서 검증된 SaaS, 한국에서도 통할까?">
+    <meta property="og:title" content="KLD — Korean Localization Detector">
+    <meta property="og:description" content="해외에서 검증된 SaaS의 한국 시장 적합도를 AI로 분석합니다.">
+    <meta property="og:type" content="website">
+    <title>KLD — Korean Localization Detector</title>
     <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         :root {
-            --bg: #080b09; --surface: #0d120f; --surface2: #131a15;
-            --green: #3FBE6F; --green-dim: rgba(63,190,111,0.08); --green-glow: rgba(63,190,111,0.15);
-            --text: #e4e7e5; --text2: #8a938d; --text3: #5a635d;
-            --border: rgba(255,255,255,0.04); --border2: rgba(255,255,255,0.07);
-            --radius: 16px;
+            --bg:#080b09;--surface:#0d110f;--surface2:#121714;
+            --green:#3FBE6F;--green-dim:rgba(63,190,111,0.06);--green-glow:rgba(63,190,111,0.18);
+            --gold:#D4A83C;
+            --text:#e4e7e5;--text2:#8a938d;--text3:#59615d;
+            --border:rgba(255,255,255,0.04);--border2:rgba(255,255,255,0.07);
+            --radius:14px;
+            --font:system-ui,-apple-system,sans-serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-        body {
-            background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif;
-            font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        .container{max-width:1160px;margin:0 auto;padding:0 28px}
+        #particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+        @media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none!important}}
+
+        /*=== NAV ===*/
+        nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:22px 0;transition:all .3s}
+        nav.scrolled{background:rgba(8,11,9,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:14px 0;border-bottom:1px solid var(--border)}
+        nav .container{display:flex;align-items:center;justify-content:space-between}
+        .logo{font-weight:800;font-size:1.25rem;color:var(--green);text-decoration:none;letter-spacing:-.02em}
+        .nav-links{display:flex;align-items:center;gap:32px}
+        .nav-links a{color:var(--text2);text-decoration:none;font-size:.84rem;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:var(--text)}
+        .nav-cta{background:var(--green)!important;color:#080b09!important;padding:8px 22px;border-radius:8px;font-weight:600!important}
+        .nav-cta:hover{background:#5ad67f!important;color:#080b09!important}
+
+        /*=== HERO ===*/
+        .hero{min-height:100dvh;display:flex;align-items:center;padding:60px 0 80px;position:relative;z-index:1}
+        .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+        .hero-tag{display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:24px;background:var(--green-dim);border:1px solid rgba(63,190,111,.1);color:var(--green);font-size:.74rem;font-weight:600;margin-bottom:28px}
+        .hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        .hero h1{font-size:clamp(2.6rem,5.5vw,3.8rem);font-weight:800;line-height:1.06;letter-spacing:-.03em;margin-bottom:24px}
+        .hero h1 em{font-style:normal;color:var(--green)}
+        .hero p{font-size:1.06rem;color:var(--text2);max-width:500px;line-height:1.68;margin-bottom:36px}
+        .hero-cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+        .btn{display:inline-flex;align-items:center;gap:7px;padding:14px 28px;border-radius:10px;font-weight:600;font-size:.9rem;text-decoration:none;cursor:pointer;transition:all .2s;border:none;line-height:1.3}
+        .btn:active{transform:scale(.96)}
+        .btn-fill{background:var(--green);color:#080b09}
+        .btn-fill:hover{background:#5ad67f;transform:translateY(-1px)}
+        .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border2)}
+        .btn-outline:hover{border-color:var(--green);color:var(--green)}
+        .hero-visual{position:relative;display:flex;align-items:center;justify-content:center}
+        .hero-glow{position:absolute;width:420px;height:420px;background:radial-gradient(circle,rgba(63,190,111,.08),transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+        .hero-preview{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:26px 24px;width:100%;max-width:360px;position:relative}
+        .pv-label{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px}
+        .pv-row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--border);font-size:.82rem}
+        .pv-row:last-child{border-bottom:none}
+        .pv-score{font-weight:800;font-size:1.05rem;color:var(--green);min-width:44px;font-variant-numeric:tabular-nums}
+        .pv-name{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .pv-tag{font-size:.6rem;padding:2px 10px;border-radius:20px;background:var(--green-dim);color:var(--green);white-space:nowrap}
+
+        /*=== STATS ===*/
+        .stats{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+        .stat-item{text-align:center;padding:36px 16px;position:relative}
+        .stat-item:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:var(--border)}
+        .stat-val{font-size:2.6rem;font-weight:800;color:var(--green);letter-spacing:-.02em;display:block;font-variant-numeric:tabular-nums}
+        .stat-lbl{font-size:.66rem;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-top:4px;display:block}
+
+        /*=== SECTIONS ===*/
+        .section{padding:110px 0;position:relative;z-index:1}
+        .sec-label{font-size:.68rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px}
+        .section h2{font-size:2.4rem;font-weight:800;letter-spacing:-.02em;line-height:1.13;margin-bottom:16px;max-width:640px}
+        .section .lead{color:var(--text2);font-size:1rem;max-width:540px;line-height:1.7;margin-bottom:64px}
+
+        /* Features  (bento-styled alternating grid) */
+        .features-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .feat-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:38px 32px;transition:all .3s;position:relative}
+        .feat-card:hover{border-color:rgba(63,190,111,.15);transform:translateY(-2px)}
+        .feat-card .f-icon{font-size:2.2rem;margin-bottom:18px;display:block;line-height:1}
+        .feat-card h3{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+        .feat-card p{color:var(--text2);font-size:.9rem;line-height:1.6}
+        .feat-card.dark{background:var(--surface2);border-color:var(--border)}
+
+        /* Process track */
+        .process-track{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .proc-step{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:32px 24px;text-align:center;transition:all .3s}
+        .proc-step:hover{border-color:rgba(63,190,111,.15);transform:translateY(-2px)}
+        .proc-icon{font-size:2.5rem;display:block;margin-bottom:16px;line-height:1}
+        .proc-step h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+        .proc-step .action{font-size:.66rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:8px}
+        .proc-step p{font-size:.82rem;color:var(--text2);line-height:1.55}
+
+        /* CTA */
+        .cta-wrap{position:relative;z-index:1;border-top:1px solid var(--border);padding:90px 0;text-align:left}
+        .cta-glow{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(63,190,111,.06),transparent 70%);top:50%;left:30%;transform:translate(-50%,-50%);pointer-events:none}
+        .cta-wrap h2{font-size:2.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+        .cta-wrap p{color:var(--text2);font-size:1.05rem;margin-bottom:32px;max-width:500px}
+
+        /* Footer */
+        footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24px 0;text-align:center;color:var(--text3);font-size:.7rem}
+        footer a{color:var(--text2);text-decoration:none;font-weight:500;margin:0 6px}
+        footer a:hover{color:var(--green)}
+
+        /* Reveal */
+        .reveal{opacity:0;transform:translateY(18px);transition:all .55s cubic-bezier(.16,1,.3,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+
+        /*=== MOBILE ===*/
+        @media(max-width:768px){
+            .container{padding:0 18px}
+            .hero{min-height:auto;padding:100px 0 50px}
+            .hero-grid{grid-template-columns:1fr;gap:36px}
+            .hero h1{font-size:2.2rem}
+            .hero-cta{flex-direction:column;align-items:stretch}
+            .hero-visual{display:none}
+            .btn{justify-content:center}
+            .stats-grid{grid-template-columns:repeat(3,1fr)}
+            .stat-item:not(:last-child)::after{display:none}
+            .stat-val{font-size:1.8rem}
+            .section{padding:70px 0}
+            .section h2{font-size:1.8rem}
+            .features-grid{grid-template-columns:1fr}
+            .process-track{grid-template-columns:1fr 1fr}
+            .cta-wrap{padding:60px 0;text-align:center}
+            .cta-wrap h2{font-size:1.9rem}
         }
-        .container { max-width:1200px; margin:0 auto; padding:0 32px; }
-
-        #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
-
-        nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:20px 0; transition:all 0.3s; }
-        nav.scrolled { background:rgba(8,11,9,0.9); backdrop-filter:blur(12px); padding:12px 0; border-bottom:1px solid var(--border); }
-        nav .container { display:flex; align-items:center; justify-content:space-between; }
-        .logo { font-weight:800; font-size:1.3rem; color:var(--green); text-decoration:none; letter-spacing:-0.02em; }
-        .nav-links { display:flex; align-items:center; gap:32px; }
-        .nav-links a { color:var(--text2); text-decoration:none; font-size:0.88rem; font-weight:500; transition:color 0.2s; }
-        .nav-links a:hover { color:var(--text); }
-        .nav-cta { background:var(--green); color:#080b09 !important; padding:8px 20px; border-radius:8px; font-weight:600 !important; }
-        .nav-cta:hover { background:#6ee7a7 !important; }
-
-        .hero { min-height:100dvh; display:flex; align-items:center; padding:80px 0; position:relative; z-index:1; }
-        .hero-grid { display:grid; grid-template-columns:1.1fr 0.9fr; gap:80px; align-items:center; }
-        .hero-tag { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:24px; background:var(--green-dim); border:1px solid rgba(63,190,111,0.12); color:var(--green); font-size:0.78rem; font-weight:600; margin-bottom:32px; }
-        .hero-tag .live { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-        .hero h1 { font-size:clamp(2.6rem,5.5vw,4rem); font-weight:800; line-height:1.06; letter-spacing:-0.03em; margin-bottom:28px; }
-        .hero h1 span { color:var(--green); }
-        .hero p { font-size:1.1rem; color:var(--text2); max-width:520px; line-height:1.7; margin-bottom:40px; }
-        .hero-btns { display:flex; gap:14px; align-items:center; }
-        .btn { padding:15px 32px; border-radius:10px; font-weight:600; font-size:0.94rem; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; display:inline-flex; align-items:center; gap:8px; }
-        .btn:active { transform:scale(0.97); }
-        .btn-fill { background:var(--green); color:#080b09; }
-        .btn-fill:hover { background:#5ad67f; transform:translateY(-1px); }
-        .btn-outline { background:transparent; color:var(--text); border:1px solid var(--border2); }
-        .btn-outline:hover { border-color:var(--green); color:var(--green); }
-
-        .hero-preview {
-            background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius);
-            padding:28px; position:relative;
-        }
-        .hero-preview::after {
-            content:''; position:absolute; inset:-1px; border-radius:var(--radius);
-            background:radial-gradient(circle at 30% 20%, var(--green-glow), transparent 70%);
-            pointer-events:none; z-index:-1;
-        }
-        .preview-header { font-size:0.65rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px; }
-        .preview-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); transition:background 0.15s; border-radius:6px; padding:10px 8px; margin:0 -8px; }
-        .preview-row:hover { background:rgba(255,255,255,0.02); }
-        .preview-row:last-child { border-bottom:none; }
-        .pv-score { font-weight:800; font-size:1.1rem; color:var(--green); min-width:42px; font-variant-numeric:tabular-nums; }
-        .pv-name { flex:1; font-size:0.85rem; font-weight:600; }
-        .pv-tag { font-size:0.62rem; padding:2px 8px; border-radius:10px; background:var(--green-dim); color:var(--green); white-space:nowrap; }
-
-        .stats-wrap { padding:60px 0; position:relative; z-index:1; }
-        .stats-pills { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-        .stat-pill { background:var(--surface); border:1px solid var(--border2); border-radius:60px; padding:24px 40px; text-align:center; min-width:160px; }
-        .stat-pill .val { font-size:2.4rem; font-weight:800; color:var(--green); letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
-        .stat-pill .lbl { font-size:0.68rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px; }
-
-        .section { padding:120px 0; position:relative; z-index:1; }
-        .section-eyebrow { font-size:0.7rem; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px; }
-        .section h2 { font-size:2.6rem; font-weight:800; letter-spacing:-0.02em; line-height:1.12; margin-bottom:20px; max-width:700px; }
-        .section .lead { color:var(--text2); font-size:1.05rem; max-width:560px; line-height:1.7; margin-bottom:64px; }
-
-        .bento { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:20px; }
-        .bento-card {
-            background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius);
-            padding:40px; transition:all 0.3s; position:relative; overflow:hidden;
-        }
-        .bento-card:hover { border-color:rgba(63,190,111,0.2); transform:translateY(-2px); }
-        .bento-card.featured { grid-row:span 2; display:flex; flex-direction:column; justify-content:center; }
-        .bento-card .num { font-size:0.7rem; font-weight:700; color:var(--green); letter-spacing:0.1em; margin-bottom:12px; }
-        .bento-card h3 { font-size:1.3rem; font-weight:700; margin-bottom:10px; }
-        .bento-card p { color:var(--text2); font-size:0.9rem; line-height:1.65; }
-        .bento-card .illustration { margin-top:24px; flex:1; }
-        .bento-bar { display:flex; flex-direction:column; gap:10px; }
-        .bento-bar-row { display:flex; align-items:center; gap:12px; padding:10px; background:rgba(255,255,255,0.02); border-radius:8px; }
-        .bento-bar-row .bb-score { font-weight:700; color:var(--green); min-width:38px; font-size:0.85rem; }
-        .bento-bar-row .bb-name { flex:1; font-size:0.82rem; }
-        .bento-bar-row .bb-bar { width:56px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
-        .bento-bar-row .bb-fill { height:100%; background:var(--green); border-radius:2px; }
-
-        .timeline { position:relative; padding-left:40px; }
-        .timeline::before { content:''; position:absolute; left:15px; top:0; bottom:0; width:1px; background:var(--border2); }
-        .tl-item { position:relative; padding-bottom:48px; }
-        .tl-item:last-child { padding-bottom:0; }
-        .tl-dot { position:absolute; left:-33px; top:4px; width:14px; height:14px; border-radius:50%; background:var(--green); border:3px solid var(--bg); z-index:1; }
-        .tl-item h3 { font-size:1.15rem; font-weight:700; margin-bottom:6px; }
-        .tl-item p { color:var(--text2); font-size:0.9rem; line-height:1.6; max-width:500px; }
-
-        .cta-section { text-align:center; padding:120px 0; position:relative; z-index:1; }
-        .cta-section h2 { font-size:2.8rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:16px; }
-        .cta-section p { color:var(--text2); font-size:1.1rem; margin-bottom:36px; }
-        .cta-glow { position:absolute; width:500px; height:500px; background:radial-gradient(circle,var(--green-glow),transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
-
-        footer { padding:28px 0; text-align:center; color:var(--text3); font-size:0.72rem; border-top:1px solid var(--border); position:relative; z-index:1; }
-        footer a { color:var(--text2); text-decoration:none; }
-        footer a:hover { color:var(--green); }
-
-        .reveal { opacity:0; transform:translateY(20px); transition:all 0.6s cubic-bezier(0.16,1,0.3,1); }
-        .reveal.visible { opacity:1; transform:translateY(0); }
-
-        @media (max-width:768px) {
-            .container { padding:0 20px; }
-            .hero { min-height:auto; padding:100px 0 60px; }
-            .hero-grid { grid-template-columns:1fr; gap:40px; }
-            .hero h1 { font-size:2.2rem; }
-            .hero-btns { flex-direction:column; align-items:stretch; }
-            .hero-preview { display:none; }
-            .btn { justify-content:center; }
-            .stats-pills { gap:10px; }
-            .stat-pill { padding:18px 24px; min-width:100px; }
-            .stat-pill .val { font-size:1.6rem; }
-            .bento { grid-template-columns:1fr; grid-template-rows:auto; }
-            .bento-card.featured { grid-row:span 1; }
-            .section { padding:72px 0; }
-            .section h2 { font-size:1.9rem; }
-            .cta-section { padding:72px 0; }
-            .cta-section h2 { font-size:2rem; }
-            .timeline { padding-left:30px; }
-            .tl-dot { left:-23px; }
+        @media(max-width:480px){
+            .process-track{grid-template-columns:1fr}
+            .nav-links{gap:16px}
+            .nav-links a{font-size:.78rem}
+            .stat-val{font-size:1.4rem}
         }
     </style>
 </head>
@@ -154,59 +153,60 @@
 <section class="hero">
     <div class="container hero-grid">
         <div>
-            <div class="hero-tag"><span class="live"></span>5개 플랫폼 실시간 수집</div>
-            <h1>해외 SaaS,<br><span>한국에선 통할까</span></h1>
-            <p>글로벌 마이크로 SaaS 중 한국 시장에 진출할 가치가 있는 기회만 찾아냅니다. AI가 경쟁 현황, 규제, 필요 API를 분석하고 점수로 알려줍니다.</p>
-            <div class="hero-btns">
-                <a href="dashboard.html" class="btn btn-fill">지금 분석하기</a>
-                <a href="#how" class="btn btn-outline">어떻게 분석하나</a>
+            <div class="hero-tag"><span class="dot"></span>5개 플랫폼 실시간 모니터링</div>
+            <h1>해외에서 통한 SaaS<br><em>한국에서는?</em></h1>
+            <p>GitHub, Dev.to, ProductHunt, HackerNews, Reddit — 5개 글로벌 채널에서 검증된 마이크로 SaaS를 자동으로 찾아내고, 한국 시장 적합도를 수치로 알려드립니다.</p>
+            <div class="hero-cta">
+                <a href="dashboard.html" class="btn btn-fill">지금 분석 보기</a>
+                <a href="#how" class="btn btn-outline">작동 방식</a>
             </div>
         </div>
-        <div class="hero-preview">
-            <div class="preview-header">실시간 Triage Table</div>
-            <div class="preview-row"><span class="pv-score">87</span><span class="pv-name">Opula</span><span class="pv-tag">국내無</span></div>
-            <div class="preview-row"><span class="pv-score">72</span><span class="pv-name">CiteReady</span><span class="pv-tag">국내無</span></div>
-            <div class="preview-row"><span class="pv-score">68</span><span class="pv-name">Stager</span><span class="pv-tag">국내無</span></div>
-            <div class="preview-row"><span class="pv-score">65</span><span class="pv-name">Recallendar</span><span class="pv-tag">약한경쟁</span></div>
-            <div class="preview-row"><span class="pv-score">63</span><span class="pv-name">HabitStack</span><span class="pv-tag">국내無</span></div>
+        <div class="hero-visual">
+            <div class="hero-glow"></div>
+            <div class="hero-preview">
+                <div class="pv-label">분석 중인 서비스</div>
+                <div class="pv-row"><span class="pv-score">87</span><span class="pv-name">Opula</span><span class="pv-tag">국내無</span></div>
+                <div class="pv-row"><span class="pv-score">72</span><span class="pv-name">CiteReady</span><span class="pv-tag">국내無</span></div>
+                <div class="pv-row"><span class="pv-score">68</span><span class="pv-name">Stager</span><span class="pv-tag">국내無</span></div>
+                <div class="pv-row"><span class="pv-score">65</span><span class="pv-name">Recallendar</span><span class="pv-tag">약한경쟁</span></div>
+            </div>
         </div>
     </div>
 </section>
 
-<div class="stats-wrap">
-    <div class="container stats-pills">
-        <div class="stat-pill"><div class="val" id="st-total">144</div><div class="lbl">수집된 서비스</div></div>
-        <div class="stat-pill"><div class="val" id="st-analyzed">143</div><div class="lbl">분석 완료</div></div>
-        <div class="stat-pill"><div class="val" id="st-score">43</div><div class="lbl">평균 점수</div></div>
+<div class="stats">
+    <div class="container stats-grid">
+        <div class="stat-item"><span class="stat-val" id="st-total">144</span><span class="stat-lbl">수집된 서비스</span></div>
+        <div class="stat-item"><span class="stat-val" id="st-analyzed">143</span><span class="stat-lbl">분석 완료</span></div>
+        <div class="stat-item"><span class="stat-val" id="st-score">43</span><span class="stat-lbl">평균 점수</span></div>
     </div>
 </div>
 
 <section class="section" id="features">
     <div class="container">
-        <div class="section-eyebrow">핵심 가치</div>
-        <h2>찾는 게 아니라 걸러내는 겁니다</h2>
-        <p class="lead">144개 서비스 중 국내 진출 가능성이 진짜 있는 것만 남깁니다.</p>
-
-        <div class="bento">
-            <div class="bento-card featured reveal">
-                <div class="num">필터 1</div>
-                <h3>국내 미출시 서비스 선별</h3>
-                <p>해외에서 잘 나가지만 한국에 아직 없는 SaaS를 찾습니다. 토스, 카카오 등이 이미 장악한 시장은 자동 제외합니다.</p>
-                <div class="illustration bento-bar">
-                    <div class="bento-bar-row"><span class="bb-score">87</span><span class="bb-name">Opula</span><div class="bb-bar"><div class="bb-fill" style="width:87%"></div></div></div>
-                    <div class="bento-bar-row"><span class="bb-score">72</span><span class="bb-name">CiteReady</span><div class="bb-bar"><div class="bb-fill" style="width:72%"></div></div></div>
-                    <div class="bento-bar-row"><span class="bb-score">68</span><span class="bb-name">Stager</span><div class="bb-bar"><div class="bb-fill" style="width:68%"></div></div></div>
-                </div>
+        <div class="sec-label">핵심 기능</div>
+        <h2>걸러내는 데 집중합니다</h2>
+        <p class="lead">수많은 서비스 중 국내에서 진짜 기회가 될 SaaS만 남기고, 나머지는 자동으로 제외합니다.</p>
+        <div class="features-grid">
+            <div class="feat-card reveal">
+                <span class="f-icon">01</span>
+                <h3>국내 미출시 선별</h3>
+                <p>해외에서 검증되었지만 아직 한국에 진출하지 않은 SaaS만 필터링합니다. 토스, 네이버, 카카오가 장악한 시장은 자동 제외.</p>
             </div>
-            <div class="bento-card reveal">
-                <div class="num">필터 2</div>
-                <h3>현지화 가치 판단</h3>
-                <p>이미 한국 개발자들이 불편 없이 쓰는 글로벌 표준은 점수가 높아도 걸러냅니다.</p>
+            <div class="feat-card dark reveal">
+                <span class="f-icon">02</span>
+                <h3>글로벌 표준 걸러내기</h3>
+                <p>testify, Prometheus처럼 이미 한국 개발자들이 불편함 없이 사용하는 오픈소스는 점수가 높아도 제외합니다.</p>
             </div>
-            <div class="bento-card reveal">
-                <div class="num">필터 3</div>
+            <div class="feat-card dark reveal">
+                <span class="f-icon">03</span>
+                <h3>AI 기반 분석</h3>
+                <p>DeepSeek가 국내 API 연동 가능성, 규제 장벽, 경쟁 환경을 종합 평가해 0-100점으로 현지화 가치를 수치화합니다.</p>
+            </div>
+            <div class="feat-card reveal">
+                <span class="f-icon">04</span>
                 <h3>실행 가능한 인사이트</h3>
-                <p>개발 기간, 필요 API, 수익화 전략을 확인하고 바로 착수할 수 있습니다.</p>
+                <p>예상 개발 기간, 필요 API 목록, 수익화 전략을 확인하고 바로 개발에 착수할 수 있습니다.</p>
             </div>
         </div>
     </div>
@@ -214,70 +214,82 @@
 
 <section class="section" id="how">
     <div class="container">
-        <div class="section-eyebrow">작동 방식</div>
-        <h2>4단계로 기회를 포착합니다</h2>
-        <p class="lead">수집부터 분석까지, 자동화된 파이프라인으로 과정을 단축합니다.</p>
-
-        <div class="timeline">
-            <div class="tl-item reveal">
-                <div class="tl-dot"></div>
+        <div class="sec-label">작동 방식</div>
+        <h2>4단계면 충분합니다</h2>
+        <p class="lead">스크래핑부터 분석까지, 자동화된 파이프라인이 여러분의 다음 프로젝트 후보를 발굴합니다.</p>
+        <div class="process-track">
+            <div class="proc-step reveal">
+                <span class="proc-icon">1</span>
+                <div class="action">수집</div>
                 <h3>글로벌 소스 스크래핑</h3>
-                <p>GitHub Trending, Dev.to, Product Hunt, Hacker News, Reddit에서 실시간으로 마이크로 SaaS를 수집합니다.</p>
+                <p>GitHub, Dev.to, ProductHunt, HN, Reddit에서 실시간 수집</p>
             </div>
-            <div class="tl-item reveal">
-                <div class="tl-dot"></div>
-                <h3>DeepSeek AI 분석</h3>
-                <p>현지화 적합도, 필요 API, 규제 장벽, 경쟁 환경을 종합 평가해 0-100점으로 수치화합니다.</p>
+            <div class="proc-step reveal">
+                <span class="proc-icon">2</span>
+                <div class="action">분석</div>
+                <h3>DeepSeek AI 평가</h3>
+                <p>현지화 적합도, API, 규제, 경쟁 환경 종합 분석</p>
             </div>
-            <div class="tl-item reveal">
-                <div class="tl-dot"></div>
-                <h3>필터링 및 정렬</h3>
-                <p>국내 미출시, 현지화 가치 기준으로 걸러내고 점수와 신뢰도로 우선순위를 정합니다.</p>
+            <div class="proc-step reveal">
+                <span class="proc-icon">3</span>
+                <div class="action">선별</div>
+                <h3>Triage Table 탐색</h3>
+                <p>국내 미출시, 현지화 가치로 필터링하고 점수로 정렬</p>
             </div>
-            <div class="tl-item reveal">
-                <div class="tl-dot"></div>
-                <h3>실행 계획 확보</h3>
-                <p>개발 기간, API 목록, 수익화 전략까지 확인하고 바로 개발에 착수할 수 있습니다.</p>
+            <div class="proc-step reveal">
+                <span class="proc-icon">4</span>
+                <div class="action">실행</div>
+                <h3>바로 개발 착수</h3>
+                <p>API 목록, 예상 기간, 수익화 전략 확보 후 실행</p>
             </div>
         </div>
     </div>
 </section>
 
-<div class="cta-section">
+<div class="cta-wrap">
     <div class="cta-glow"></div>
     <div class="container">
-        <h2>분석은 끝났습니다</h2>
-        <p>이제 어떤 SaaS를 들여올지 결정만 하면 됩니다</p>
+        <h2>분석은 이미 끝났습니다</h2>
+        <p>이제 어떤 서비스를 한국에 들여올지만 결정하면 됩니다.</p>
         <a href="dashboard.html" class="btn btn-fill">대시보드 열기</a>
     </div>
 </div>
 
 <footer>
-    <div class="container">KLD - Korean Localization Detector &middot; <a href="https://github.com/hwan7256/korean-localization-detector">GitHub</a></div>
+    <div class="container">
+        <span>KLD - Korean Localization Detector</span>
+        <a href="https://github.com/hwan7256/korean-localization-detector">GitHub</a>
+        <a href="dashboard.html">대시보드</a>
+    </div>
 </footer>
 
 <script>
 const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
-let p=[];
-function rs(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
-rs();addEventListener('resize',rs);
-class P{constructor(){this.r();this.y=Math.random()*canvas.height}
-r(){this.x=Math.random()*canvas.width;this.y=-10;this.s=Math.random()*1.8+0.5;this.v=Math.random()*0.5+0.15;this.o=Math.random()*0.3+0.06;this.h=Math.random()>0.65?145:0}
-u(){this.y+=this.v;if(this.y>canvas.height+10)this.r()}
-d(){ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,2*Math.PI);ctx.fillStyle=this.h?`hsla(${this.h},60%,52%,${this.o})`:`rgba(255,255,255,${this.o})`;ctx.fill()}}
-for(let i=0;i<70;i++)p.push(new P());
-(function a(){ctx.clearRect(0,0,canvas.width,canvas.height);p.forEach(x=>{x.u();x.d()});requestAnimationFrame(a)})();
+let particles=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();addEventListener('resize',resize);
+class P{constructor(){this.reset();this.y=Math.random()*canvas.height}
+reset(){this.x=Math.random()*canvas.width;this.y=-10;this.s=Math.random()*1.4+.5;this.v=Math.random()*.4+.10;this.o=Math.random()*.22+.04;this.h=Math.random()>.68?145:0}
+update(){this.y+=this.v;if(this.y>canvas.height+10)this.reset()}
+draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,2*Math.PI);ctx.fillStyle=this.h?`hsla(${this.h},55%,50%,${this.o})`:`rgba(255,255,255,${this.o})`;ctx.fill();
+const n=particles.find(q=>q!==this&&Math.hypot(this.x-q.x,this.y-q.y)<80);if(n){ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(n.x,n.y);ctx.strokeStyle=`rgba(63,190,111,${.04})`;ctx.stroke()}}}
+for(let i=0;i<50;i++)particles.push(new P());
+(function a(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(a)})();
 
 const nav=document.getElementById('nav');
-addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
+const navObs=new IntersectionObserver(([e])=>{nav.classList.toggle('scrolled',!e.isIntersecting)},{threshold:.98});
+navObs.observe(document.createElement('div'));
+const sentinel=document.createElement('div');sentinel.style.position='absolute';sentinel.style.top='0';sentinel.style.height='1px';sentinel.style.width='100%';sentinel.style.pointerEvents='none';
+document.body.prepend(sentinel);navObs.observe(sentinel);
+addEventListener('scroll',()=>{nav.classList.toggle('scrolled',scrollY>20)},{passive:true});
 
-const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.12,rootMargin:'0px 0px -30px 0px'});
-document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const revObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
 
 fetch('https://api.kld.lat/api/stats').then(r=>r.json()).then(d=>{
-    document.getElementById('st-total').textContent=d.total_services||144;
-    document.getElementById('st-analyzed').textContent=d.total_analyzed||143;
-    document.getElementById('st-score').textContent=Math.round(d.avg_localization_score)||43;
+document.getElementById('st-total').textContent=d.total_services||144;
+document.getElementById('st-analyzed').textContent=d.total_analyzed||143;
+document.getElementById('st-score').textContent=Math.round(d.avg_localization_score)||43;
 }).catch(()=>{});
 </script>
 </body>
