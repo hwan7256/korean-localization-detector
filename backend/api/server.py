@@ -1,7 +1,7 @@
 """KLD FastAPI Server — REST API"""
 import os
 import json
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -146,6 +146,23 @@ def list_korean_apis(category: str = Query(None)):
     return {"apis": [dict(r) for r in rows]}
 
 
+@app.get("/robots.txt")
+def robots():
+    fp = os.path.join(STATIC_DIR, "robots.txt")
+    if os.path.exists(fp):
+        return Response(open(fp).read(), media_type="text/plain")
+    raise HTTPException(404)
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    """Google Search Console 사이트맵"""
+    fp = os.path.join(STATIC_DIR, "sitemap.xml")
+    if os.path.exists(fp):
+        return Response(open(fp).read(), media_type="application/xml")
+    raise HTTPException(404)
+
+
 @app.get("/api/sources")
 def get_sources():
     """소스별 통계"""
@@ -159,4 +176,4 @@ def get_sources():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.api.server:app", host="0.0.0.0", port=8733, reload=True)
+    uvicorn.run("backend.api.server:app", host="127.0.0.1", port=8733, reload=True)
