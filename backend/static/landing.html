@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConvertRadar — 1분 랜딩페이지 전환율 & UX 진단기</title>
+    <meta name="description" content="1분 만에 분석하는 랜딩페이지 전환 최적화(CRO) & SEO 진단 도구. Playwright와 DeepSeek AI를 통해 사용자 이탈 요인을 감지하고 성과를 높일 대안 카피를 제공합니다.">
+    <link rel="canonical" href="https://kld.lat/">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
@@ -98,20 +100,21 @@
         }
 
         .btn-pricing {
-            background: linear-gradient(135deg, var(--primary), var(--info));
-            color: #07070b;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
             padding: 8px 16px;
             border-radius: 8px;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.9rem;
-            border: none;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
 
         .btn-pricing:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px var(--primary-glow);
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0, 255, 178, 0.05);
         }
 
         /* Container */
@@ -1214,11 +1217,11 @@
 
         <!-- 1. Hero / Input View -->
         <div id="inputView" class="hero-section">
-            <span class="badge-main">KLD 실패 교훈 기반 신규 피벗 프로젝트</span>
-            <h1 class="hero-title">당신의 랜딩페이지는<br>왜 고객을 놓치고 있을까요?</h1>
+            <span class="badge-main">1분 실시간 AI 랜딩페이지 CRO 진단</span>
+            <h1 class="hero-title">고객이 이탈하는 1%의 마찰을 찾아냅니다</h1>
             <p class="hero-desc">
-                URL만 입력하세요. 플레이라이트 동적 크롤러가 사이트를 정밀 스캔하고,<br>
-                DeepSeek AI가 1분 만에 시각적 전환율 마찰 요인과 대안 카피를 찾아드립니다.
+                URL 입력만으로 Playwright 동적 스캔과 DeepSeek AI 분석을 즉시 실행합니다.<br>
+                시각적 이탈 마찰 요인, 테크니컬 SEO 진단, 그리고 전환율을 극대화하는 A/B 테스트 대안 카피까지 1분 만에 진단받으세요.
             </p>
 
             <div class="input-card">
@@ -1303,7 +1306,7 @@
             <!-- 신문 헤드라인 영역: 핵심 요약 먼저 -->
             <div class="headline-section-card">
                 <div class="headline-meta">CRO EDITORIAL REPORT</div>
-                <h1 class="headline-main-title" id="gradeComment">전환 잠재력이 높습니다</h1>
+                <h2 class="headline-main-title" id="gradeComment">전환 잠재력이 높습니다</h2>
                 <p class="headline-lead-paragraph" id="valPropSummary">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 유입 고객의 구매 전환율이 크게 오를 수 있습니다.</p>
                 <div class="confidence-info-row" id="confidenceBar" style="display:none">
                     <div class="confidence-progress-wrapper">
@@ -1497,12 +1500,17 @@
                         minute: '2-digit'
                     });
                     
+                    // F등급(60점 미만)은 점수/등급 대신 '리포트 확인'으로 우회 표시하여 신뢰도 유지
+                    const scoreDisplay = item.score_overall >= 60 
+                        ? `${grade} (${item.score_overall}점)` 
+                        : '리포트 확인';
+                    
                     return `
                         <div class="history-card" onclick="loadAudit(${item.id})">
                             <div class="history-url">${escapeHtml(item.url)}</div>
                             <div class="history-meta">
                                 <span>${formattedDate}</span>
-                                <span class="history-score">${grade} (${item.score_overall}점)</span>
+                                <span class="history-score" style="${item.score_overall < 60 ? 'color: var(--text-muted); font-weight: 600;' : ''}">${scoreDisplay}</span>
                             </div>
                         </div>
                     `;
