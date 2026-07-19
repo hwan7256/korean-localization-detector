@@ -3,9 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConvertRadar — 1분 랜딩페이지 전환율 & UX 진단기</title>
+    <title>ConvertRadar — AI 랜딩페이지 전환율(CRO) 진단 & SEO 분석 도구</title>
     <meta name="description" content="1분 만에 분석하는 랜딩페이지 전환 최적화(CRO) & SEO 진단 도구. Playwright와 DeepSeek AI를 통해 사용자 이탈 요인을 감지하고 성과를 높일 대안 카피를 제공합니다.">
     <link rel="canonical" href="https://kld.lat/">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2307070b'/%3E%3Cpath d='M8 22 L14 10 L20 18 L26 8' stroke='%2300ffb2' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <!-- Open Graph -->
+    <meta property="og:title" content="ConvertRadar — AI 랜딩페이지 CRO 진단 도구">
+    <meta property="og:description" content="1분 만에 랜딩페이지의 전환율 마찰 요인을 찾고 A/B 카피 대안을 받아보세요.">
+    <meta property="og:url" content="https://kld.lat/">
+    <meta property="og:type" content="website">
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "ConvertRadar",
+      "description": "AI 기반 랜딩페이지 전환율(CRO) 및 SEO 분석 도구",
+      "url": "https://kld.lat/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web"
+    }
+    </script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
@@ -1641,6 +1659,362 @@
         .plan-btn.outline:hover { border-color: var(--primary); }
         .plan-btn:hover { transform: translateY(-1px); }
         .pricing-footer { text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+
+        /* =============================================================
+           Semrush site audit style accordions and icons
+           ============================================================= */
+        .semrush-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .semrush-icon.pass {
+            background-color: rgba(0, 255, 178, 0.12);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .semrush-icon.warn {
+            background-color: rgba(255, 183, 0, 0.12);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+        .semrush-icon.err {
+            background-color: rgba(255, 74, 107, 0.12);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .semrush-accordion-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .semrush-accordion-panel {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .semrush-accordion-panel:hover {
+            border-color: rgba(0, 255, 178, 0.15);
+        }
+
+        .semrush-accordion-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background-color: rgba(255, 255, 255, 0.01);
+            border-bottom: 1px solid transparent;
+            transition: background-color 0.2s;
+        }
+
+        .semrush-accordion-header:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .semrush-accordion-header.active {
+            border-bottom-color: var(--border);
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .accordion-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .accordion-arrow {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .accordion-arrow.open {
+            transform: rotate(90deg);
+            color: var(--primary);
+        }
+
+        .accordion-title-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .accordion-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .accordion-badge {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 6px;
+        }
+        .accordion-badge.pass {
+            background-color: rgba(0, 255, 178, 0.06);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 178, 0.1);
+        }
+        .accordion-badge.warn {
+            background-color: rgba(255, 183, 0, 0.06);
+            color: var(--warning);
+            border: 1px solid rgba(255, 183, 0, 0.1);
+        }
+        .accordion-badge.err {
+            background-color: rgba(255, 74, 107, 0.06);
+            color: var(--danger);
+            border: 1px solid rgba(255, 74, 107, 0.1);
+        }
+
+        .semrush-accordion-body {
+            display: none;
+            padding: 24px;
+            background-color: #0b0c13;
+        }
+
+        .semrush-accordion-body.open {
+            display: block;
+        }
+
+        .accordion-inner-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .semrush-audit-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: border-color 0.2s;
+        }
+        .semrush-audit-item:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .semrush-audit-content {
+            flex: 1;
+        }
+
+        .semrush-audit-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .semrush-audit-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .semrush-audit-solution {
+            font-size: 0.82rem;
+            color: var(--primary);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* Top summary section cards */
+        .summary-dashboard-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 900px) {
+            .summary-dashboard-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .health-ring-panel {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .semrush-gauge-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 16px;
+        }
+
+        .semrush-gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .semrush-gauge-circle {
+            fill: none;
+            stroke-width: 10;
+        }
+        .semrush-gauge-circle.bg {
+            stroke: var(--border);
+        }
+        .semrush-gauge-circle.val {
+            stroke: var(--primary);
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 1s ease-in-out;
+            stroke-linecap: round;
+        }
+
+        .semrush-gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .semrush-gauge-num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+        }
+        .semrush-gauge-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .summary-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .summary-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card-semrush {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            transition: border-color 0.2s;
+        }
+        .metric-card-semrush:hover {
+            border-color: rgba(0, 255, 178, 0.2);
+        }
+
+        .metric-card-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-card-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 12px 0 6px 0;
+        }
+
+        .metric-card-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Bottom banner styles */
+        .pricing-banner-panel {
+            background: linear-gradient(135deg, rgba(0, 255, 178, 0.04) 0%, rgba(0, 178, 255, 0.02) 100%);
+            border: 1px solid rgba(0, 255, 178, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        @media (max-width: 768px) {
+            .pricing-banner-panel {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+        }
+        .pricing-banner-left {
+            flex: 1;
+        }
+        .pricing-banner-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .pricing-banner-left h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .pricing-banner-left p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .btn-pricing-upgrade {
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            color: #07070b;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+        .btn-pricing-upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
     </style>
 </head>
 <body>
@@ -1852,11 +2226,8 @@
                 </div>
                 <div class="summary-score-group">
                     <div class="summary-score-item">
-                        <span class="summary-score-label">종합 점수</span>
-                        <span class="summary-score-val">
-                            <span id="resScore">84</span>점 
-                            <span class="summary-grade" id="resGrade">B+</span>
-                        </span>
+                        <span class="summary-score-label">종합 등급</span>
+                        <span class="summary-score-val summary-grade" id="resGrade">B+</span>
                     </div>
                     <div class="summary-score-item">
                         <span class="summary-score-label">분석 신뢰도</span>
@@ -1866,88 +2237,61 @@
                 </div>
             </div>
 
-            <!-- 신문 헤드라인 영역: 핵심 요약 먼저 -->
-            <div class="headline-section-card">
-                <div class="headline-meta">CRO EDITORIAL REPORT</div>
-                <h2 class="headline-main-title" id="gradeComment">전환 잠재력이 높습니다</h2>
-                <p class="headline-lead-paragraph" id="valPropSummary">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 유입 고객의 구매 전환율이 크게 오를 수 있습니다.</p>
-                <div class="confidence-info-row" id="confidenceBar" style="display:none">
-                    <div class="confidence-progress-wrapper">
-                        <span class="confidence-mini-label">하이브리드 분석 신뢰도</span>
-                        <div class="progress-track confidence-track">
-                            <div class="progress-bar confidence-fill" id="barConfidence"></div>
+            <!-- Semrush 스타일 대시보드 요약 (종합 점수 게이지 + 핵심 3영역 카드) -->
+            <div class="summary-dashboard-wrapper">
+                <!-- Left: Circular Health Gauge -->
+                <div class="health-ring-panel">
+                    <h3 class="metric-card-title" style="margin-bottom: 16px;">사이트 건강 점수 (Site Health)</h3>
+                    <div class="semrush-gauge-container">
+                        <svg class="semrush-gauge-svg" width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="semrush-gauge-circle bg" cx="70" cy="70" r="60"></circle>
+                            <circle class="semrush-gauge-circle val" id="semrushGaugeVal" cx="70" cy="70" r="60"></circle>
+                        </svg>
+                        <div class="semrush-gauge-text">
+                            <span class="semrush-gauge-num" id="resScore">84</span>
+                            <span class="semrush-gauge-label">Score</span>
                         </div>
                     </div>
-                    <span class="confidence-note-text" id="confidenceNote"></span>
+                    <div id="gradeComment" style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 6px;">전환 잠재력이 높습니다</div>
+                    <div id="valPropSummary" style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 전환율이 크게 오를 수 있습니다.</div>
+                    <!-- JS 에러 방지용으로 유지하되 보이지 않게 처리 -->
+                    <div id="gradeRing" style="display:none"></div>
+                    <div id="confidenceBar" style="display:none">
+                        <div id="barConfidence"></div>
+                        <div id="confidenceNote"></div>
+                    </div>
                 </div>
-                <!-- JS 에러 방지용으로 DOM 내 유지하되 숨김 처리 -->
-                <div id="gradeRing" style="display:none"></div>
+
+                <!-- Right: 3 Core Category Score cards -->
+                <div class="summary-metrics-grid">
+                    <div class="metric-card-semrush">
+                        <span class="metric-card-title">온페이지 최적화 (On-page)</span>
+                        <div>
+                            <div class="metric-card-value" id="cardOnpageScore">80%</div>
+                            <div class="metric-card-status" id="cardOnpageStatus">양호</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-semrush">
+                        <span class="metric-card-title">전환 마찰 (CTA)</span>
+                        <div>
+                            <div class="metric-card-value" id="cardCtaScore">80%</div>
+                            <div class="metric-card-status" id="cardCtaStatus">경고 감지</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-semrush">
+                        <span class="metric-card-title">기술 성능 & SEO</span>
+                        <div>
+                            <div class="metric-card-value" id="cardTechSeoScore">80%</div>
+                            <div class="metric-card-status" id="cardTechSeoStatus">최적화 필요</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 메인 콘텐츠 레이아웃 -->
-            <div class="report-grid-layout">
-                
-                <!-- Left Section (중단: 세부 점수 가로 바 + AI 대안 카피) -->
+            <!-- 시각적 레이아웃 & 레이더 차트 (사이드 그리드) -->
+            <div class="report-grid-layout" style="margin-bottom: 40px;">
+                <!-- Left: AI 대안 카피 처방전 & 레이더 차트 -->
                 <div class="report-left-column">
-                    <!-- 2. 중단: 5개 세부 점수를 가로 바 차트로 -->
-                    <div class="panel">
-                        <div class="panel-title">핵심 평가 지표 (가치명확성/CTA/계층구조/신뢰도/성능)</div>
-                        <div class="sub-scores">
-                            <div class="sub-score-item">
-                                <div class="sub-score-info">
-                                    <span class="sub-score-label">가치 명확성 (Clarity)</span>
-                                    <span class="sub-score-val" id="valClarity">80 / 100</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-bar" id="barClarity"></div></div>
-                            </div>
-                            <div class="sub-score-item">
-                                <div class="sub-score-info">
-                                    <span class="sub-score-label">행동 촉구 (CTA Friction)</span>
-                                    <span class="sub-score-val" id="valCta">80 / 100</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-bar" id="barCta"></div></div>
-                            </div>
-                            <div class="sub-score-item">
-                                <div class="sub-score-info">
-                                    <span class="sub-score-label">정보 계층 구조 (Hierarchy)</span>
-                                    <span class="sub-score-val" id="valHierarchy">80 / 100</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-bar" id="barHierarchy"></div></div>
-                            </div>
-                            <div class="sub-score-item">
-                                <div class="sub-score-info">
-                                    <span class="sub-score-label">신뢰도 지표 (Social Proof)</span>
-                                    <span class="sub-score-val" id="valSocial">80 / 100</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-bar" id="barSocial"></div></div>
-                            </div>
-                            <div class="sub-score-item">
-                                <div class="sub-score-info">
-                                    <span class="sub-score-label">최초 로딩 성능 (Performance)</span>
-                                    <span class="sub-score-val" id="valPerf">80 / 100</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-bar" id="barPerf"></div></div>
-                            </div>
-                        </div>
-
-                        <!-- 기술 성능 상세 (측정된 수치) -->
-                        <div class="perf-detail" id="perfDetail" style="display:none">
-                            <div class="perf-detail-header" onclick="document.getElementById('perfBody').classList.toggle('open');var t=document.getElementById('perfToggle');t.textContent=t.textContent=='+'?'-':'+';">
-                                <span>측정된 기술 성능 상세</span>
-                                <span class="perf-toggle" id="perfToggle">+</span>
-                            </div>
-                            <div class="perf-body" id="perfBody">
-                                <div class="perf-row"><span>로딩 시간</span><span id="perfLoadTime">-</span></div>
-                                <div class="perf-row"><span>SEO 기본 점수</span><span id="perfSeoScore">-</span></div>
-                                <div class="perf-row"><span>H1 개수 / Canonical</span><span id="perfH1Canon">-</span></div>
-                                <div class="perf-row"><span>이미지 Alt 누락</span><span id="perfAltMissing">-</span></div>
-                                <div class="perf-row"><span>타이틀 / 메타 길이</span><span id="perfTitleMeta">-</span></div>
-                                <div id="perfIssues" class="perf-issues"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. AI 대안 카피 처방전 -->
                     <div class="panel">
                         <div class="panel-title">AI 카피라이팅 처방전 (A/B 테스트 제안)</div>
                         <div class="ab-test-card">
@@ -1968,11 +2312,17 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="panel">
+                        <div class="panel-title">전환율 최적화 오각형 프로필</div>
+                        <div class="chart-wrapper">
+                            <canvas id="radarChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right Section (시각적 진단 스크린샷 + 오각형 차트) -->
+                <!-- Right: 시각적 레이아웃 진단 스크린샷 -->
                 <div class="report-right-column">
-                    <!-- 시각적 레이아웃 진단 -->
                     <div class="panel">
                         <div class="panel-title">시각적 레이아웃 진단 (마우스 오버 툴팁)</div>
                         <div class="inspector-scroll-container">
@@ -1990,35 +2340,149 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- 오각형 차트 -->
-                    <div class="panel">
-                        <div class="panel-title">전환율 최적화 오각형 프로필</div>
-                        <div class="chart-wrapper">
-                            <canvas id="radarChart" width="300" height="300"></canvas>
+            <!-- 중단: 카테고리별 아코디언 패널 (Semrush Audit 스타일) -->
+            <div class="semrush-accordion-container">
+                
+                <!-- 1. 온페이지 최적화 아코디언 -->
+                <div class="semrush-accordion-panel">
+                    <div class="semrush-accordion-header" id="header-accOnpage" onclick="toggleAccordion('accOnpage')">
+                        <div class="accordion-header-left">
+                            <span class="accordion-arrow" id="arrow-accOnpage">▶</span>
+                            <span class="accordion-title-text">온페이지 최적화 (가치 명확성 & 계층 구조)</span>
+                        </div>
+                        <div class="accordion-badges" id="badges-accOnpage">
+                            <span class="accordion-badge pass" id="badge-accOnpage-pass">✓ 0</span>
+                            <span class="accordion-badge warn" id="badge-accOnpage-warn">▲ 0</span>
+                            <span class="accordion-badge err" id="badge-accOnpage-err">✕ 0</span>
+                        </div>
+                    </div>
+                    <div class="semrush-accordion-body" id="accOnpage">
+                        <div class="accordion-inner-list" id="list-accOnpage">
+                            <!-- Dynamic items -->
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 3. 하단: 우선순위별 마찰점 및 개선사항 + 체크리스트 -->
-            <div class="bottom-report-layout">
-                <!-- 식별된 전환 방해 요소 (Friction Points) -->
-                <div class="panel">
-                    <div class="panel-title">식별된 전환 방해 요소 (우선순위순 정렬)</div>
-                    <div id="frictionList" class="friction-list">
-                        <!-- Dynamic friction items -->
+                <!-- 2. 전환 마찰 (CTA) 아코디언 -->
+                <div class="semrush-accordion-panel">
+                    <div class="semrush-accordion-header" id="header-accCta" onclick="toggleAccordion('accCta')">
+                        <div class="accordion-header-left">
+                            <span class="accordion-arrow" id="arrow-accCta">▶</span>
+                            <span class="accordion-title-text">전환 마찰 요소 (행동 촉구 및 가치 명확성)</span>
+                        </div>
+                        <div class="accordion-badges" id="badges-accCta">
+                            <span class="accordion-badge pass" id="badge-accCta-pass">✓ 0</span>
+                            <span class="accordion-badge warn" id="badge-accCta-warn">▲ 0</span>
+                            <span class="accordion-badge err" id="badge-accCta-err">✕ 0</span>
+                        </div>
+                    </div>
+                    <div class="semrush-accordion-body" id="accCta">
+                        <div class="accordion-inner-list" id="list-accCta">
+                            <!-- Dynamic items -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- 즉시 개선 액션 체크리스트 -->
-                <div class="panel">
-                    <div class="panel-title">즉시 개선 액션 체크리스트</div>
-                    <div id="actionChecklist" class="checklist">
-                        <!-- Dynamic checklist items -->
+                <!-- 3. 신뢰도 지표 아코디언 -->
+                <div class="semrush-accordion-panel">
+                    <div class="semrush-accordion-header" id="header-accSocial" onclick="toggleAccordion('accSocial')">
+                        <div class="accordion-header-left">
+                            <span class="accordion-arrow" id="arrow-accSocial">▶</span>
+                            <span class="accordion-title-text">신뢰도 지표 (Social Proof)</span>
+                        </div>
+                        <div class="accordion-badges" id="badges-accSocial">
+                            <span class="accordion-badge pass" id="badge-accSocial-pass">✓ 0</span>
+                            <span class="accordion-badge warn" id="badge-accSocial-warn">▲ 0</span>
+                            <span class="accordion-badge err" id="badge-accSocial-err">✕ 0</span>
+                        </div>
+                    </div>
+                    <div class="semrush-accordion-body" id="accSocial">
+                        <div class="accordion-inner-list" id="list-accSocial">
+                            <!-- Dynamic items -->
+                        </div>
                     </div>
                 </div>
+
+                <!-- 4. 기술 성능 아코디언 -->
+                <div class="semrush-accordion-panel">
+                    <div class="semrush-accordion-header" id="header-accPerformance" onclick="toggleAccordion('accPerformance')">
+                        <div class="accordion-header-left">
+                            <span class="accordion-arrow" id="arrow-accPerformance">▶</span>
+                            <span class="accordion-title-text">기술 성능 & 코어 웹 바이탈 (Performance)</span>
+                        </div>
+                        <div class="accordion-badges" id="badges-accPerformance">
+                            <span class="accordion-badge pass" id="badge-accPerformance-pass">✓ 0</span>
+                            <span class="accordion-badge warn" id="badge-accPerformance-warn">▲ 0</span>
+                            <span class="accordion-badge err" id="badge-accPerformance-err">✕ 0</span>
+                        </div>
+                    </div>
+                    <div class="semrush-accordion-body" id="accPerformance">
+                        <div class="accordion-inner-list">
+                            <!-- 기술 성능 상세 영역 -->
+                            <div class="perf-detail" id="perfDetail" style="display:block; border-top:none; padding-top:0;">
+                                <div class="perf-body open" id="perfBody" style="display:block;">
+                                    <div class="perf-row"><span>로딩 시간</span><span id="perfLoadTime">-</span></div>
+                                    <div class="perf-row"><span>SEO 기본 점수</span><span id="perfSeoScore">-</span></div>
+                                    <div class="perf-row"><span>H1 개수 / Canonical</span><span id="perfH1Canon">-</span></div>
+                                    <div class="perf-row"><span>이미지 Alt 누락</span><span id="perfAltMissing">-</span></div>
+                                    <div class="perf-row"><span>타이틀 / 메타 길이</span><span id="perfTitleMeta">-</span></div>
+                                    <div id="perfIssues" class="perf-issues" style="margin-top:12px;"></div>
+                                </div>
+                            </div>
+                            <div class="accordion-inner-list" id="list-accPerformance" style="margin-top:14px;">
+                                <!-- Dynamic items -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 검색엔진 최적화 아코디언 -->
+                <div class="semrush-accordion-panel">
+                    <div class="semrush-accordion-header" id="header-accSeo" onclick="toggleAccordion('accSeo')">
+                        <div class="accordion-header-left">
+                            <span class="accordion-arrow" id="arrow-accSeo">▶</span>
+                            <span class="accordion-title-text">검색엔진 최적화 (SEO)</span>
+                        </div>
+                        <div class="accordion-badges" id="badges-accSeo">
+                            <span class="accordion-badge pass" id="badge-accSeo-pass">✓ 0</span>
+                            <span class="accordion-badge warn" id="badge-accSeo-warn">▲ 0</span>
+                            <span class="accordion-badge err" id="badge-accSeo-err">✕ 0</span>
+                        </div>
+                    </div>
+                    <div class="semrush-accordion-body" id="accSeo">
+                        <div class="accordion-inner-list" id="list-accSeo">
+                            <!-- Dynamic items -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- 하단: 즉시 개선 액션 체크리스트 -->
+            <div class="panel">
+                <div class="panel-title">즉시 개선 액션 체크리스트 (우선순위순 정렬)</div>
+                <div id="actionChecklist" class="checklist">
+                    <!-- Dynamic checklist items -->
+                </div>
+                <!-- JS 에러 방지용으로 유지하되 숨김 처리 -->
+                <div id="frictionList" style="display:none"></div>
+            </div>
+
+            <!-- 최하단: 무료 플랜 한계 & Pro 업그레이드 CTA -->
+            <div class="pricing-banner-panel">
+                <div class="pricing-banner-left">
+                    <span class="pricing-banner-tag">PRO PLAN RECOMMENDED</span>
+                    <h2>진단 한계에 도달하셨나요? Pro 멤버십으로 무제한 오딧을 시작하세요.</h2>
+                    <p>현재 무료 플랜에서는 월 3회 분석 제한이 적용됩니다. Pro 멤버십으로 업그레이드하시면 대안 카피 무제한 발급, 다차원 경쟁사 페이지 추적, 픽셀 좌표 아카이브 저장 등 모든 기능을 사용할 수 있습니다.</p>
+                </div>
+                <div class="pricing-banner-right">
+                    <button class="btn-pricing-upgrade" onclick="openPricing()">Pro 업그레이드하기</button>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -2141,6 +2605,73 @@
             }
         }
 
+        function toggleAccordion(panelId) {
+            const body = document.getElementById(panelId);
+            const header = document.getElementById('header-' + panelId);
+            const arrow = document.getElementById('arrow-' + panelId);
+            
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+                header.classList.remove('active');
+                arrow.classList.remove('open');
+            } else {
+                body.classList.add('open');
+                header.classList.add('active');
+                arrow.classList.add('open');
+            }
+        }
+
+        function populateAccordionCategory(panelId, categoryFrictions, defaultPassed = 5) {
+            const listEl = document.getElementById('list-' + panelId);
+            const passEl = document.getElementById('badge-' + panelId + '-pass');
+            const warnEl = document.getElementById('badge-' + panelId + '-warn');
+            const errEl = document.getElementById('badge-' + panelId + '-err');
+            
+            let errors = 0;
+            let warnings = 0;
+            
+            const itemsHTML = categoryFrictions.map(item => {
+                const isHigh = item.severity.toLowerCase() === 'high';
+                if (isHigh) errors++;
+                else warnings++;
+                
+                const iconClass = isHigh ? 'err' : 'warn';
+                const iconChar = isHigh ? '✕' : '▲';
+                
+                return `
+                    <div class="semrush-audit-item">
+                        <span class="semrush-icon ${iconClass}">${iconChar}</span>
+                        <div class="semrush-audit-content">
+                            <div class="semrush-audit-title">[${escapeHtml(item.severity)}] ${escapeHtml(item.issue)}</div>
+                            <div class="semrush-audit-desc">${escapeHtml(item.solution)}</div>
+                            <span class="friction-tag" style="margin-top: 8px;">#${escapeHtml(item.category)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (categoryFrictions.length === 0) {
+                listEl.innerHTML = `
+                    <div class="semrush-audit-item">
+                        <span class="semrush-icon pass">✓</span>
+                        <div class="semrush-audit-content">
+                            <div class="semrush-audit-title">모든 검사 항목 통과</div>
+                            <div class="semrush-audit-desc">해당 카테고리에서 감지된 가시적인 마찰이나 최적화 방해 요인이 없습니다.</div>
+                        </div>
+                    </div>
+                `;
+                passEl.textContent = `✓ ${defaultPassed}`;
+                warnEl.textContent = `▲ 0`;
+                errEl.textContent = `✕ 0`;
+            } else {
+                listEl.innerHTML = itemsHTML.join('');
+                const passes = Math.max(0, defaultPassed - errors - warnings);
+                passEl.textContent = `✓ ${passes}`;
+                warnEl.textContent = `▲ ${warnings}`;
+                errEl.textContent = `✕ ${errors}`;
+            }
+        }
+
         function displayResult(data) {
             document.getElementById('loadingView').style.display = 'none';
             document.getElementById('dashboardView').style.display = 'block';
@@ -2163,9 +2694,13 @@
             document.getElementById('resGrade').textContent = grade;
             document.getElementById('resScore').textContent = overallScore;
             
-            // 링 차트 색상 보정
-            const gradeRing = document.getElementById('gradeRing');
-            gradeRing.style.background = `radial-gradient(circle, #0e0f17 55%, transparent 58%), conic-gradient(var(--primary) ${overallScore}%, var(--border) ${overallScore}%)`;
+            // Semrush 스타일 원형 게이지 업데이트
+            const semrushGauge = document.getElementById('semrushGaugeVal');
+            const circumference = 377;
+            semrushGauge.style.strokeDashoffset = circumference - (circumference * overallScore) / 100;
+            if (overallScore >= 80) semrushGauge.style.stroke = 'var(--primary)';
+            else if (overallScore >= 60) semrushGauge.style.stroke = 'var(--warning)';
+            else semrushGauge.style.stroke = 'var(--danger)';
             
             // 종합 등급 한줄 평
             const commentEl = document.getElementById('gradeComment');
@@ -2181,7 +2716,7 @@
             
             document.getElementById('valPropSummary').textContent = data.value_proposition || data.value_proposition_analysis;
             
-            // 신뢰도 표시
+            // 신뢰도 표시 및 보정 정보
             const confBar = document.getElementById('confidenceBar');
             const confVal = data.confidence != null ? data.confidence : 0;
             if (confVal > 0) {
@@ -2189,11 +2724,10 @@
                 document.getElementById('confidenceVal').textContent = Math.round(confVal) + '%';
                 const barConf = document.getElementById('barConfidence');
                 setTimeout(() => { barConf.style.width = confVal + '%'; }, 100);
-                // 신뢰도 색상
                 if (confVal >= 80) barConf.style.backgroundColor = 'var(--primary)';
                 else if (confVal >= 60) barConf.style.backgroundColor = 'var(--warning)';
                 else barConf.style.backgroundColor = 'var(--danger)';
-                // 보정 노트
+                
                 var noteEl = document.getElementById('confidenceNote');
                 if (data.calibration_applied) {
                     noteEl.textContent = '점수 보정 적용됨 (-' + (data.calibration_deduction || 0) + '점). 마찰점 심각도와 점수 불일치 감지.';
@@ -2212,7 +2746,6 @@
                 document.getElementById('perfDetail').style.display = 'block';
                 document.getElementById('perfLoadTime').textContent = pd.load_time_ms + 'ms (' + (pd.load_score || '?') + '점)';
                 document.getElementById('perfSeoScore').textContent = (pd.seo_score || '?') + '점';
-                // H1 + Canonical 통합
                 var h1CanonParts = [];
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
@@ -2221,7 +2754,6 @@
                     }
                 }
                 document.getElementById('perfH1Canon').textContent = h1CanonParts.length > 0 ? h1CanonParts.join(' / ') : '양호';
-                // Alt 누락
                 var altIssue = '';
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
@@ -2229,7 +2761,6 @@
                     }
                 }
                 document.getElementById('perfAltMissing').textContent = altIssue || '없음';
-                // 타이틀 + 메타
                 var titleMetaParts = [];
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
@@ -2238,20 +2769,62 @@
                     }
                 }
                 document.getElementById('perfTitleMeta').textContent = titleMetaParts.length > 0 ? titleMetaParts.join(' / ') : '양호';
-                // 이슈 종합
                 var issuesEl = document.getElementById('perfIssues');
                 if (pd.seo_issues && pd.seo_issues.length > 0) {
                     issuesEl.innerHTML = pd.seo_issues.map(function(i){ return '- ' + i; }).join('<br>');
                 }
             }
+
+            // 3대 핵심 카테고리 스코어 카드 업데이트
+            const clarityVal = clarity || 80;
+            const hierarchyVal = hierarchy || 80;
+            const onpageScore = Math.round((clarityVal + hierarchyVal) / 2);
+            document.getElementById('cardOnpageScore').textContent = onpageScore + '%';
+            document.getElementById('cardOnpageStatus').textContent = onpageScore >= 80 ? '최적 상태 (양호)' : (onpageScore >= 60 ? '개선 권장 (경고)' : '즉각 개선 필요');
+
+            const ctaVal = cta || 80;
+            document.getElementById('cardCtaScore').textContent = ctaVal + '%';
+            document.getElementById('cardCtaStatus').textContent = ctaVal >= 80 ? '가시성 우수 (양호)' : (ctaVal >= 60 ? '마찰 감지 (경고)' : '행동 유도 누락');
+
+            const perfVal = performance || 80;
+            const seoScoreVal = pd ? (pd.seo_score || 80) : 80;
+            const techSeoScore = Math.round((perfVal + seoScoreVal) / 2);
+            document.getElementById('cardTechSeoScore').textContent = techSeoScore + '%';
+            document.getElementById('cardTechSeoStatus').textContent = techSeoScore >= 80 ? '최적화 완료 (양호)' : (techSeoScore >= 60 ? '성능 보통 (경고)' : '성능 저하 감지');
             
-            // 서브 스코어바 갱신
+            // 서브 스코어바 갱신 (오각형 매핑용 백그라운드용)
             updateProgressBar('barClarity', 'valClarity', clarity);
             updateProgressBar('barCta', 'valCta', cta);
             updateProgressBar('barHierarchy', 'valHierarchy', hierarchy);
             updateProgressBar('barSocial', 'valSocial', socialProof);
             updateProgressBar('barPerf', 'valPerf', performance);
             
+            // 카테고리별 아코디언 패널 렌더링 (Semrush Audit 스타일)
+            const onpageFrictions = data.friction_points.filter(f => 
+                f.category.toLowerCase() === 'clarity' || f.category.toLowerCase() === 'hierarchy'
+            );
+            populateAccordionCategory('accOnpage', onpageFrictions, 6);
+
+            const ctaFrictions = data.friction_points.filter(f => 
+                f.category.toLowerCase() === 'cta'
+            );
+            populateAccordionCategory('accCta', ctaFrictions, 5);
+
+            const socialFrictions = data.friction_points.filter(f => 
+                f.category.toLowerCase() === 'trust' || f.category.toLowerCase() === 'social' || f.category.toLowerCase() === 'social_proof'
+            );
+            populateAccordionCategory('accSocial', socialFrictions, 4);
+
+            const perfFrictions = data.friction_points.filter(f => 
+                f.category.toLowerCase() === 'performance'
+            );
+            populateAccordionCategory('accPerformance', perfFrictions, 5);
+
+            const seoFrictions = data.friction_points.filter(f => 
+                f.category.toLowerCase() === 'seo'
+            );
+            populateAccordionCategory('accSeo', seoFrictions, 6);
+
             // 카피 제안 갱신
             const ab = data.ab_test_suggestions;
             document.getElementById('originalH1').textContent = ab.original_h1 || "(수집 실패 또는 없음)";
@@ -2275,31 +2848,19 @@
                 </div>
             `).join('');
             
-            // 이탈 장벽 목록 렌더링 (우선순위 정렬: High -> Medium -> Low)
-            const severityOrder = { "high": 0, "medium": 1, "low": 2 };
-            const sortedFrictionPoints = [...data.friction_points].sort((a, b) => {
-                const aOrder = severityOrder[a.severity.toLowerCase()] ?? 9;
-                const bOrder = severityOrder[b.severity.toLowerCase()] ?? 9;
-                return aOrder - bOrder;
-            });
-            const frictionListEl = document.getElementById('frictionList');
-            frictionListEl.innerHTML = sortedFrictionPoints.map(item => `
-                <div class="friction-item">
-                    <div class="friction-badge ${escapeHtml(item.severity.toLowerCase())}">${escapeHtml(item.severity)}</div>
-                    <div class="friction-content">
-                        <div class="friction-issue">${escapeHtml(item.issue)}</div>
-                        <div class="friction-sol">${escapeHtml(item.solution)}</div>
-                        <span class="friction-tag">#${escapeHtml(item.category)}</span>
-                    </div>
-                </div>
-            `).join('');
-            
             // 캡처 이미지 로드
             const img = document.getElementById('screenshotImage');
             img.src = data.screenshot_url || data.screenshot_path;
             
             // 좌표 오버레이 렌더링
             crawledElements = data.elements;
+            frictionPoints = data.friction_points;
+            
+            renderVisualAnnotations(crawledElements, frictionPoints);
+            
+            // 오각형 레이더 차트 갱신
+            renderRadarChart([clarity, cta, hierarchy, socialProof, performance]);
+        }
             frictionPoints = data.friction_points;
             
             renderVisualAnnotations(crawledElements, frictionPoints);
