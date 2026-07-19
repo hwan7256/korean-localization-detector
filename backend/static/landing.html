@@ -2679,22 +2679,23 @@
         }
 
         function displayResult(data) {
+            if (!data) return;
             document.getElementById('loadingView').style.display = 'none';
             document.getElementById('dashboardView').style.display = 'block';
             history.pushState({view: 'dashboard'}, '', '/dashboard');
             
             // 데이터 매핑
-            document.getElementById('resUrl').textContent = data.url;
-            document.getElementById('browserAddressBar').textContent = data.url;
+            document.getElementById('resUrl').textContent = data.url || "";
+            document.getElementById('browserAddressBar').textContent = data.url || "";
             document.getElementById('resAudience').textContent = data.target_audience || "일반 대중";
             
             // 점수 및 링 차트 갱신
-            const overallScore = data.overall_score || data.score_overall;
-            const clarity = data.scores ? data.scores.clarity : data.score_clarity;
-            const cta = data.scores ? data.scores.cta : data.score_cta;
-            const hierarchy = data.scores ? data.scores.hierarchy : data.score_hierarchy;
-            const socialProof = data.scores ? data.scores.social_proof : data.score_social_proof;
-            const performance = data.scores ? data.scores.performance : data.score_performance;
+            const overallScore = data.overall_score || data.score_overall || 0;
+            const clarity = data.scores ? (data.scores.clarity || 0) : (data.score_clarity || 0);
+            const cta = data.scores ? (data.scores.cta || 0) : (data.score_cta || 0);
+            const hierarchy = data.scores ? (data.scores.hierarchy || 0) : (data.score_hierarchy || 0);
+            const socialProof = data.scores ? (data.scores.social_proof || 0) : (data.score_social_proof || 0);
+            const performance = data.scores ? (data.scores.performance || 0) : (data.score_performance || 0);
             
             const grade = calculateGrade(overallScore);
             document.getElementById('resGrade').textContent = grade;
@@ -2702,56 +2703,73 @@
             
             // Semrush 스타일 원형 게이지 업데이트
             const semrushGauge = document.getElementById('semrushGaugeVal');
-            const circumference = 377;
-            semrushGauge.style.strokeDashoffset = circumference - (circumference * overallScore) / 100;
-            if (overallScore >= 80) semrushGauge.style.stroke = 'var(--primary)';
-            else if (overallScore >= 60) semrushGauge.style.stroke = 'var(--warning)';
-            else semrushGauge.style.stroke = 'var(--danger)';
+            if (semrushGauge) {
+                const circumference = 377;
+                semrushGauge.style.strokeDashoffset = circumference - (circumference * overallScore) / 100;
+                if (overallScore >= 80) semrushGauge.style.stroke = 'var(--primary)';
+                else if (overallScore >= 60) semrushGauge.style.stroke = 'var(--warning)';
+                else semrushGauge.style.stroke = 'var(--danger)';
+            }
             
             // 종합 등급 한줄 평
             const commentEl = document.getElementById('gradeComment');
-            if (overallScore >= 85) {
-                commentEl.textContent = "최고 수준의 랜딩페이지입니다";
-            } else if (overallScore >= 70) {
-                commentEl.textContent = "전환 잠재력이 훌륭합니다";
-            } else if (overallScore >= 55) {
-                commentEl.textContent = "일부 치명적인 수정이 필요합니다";
-            } else {
-                commentEl.textContent = "구조적인 전면 개편이 시급합니다";
+            if (commentEl) {
+                if (overallScore >= 85) {
+                    commentEl.textContent = "최고 수준의 랜딩페이지입니다";
+                } else if (overallScore >= 70) {
+                    commentEl.textContent = "전환 잠재력이 훌륭합니다";
+                } else if (overallScore >= 55) {
+                    commentEl.textContent = "일부 치명적인 수정이 필요합니다";
+                } else {
+                    commentEl.textContent = "구조적인 전면 개편이 시급합니다";
+                }
             }
             
-            document.getElementById('valPropSummary').textContent = data.value_proposition || data.value_proposition_analysis;
+            const valPropEl = document.getElementById('valPropSummary');
+            if (valPropEl) {
+                valPropEl.textContent = data.value_proposition || data.value_proposition_analysis || "";
+            }
             
             // 신뢰도 표시 및 보정 정보
             const confBar = document.getElementById('confidenceBar');
             const confVal = data.confidence != null ? data.confidence : 0;
             if (confVal > 0) {
-                confBar.style.display = 'block';
-                document.getElementById('confidenceVal').textContent = Math.round(confVal) + '%';
+                if (confBar) confBar.style.display = 'block';
+                const confValEl = document.getElementById('confidenceVal');
+                if (confValEl) confValEl.textContent = Math.round(confVal) + '%';
                 const barConf = document.getElementById('barConfidence');
-                setTimeout(() => { barConf.style.width = confVal + '%'; }, 100);
-                if (confVal >= 80) barConf.style.backgroundColor = 'var(--primary)';
-                else if (confVal >= 60) barConf.style.backgroundColor = 'var(--warning)';
-                else barConf.style.backgroundColor = 'var(--danger)';
+                if (barConf) {
+                    setTimeout(() => { barConf.style.width = confVal + '%'; }, 100);
+                    if (confVal >= 80) barConf.style.backgroundColor = 'var(--primary)';
+                    else if (confVal >= 60) barConf.style.backgroundColor = 'var(--warning)';
+                    else barConf.style.backgroundColor = 'var(--danger)';
+                }
                 
                 var noteEl = document.getElementById('confidenceNote');
-                if (data.calibration_applied) {
-                    noteEl.textContent = '점수 보정 적용됨 (-' + (data.calibration_deduction || 0) + '점). 마찰점 심각도와 점수 불일치 감지.';
-                    document.getElementById('calibBadge').style.display = 'inline-block';
-                } else {
-                    noteEl.textContent = 'LLM + 정량 지표 하이브리드 분석. 보정 없음.';
-                    document.getElementById('calibBadge').style.display = 'none';
+                const calibBadge = document.getElementById('calibBadge');
+                if (noteEl) {
+                    if (data.calibration_applied) {
+                        noteEl.textContent = '점수 보정 적용됨 (-' + (data.calibration_deduction || 0) + '점). 마찰점 심각도와 점수 불일치 감지.';
+                        if (calibBadge) calibBadge.style.display = 'inline-block';
+                    } else {
+                        noteEl.textContent = 'LLM + 정량 지표 하이브리드 분석. 보정 없음.';
+                        if (calibBadge) calibBadge.style.display = 'none';
+                    }
                 }
             } else {
-                confBar.style.display = 'none';
+                if (confBar) confBar.style.display = 'none';
             }
             
             // 기술 성능 상세 표시
             var pd = data.performance_detail;
             if (pd && pd.load_time_ms != null) {
-                document.getElementById('perfDetail').style.display = 'block';
-                document.getElementById('perfLoadTime').textContent = pd.load_time_ms + 'ms (' + (pd.load_score || '?') + '점)';
-                document.getElementById('perfSeoScore').textContent = (pd.seo_score || '?') + '점';
+                const perfDetailEl = document.getElementById('perfDetail');
+                if (perfDetailEl) perfDetailEl.style.display = 'block';
+                const perfLoadTimeEl = document.getElementById('perfLoadTime');
+                if (perfLoadTimeEl) perfLoadTimeEl.textContent = pd.load_time_ms + 'ms (' + (pd.load_score || '?') + '점)';
+                const perfSeoScoreEl = document.getElementById('perfSeoScore');
+                if (perfSeoScoreEl) perfSeoScoreEl.textContent = (pd.seo_score || '?') + '점';
+                
                 var h1CanonParts = [];
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
@@ -2759,14 +2777,18 @@
                         if (pd.seo_issues[i].indexOf('Canonical') >= 0) h1CanonParts.push(pd.seo_issues[i]);
                     }
                 }
-                document.getElementById('perfH1Canon').textContent = h1CanonParts.length > 0 ? h1CanonParts.join(' / ') : '양호';
+                const perfH1CanonEl = document.getElementById('perfH1Canon');
+                if (perfH1CanonEl) perfH1CanonEl.textContent = h1CanonParts.length > 0 ? h1CanonParts.join(' / ') : '양호';
+                
                 var altIssue = '';
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
                         if (pd.seo_issues[i].indexOf('Alt') >= 0) { altIssue = pd.seo_issues[i]; break; }
                     }
                 }
-                document.getElementById('perfAltMissing').textContent = altIssue || '없음';
+                const perfAltMissingEl = document.getElementById('perfAltMissing');
+                if (perfAltMissingEl) perfAltMissingEl.textContent = altIssue || '없음';
+                
                 var titleMetaParts = [];
                 if (pd.seo_issues) {
                     for (var i = 0; i < pd.seo_issues.length; i++) {
@@ -2774,9 +2796,11 @@
                         if (pd.seo_issues[i].indexOf('메타') >= 0) titleMetaParts.push(pd.seo_issues[i]);
                     }
                 }
-                document.getElementById('perfTitleMeta').textContent = titleMetaParts.length > 0 ? titleMetaParts.join(' / ') : '양호';
+                const perfTitleMetaEl = document.getElementById('perfTitleMeta');
+                if (perfTitleMetaEl) perfTitleMetaEl.textContent = titleMetaParts.length > 0 ? titleMetaParts.join(' / ') : '양호';
+                
                 var issuesEl = document.getElementById('perfIssues');
-                if (pd.seo_issues && pd.seo_issues.length > 0) {
+                if (issuesEl && pd.seo_issues && pd.seo_issues.length > 0) {
                     issuesEl.innerHTML = pd.seo_issues.map(function(i){ return '- ' + i; }).join('<br>');
                 }
             }
@@ -2785,18 +2809,24 @@
             const clarityVal = clarity || 80;
             const hierarchyVal = hierarchy || 80;
             const onpageScore = Math.round((clarityVal + hierarchyVal) / 2);
-            document.getElementById('cardOnpageScore').textContent = onpageScore + '%';
-            document.getElementById('cardOnpageStatus').textContent = onpageScore >= 80 ? '최적 상태 (양호)' : (onpageScore >= 60 ? '개선 권장 (경고)' : '즉각 개선 필요');
+            const cardOnpageScoreEl = document.getElementById('cardOnpageScore');
+            if (cardOnpageScoreEl) cardOnpageScoreEl.textContent = onpageScore + '%';
+            const cardOnpageStatusEl = document.getElementById('cardOnpageStatus');
+            if (cardOnpageStatusEl) cardOnpageStatusEl.textContent = onpageScore >= 80 ? '최적 상태 (양호)' : (onpageScore >= 60 ? '개선 권장 (경고)' : '즉각 개선 필요');
 
             const ctaVal = cta || 80;
-            document.getElementById('cardCtaScore').textContent = ctaVal + '%';
-            document.getElementById('cardCtaStatus').textContent = ctaVal >= 80 ? '가시성 우수 (양호)' : (ctaVal >= 60 ? '마찰 감지 (경고)' : '행동 유도 누락');
+            const cardCtaScoreEl = document.getElementById('cardCtaScore');
+            if (cardCtaScoreEl) cardCtaScoreEl.textContent = ctaVal + '%';
+            const cardCtaStatusEl = document.getElementById('cardCtaStatus');
+            if (cardCtaStatusEl) cardCtaStatusEl.textContent = ctaVal >= 80 ? '가시성 우수 (양호)' : (ctaVal >= 60 ? '마찰 감지 (경고)' : '행동 유도 누락');
 
             const perfVal = performance || 80;
             const seoScoreVal = pd ? (pd.seo_score || 80) : 80;
             const techSeoScore = Math.round((perfVal + seoScoreVal) / 2);
-            document.getElementById('cardTechSeoScore').textContent = techSeoScore + '%';
-            document.getElementById('cardTechSeoStatus').textContent = techSeoScore >= 80 ? '최적화 완료 (양호)' : (techSeoScore >= 60 ? '성능 보통 (경고)' : '성능 저하 감지');
+            const cardTechSeoScoreEl = document.getElementById('cardTechSeoScore');
+            if (cardTechSeoScoreEl) cardTechSeoScoreEl.textContent = techSeoScore + '%';
+            const cardTechSeoStatusEl = document.getElementById('cardTechSeoStatus');
+            if (cardTechSeoStatusEl) cardTechSeoStatusEl.textContent = techSeoScore >= 80 ? '최적화 완료 (양호)' : (techSeoScore >= 60 ? '성능 보통 (경고)' : '성능 저하 감지');
             
             // 서브 스코어바 갱신 (오각형 매핑용 백그라운드용)
             updateProgressBar('barClarity', 'valClarity', clarity);
@@ -2806,61 +2836,74 @@
             updateProgressBar('barPerf', 'valPerf', performance);
             
             // 카테고리별 아코디언 패널 렌더링 (Semrush Audit 스타일)
-            const onpageFrictions = data.friction_points.filter(f => 
-                f.category.toLowerCase() === 'clarity' || f.category.toLowerCase() === 'hierarchy'
+            const frictionPointsList = data.friction_points || [];
+            const onpageFrictions = frictionPointsList.filter(f => 
+                f && f.category && (f.category.toLowerCase() === 'clarity' || f.category.toLowerCase() === 'hierarchy')
             );
             populateAccordionCategory('accOnpage', onpageFrictions, 6);
 
-            const ctaFrictions = data.friction_points.filter(f => 
-                f.category.toLowerCase() === 'cta'
+            const ctaFrictions = frictionPointsList.filter(f => 
+                f && f.category && f.category.toLowerCase() === 'cta'
             );
             populateAccordionCategory('accCta', ctaFrictions, 5);
 
-            const socialFrictions = data.friction_points.filter(f => 
-                f.category.toLowerCase() === 'trust' || f.category.toLowerCase() === 'social' || f.category.toLowerCase() === 'social_proof'
+            const socialFrictions = frictionPointsList.filter(f => 
+                f && f.category && (f.category.toLowerCase() === 'trust' || f.category.toLowerCase() === 'social' || f.category.toLowerCase() === 'social_proof')
             );
             populateAccordionCategory('accSocial', socialFrictions, 4);
 
-            const perfFrictions = data.friction_points.filter(f => 
-                f.category.toLowerCase() === 'performance'
+            const perfFrictions = frictionPointsList.filter(f => 
+                f && f.category && f.category.toLowerCase() === 'performance'
             );
             populateAccordionCategory('accPerformance', perfFrictions, 5);
 
-            const seoFrictions = data.friction_points.filter(f => 
-                f.category.toLowerCase() === 'seo'
+            const seoFrictions = frictionPointsList.filter(f => 
+                f && f.category && f.category.toLowerCase() === 'seo'
             );
             populateAccordionCategory('accSeo', seoFrictions, 6);
 
             // 카피 제안 갱신
-            const ab = data.ab_test_suggestions;
-            document.getElementById('originalH1').textContent = ab.original_h1 || "(수집 실패 또는 없음)";
-            document.getElementById('altA').textContent = ab.alternative_h1_A;
-            document.getElementById('altB').textContent = ab.alternative_h1_B;
-            document.getElementById('abReason').innerHTML = `<strong>AI 처방 배경:</strong> ${ab.reasoning}`;
+            const ab = data.ab_test_suggestions || {};
+            const originalH1El = document.getElementById('originalH1');
+            if (originalH1El) originalH1El.textContent = ab.original_h1 || "(수집 실패 또는 없음)";
+            const altAEl = document.getElementById('altA');
+            if (altAEl) altAEl.textContent = ab.alternative_h1_A || "";
+            const altBEl = document.getElementById('altB');
+            if (altBEl) altBEl.textContent = ab.alternative_h1_B || "";
+            const abReasonEl = document.getElementById('abReason');
+            if (abReasonEl) abReasonEl.innerHTML = `<strong>AI 처방 배경:</strong> ${ab.reasoning || ""}`;
             
             // 액션 리스트 렌더링 (우선순위 정렬: Critical -> Recommended -> Optional)
             const priorityOrder = { "critical": 0, "recommended": 1, "optional": 2 };
-            const sortedActionChecklist = [...data.action_checklist].sort((a, b) => {
-                const aOrder = priorityOrder[a.priority.toLowerCase()] ?? 9;
-                const bOrder = priorityOrder[b.priority.toLowerCase()] ?? 9;
+            const checklistData = data.action_checklist || [];
+            const sortedActionChecklist = [...checklistData].sort((a, b) => {
+                const aPriority = a && a.priority ? a.priority.toLowerCase() : "optional";
+                const bPriority = b && b.priority ? b.priority.toLowerCase() : "optional";
+                const aOrder = priorityOrder[aPriority] ?? 9;
+                const bOrder = priorityOrder[bPriority] ?? 9;
                 return aOrder - bOrder;
             });
             const actionListEl = document.getElementById('actionChecklist');
-            actionListEl.innerHTML = sortedActionChecklist.map((item, idx) => `
-                <div class="check-item" onclick="this.classList.toggle('checked')">
-                    <div class="check-box"></div>
-                    <span class="check-text">${escapeHtml(item.task)}</span>
-                    <span class="check-priority ${escapeHtml(item.priority.toLowerCase())}">${escapeHtml(item.priority)}</span>
-                </div>
-            `).join('');
+            if (actionListEl) {
+                actionListEl.innerHTML = sortedActionChecklist.map((item, idx) => {
+                    if (!item) return '';
+                    return `
+                        <div class="check-item" onclick="this.classList.toggle('checked')">
+                            <div class="check-box"></div>
+                            <span class="check-text">${escapeHtml(item.task || '')}</span>
+                            <span class="check-priority ${escapeHtml((item.priority || 'optional').toLowerCase())}">${escapeHtml(item.priority || 'Optional')}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
             
             // 캡처 이미지 로드
             const img = document.getElementById('screenshotImage');
-            img.src = data.screenshot_url || data.screenshot_path;
+            if (img) img.src = data.screenshot_url || data.screenshot_path || "";
             
             // 좌표 오버레이 렌더링
-            crawledElements = data.elements;
-            frictionPoints = data.friction_points;
+            crawledElements = data.elements || [];
+            frictionPoints = data.friction_points || [];
             
             renderVisualAnnotations(crawledElements, frictionPoints);
             
