@@ -2871,6 +2871,7 @@
         function updateProgressBar(barId, valId, val) {
             const bar = document.getElementById(barId);
             const label = document.getElementById(valId);
+            if (!bar || !label) return;
             label.textContent = `${val} / 100`;
             setTimeout(() => {
                 bar.style.width = `${val}%`;
@@ -2882,45 +2883,51 @@
         }
 
         function renderRadarChart(scores) {
-            if (radarChartInstance) {
-                radarChartInstance.destroy();
-            }
-            
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['명확성(Clarity)', '행동유도(CTA)', '정보구조(Hierarchy)', '신뢰도(Social Proof)', '성능(Performance)'],
-                    datasets: [{
-                        label: '랜딩페이지 CRO 점수',
-                        data: scores,
-                        backgroundColor: 'rgba(0, 255, 178, 0.15)',
-                        borderColor: 'rgba(0, 255, 178, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(0, 178, 255, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(0, 255, 178, 1)'
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
-                            pointLabels: { color: '#8e93ad', font: { size: 11, family: 'Outfit, Noto Sans KR' } },
-                            ticks: { display: false },
-                            min: 0,
-                            max: 100
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
+            try {
+                if (radarChartInstance) {
+                    radarChartInstance.destroy();
                 }
-            });
+                
+                const canvas = document.getElementById('radarChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                radarChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['명확성(Clarity)', '행동유도(CTA)', '정보구조(Hierarchy)', '신뢰도(Social Proof)', '성능(Performance)'],
+                        datasets: [{
+                            label: '랜딩페이지 CRO 점수',
+                            data: scores,
+                            backgroundColor: 'rgba(0, 255, 178, 0.15)',
+                            borderColor: 'rgba(0, 255, 178, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(0, 178, 255, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(0, 255, 178, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                                pointLabels: { color: '#8e93ad', font: { size: 11, family: 'Outfit, Noto Sans KR' } },
+                                ticks: { display: false },
+                                min: 0,
+                                max: 100
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Radar chart rendering failed:", e);
+            }
         }
 
         // 반응형 시각적 진단 오버레이 렌더링
