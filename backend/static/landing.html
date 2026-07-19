@@ -2579,18 +2579,18 @@
             }, 3000); // 실제 API 완료 시점 전까지 가짜 단계 상승
 
             try {
-                // 120초 타임아웃 — 응답 없으면 자동으로 에러 처리
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 120000);
-                
-                const res = await fetch('/api/analyze', {
+                // 120초 타임아웃 — Promise.race로 강제 종료
+                const fetchPromise = fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: urlInput, target_audience: audienceInput }),
-                    signal: controller.signal
+                    body: JSON.stringify({ url: urlInput, target_audience: audienceInput })
                 });
                 
-                clearTimeout(timeoutId);
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('분석 시간이 초과되었습니다. 다시 시도해주세요.')), 120000)
+                );
+                
+                const res = await Promise.race([fetchPromise, timeoutPromise]);
                 clearInterval(loadingInterval);
                 
                 if (!res.ok) {
