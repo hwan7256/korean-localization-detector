@@ -1467,6 +1467,16 @@
             loadHistory();
         });
 
+        // 브라우저 뒤로가기 처리: 대시보드 → 홈
+        window.addEventListener('popstate', function(e) {
+            var dv = document.getElementById('dashboardView');
+            if (dv && dv.style.display === 'block') {
+                document.getElementById('dashboardView').style.display = 'none';
+                document.getElementById('inputView').style.display = 'block';
+                loadHistory();
+            }
+        });
+
         async function loadHistory() {
             try {
                 const res = await fetch('/api/history');
@@ -1526,6 +1536,7 @@
         function backToHome() {
             document.getElementById('dashboardView').style.display = 'none';
             document.getElementById('inputView').style.display = 'block';
+            history.replaceState({view: 'home'}, '', '/');
             loadHistory();
         }
 
@@ -1619,6 +1630,7 @@
         function displayResult(data) {
             document.getElementById('loadingView').style.display = 'none';
             document.getElementById('dashboardView').style.display = 'block';
+            history.pushState({view: 'dashboard'}, '', '/dashboard');
             
             // 데이터 매핑
             document.getElementById('resUrl').textContent = data.url;
