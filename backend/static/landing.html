@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConvertRadar 🚀 — 1분 랜딩페이지 전환율 & UX 진단기</title>
+    <title>ConvertRadar — 1분 랜딩페이지 전환율 & UX 진단기</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
@@ -526,6 +526,32 @@
             line-height: 1.5;
         }
 
+        /* Confidence Bar */
+        .confidence-bar {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+        .confidence-val {
+            color: var(--info);
+        }
+        .confidence-fill {
+            background-color: var(--info) !important;
+        }
+        .confidence-note {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
         /* Sub scores progress bars */
         .sub-scores {
             display: flex;
@@ -682,7 +708,7 @@
         }
 
         .audit-pin::after {
-            content: "⚠️";
+            content: "";
             position: absolute;
             top: -12px;
             right: -12px;
@@ -921,7 +947,7 @@
 
     <!-- Header -->
     <header>
-        <a href="/" class="logo">Convert<span>Radar</span> 🚀</a>
+        <a href="/" class="logo">Convert<span>Radar</span></a>
         <div class="nav-links">
             <a href="/" class="nav-link active">자가 진단</a>
             <a href="#" class="nav-link" onclick="alert('준비 중입니다. Pro 플랜 출시 후 자동 알림을 받으시겠습니까?')">경쟁사 추적</a>
@@ -956,7 +982,7 @@
 
             <!-- History Scans -->
             <div class="history-section">
-                <h3 class="history-title">🕒 최근 진단 이력</h3>
+                <h3 class="history-title">최근 진단 이력</h3>
                 <div id="historyGrid" class="history-grid">
                     <!-- Dynamic Loading -->
                     <p style="color: var(--text-muted)">로딩 중...</p>
@@ -1013,9 +1039,19 @@
                                 <div class="grade-score" id="resScore">84</div>
                             </div>
                             <div class="grade-desc">
-                                <h3 id="gradeComment">전환 잠재력이 높습니다!</h3>
+                                <h3 id="gradeComment">전환 잠재력이 높습니다</h3>
                                 <p id="valPropSummary">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 유입 고객의 구매 전환율이 크게 오를 수 있습니다.</p>
                             </div>
+                        </div>
+                        <div class="confidence-bar" id="confidenceBar" style="display:none">
+                            <div class="confidence-label">
+                                <span>분석 신뢰도</span>
+                                <span class="confidence-val" id="confidenceVal">85%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar confidence-fill" id="barConfidence"></div>
+                            </div>
+                            <div class="confidence-note" id="confidenceNote"></div>
                         </div>
 
                         <!-- Progress Bars -->
@@ -1318,16 +1354,39 @@
             // 종합 등급 한줄 평
             const commentEl = document.getElementById('gradeComment');
             if (overallScore >= 85) {
-                commentEl.textContent = "최고 수준의 랜딩페이지입니다! 🚀";
+                commentEl.textContent = "최고 수준의 랜딩페이지입니다";
             } else if (overallScore >= 70) {
-                commentEl.textContent = "전환 잠재력이 훌륭합니다. 👍";
+                commentEl.textContent = "전환 잠재력이 훌륭합니다";
             } else if (overallScore >= 55) {
-                commentEl.textContent = "일부 치명적인 수정이 필요합니다. ⚠️";
+                commentEl.textContent = "일부 치명적인 수정이 필요합니다";
             } else {
-                commentEl.textContent = "구조적인 전면 개편이 시급합니다. 🚨";
+                commentEl.textContent = "구조적인 전면 개편이 시급합니다";
             }
             
             document.getElementById('valPropSummary').textContent = data.value_proposition || data.value_proposition_analysis;
+            
+            // 신뢰도 표시
+            const confBar = document.getElementById('confidenceBar');
+            const confVal = data.confidence != null ? data.confidence : 0;
+            if (confVal > 0) {
+                confBar.style.display = 'block';
+                document.getElementById('confidenceVal').textContent = Math.round(confVal) + '%';
+                const barConf = document.getElementById('barConfidence');
+                setTimeout(() => { barConf.style.width = confVal + '%'; }, 100);
+                // 신뢰도 색상
+                if (confVal >= 80) barConf.style.backgroundColor = 'var(--primary)';
+                else if (confVal >= 60) barConf.style.backgroundColor = 'var(--warning)';
+                else barConf.style.backgroundColor = 'var(--danger)';
+                // 보정 노트
+                const noteEl = document.getElementById('confidenceNote');
+                if (data.calibration_applied) {
+                    noteEl.textContent = '점수 보정 적용됨 (-' + (data.calibration_deduction || 0) + '점). 마찰점 심각도와 점수 불일치 감지.';
+                } else {
+                    noteEl.textContent = 'LLM + 정량 지표 하이브리드 분석. 보정 없음.';
+                }
+            } else {
+                confBar.style.display = 'none';
+            }
             
             // 서브 스코어바 갱신
             updateProgressBar('barClarity', 'valClarity', clarity);
@@ -1341,7 +1400,7 @@
             document.getElementById('originalH1').textContent = ab.original_h1 || "(수집 실패 또는 없음)";
             document.getElementById('altA').textContent = ab.alternative_h1_A;
             document.getElementById('altB').textContent = ab.alternative_h1_B;
-            document.getElementById('abReason').innerHTML = `💡 <strong>AI 처방 배경:</strong> ${ab.reasoning}`;
+            document.getElementById('abReason').innerHTML = `<strong>AI 처방 배경:</strong> ${ab.reasoning}`;
             
             // 액션 리스트 렌더링
             const actionListEl = document.getElementById('actionChecklist');
@@ -1463,7 +1522,7 @@
                     // 티피 툴팁 매핑 속성 주입
                     pin.setAttribute('data-tippy-content', `
                         <strong>[${escapeHtml(point.category)}]</strong> ${escapeHtml(point.issue)}<br/><br/>
-                        💡 <strong>개선 방안:</strong> ${escapeHtml(point.solution)}
+                        <strong>개선 방안:</strong> ${escapeHtml(point.solution)}
                     `);
                     
                     overlayLayer.appendChild(pin);

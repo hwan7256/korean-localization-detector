@@ -72,12 +72,19 @@ def run_audit(request: AuditRequest):
         # 3. DB 저장
         db = get_db()
         cursor = db.cursor()
+        # 신뢰도 및 상세 정보 추출
+        confidence = analysis.get("confidence", 0)
+        rule_perf = analysis.get("rule_based_performance", 0)
+        calib_applied = 1 if analysis.get("calibration_applied") else 0
+        perf_detail = json.dumps(analysis.get("performance_detail", {}), ensure_ascii=False)
+
         cursor.execute("""
             INSERT INTO page_audits (
                 url, target_audience, screenshot_path,
                 score_overall, score_clarity, score_cta, score_hierarchy, score_social_proof, score_performance,
-                value_proposition, friction_points, action_checklist, ab_test_suggestions, elements
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                value_proposition, friction_points, action_checklist, ab_test_suggestions, elements,
+                confidence, rule_based_performance, calibration_applied, performance_detail
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             url,
             request.target_audience,
@@ -92,7 +99,11 @@ def run_audit(request: AuditRequest):
             json.dumps(analysis["friction_points"], ensure_ascii=False),
             json.dumps(analysis["action_checklist"], ensure_ascii=False),
             json.dumps(analysis["ab_test_suggestions"], ensure_ascii=False),
-            json.dumps(crawled_data["elements"], ensure_ascii=False)
+            json.dumps(crawled_data["elements"], ensure_ascii=False),
+            confidence,
+            rule_perf,
+            calib_applied,
+            perf_detail
         ))
         db.commit()
         audit_id = cursor.lastrowid
@@ -111,7 +122,12 @@ def run_audit(request: AuditRequest):
             "action_checklist": analysis["action_checklist"],
             "ab_test_suggestions": analysis["ab_test_suggestions"],
             "screenshot_url": crawled_data["screenshot_url"],
-            "elements": crawled_data["elements"]
+            "elements": crawled_data["elements"],
+            "confidence": analysis.get("confidence", 0),
+            "rule_based_performance": analysis.get("rule_based_performance", 0),
+            "calibration_applied": analysis.get("calibration_applied", False),
+            "calibration_deduction": analysis.get("calibration_deduction", 0),
+            "performance_detail": analysis.get("performance_detail", {})
         }
     except Exception as e:
         import traceback
