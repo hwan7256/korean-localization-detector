@@ -552,6 +552,52 @@
             margin-top: 4px;
         }
 
+        .calib-badge {
+            display: inline-block;
+            background: rgba(255,183,0,0.12);
+            color: var(--warning);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        /* Performance Detail */
+        .perf-detail {
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .perf-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 4px 0;
+        }
+        .perf-detail-header:hover { color: var(--primary); }
+        .perf-toggle { font-size: 1rem; color: var(--primary); }
+        .perf-body { display: none; margin-top: 8px; }
+        .perf-body.open { display: block; }
+        .perf-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            padding: 3px 0;
+            color: var(--text-muted);
+        }
+        .perf-row span:last-child { color: #fff; font-weight: 500; }
+        .perf-issues {
+            margin-top: 8px;
+            font-size: 0.72rem;
+            color: var(--warning);
+            line-height: 1.5;
+        }
+
         /* Sub scores progress bars */
         .sub-scores {
             display: flex;
@@ -1041,6 +1087,7 @@
                             <div class="grade-desc">
                                 <h3 id="gradeComment">전환 잠재력이 높습니다</h3>
                                 <p id="valPropSummary">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 유입 고객의 구매 전환율이 크게 오를 수 있습니다.</p>
+                                <div class="calib-badge" id="calibBadge" style="display:none">점수 보정됨</div>
                             </div>
                         </div>
                         <div class="confidence-bar" id="confidenceBar" style="display:none">
@@ -1090,6 +1137,22 @@
                                     <span class="sub-score-val" id="valPerf">80 / 100</span>
                                 </div>
                                 <div class="progress-track"><div class="progress-bar" id="barPerf"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 기술 성능 상세 (측정된 수치) -->
+                        <div class="perf-detail" id="perfDetail" style="display:none">
+                            <div class="perf-detail-header" onclick="document.getElementById('perfBody').classList.toggle('open');var t=document.getElementById('perfToggle');t.textContent=t.textContent=='+'?'-':'+';">
+                                <span>측정된 기술 성능</span>
+                                <span class="perf-toggle" id="perfToggle">+</span>
+                            </div>
+                            <div class="perf-body" id="perfBody">
+                                <div class="perf-row"><span>로딩 시간</span><span id="perfLoadTime">-</span></div>
+                                <div class="perf-row"><span>SEO 기본 점수</span><span id="perfSeoScore">-</span></div>
+                                <div class="perf-row"><span>H1 개수 / Canonical</span><span id="perfH1Canon">-</span></div>
+                                <div class="perf-row"><span>이미지 Alt 누락</span><span id="perfAltMissing">-</span></div>
+                                <div class="perf-row"><span>타이틀 / 메타 길이</span><span id="perfTitleMeta">-</span></div>
+                                <div id="perfIssues" class="perf-issues"></div>
                             </div>
                         </div>
                     </div>
@@ -1378,14 +1441,55 @@
                 else if (confVal >= 60) barConf.style.backgroundColor = 'var(--warning)';
                 else barConf.style.backgroundColor = 'var(--danger)';
                 // 보정 노트
-                const noteEl = document.getElementById('confidenceNote');
+                var noteEl = document.getElementById('confidenceNote');
                 if (data.calibration_applied) {
                     noteEl.textContent = '점수 보정 적용됨 (-' + (data.calibration_deduction || 0) + '점). 마찰점 심각도와 점수 불일치 감지.';
+                    document.getElementById('calibBadge').style.display = 'inline-block';
                 } else {
                     noteEl.textContent = 'LLM + 정량 지표 하이브리드 분석. 보정 없음.';
+                    document.getElementById('calibBadge').style.display = 'none';
                 }
             } else {
                 confBar.style.display = 'none';
+            }
+            
+            // 기술 성능 상세 표시
+            var pd = data.performance_detail;
+            if (pd && pd.load_time_ms != null) {
+                document.getElementById('perfDetail').style.display = 'block';
+                document.getElementById('perfLoadTime').textContent = pd.load_time_ms + 'ms (' + (pd.load_score || '?') + '점)';
+                document.getElementById('perfSeoScore').textContent = (pd.seo_score || '?') + '점';
+                // H1 + Canonical 통합
+                var h1CanonParts = [];
+                if (pd.seo_issues) {
+                    for (var i = 0; i < pd.seo_issues.length; i++) {
+                        if (pd.seo_issues[i].indexOf('H1') >= 0) h1CanonParts.push(pd.seo_issues[i]);
+                        if (pd.seo_issues[i].indexOf('Canonical') >= 0) h1CanonParts.push(pd.seo_issues[i]);
+                    }
+                }
+                document.getElementById('perfH1Canon').textContent = h1CanonParts.length > 0 ? h1CanonParts.join(' / ') : '양호';
+                // Alt 누락
+                var altIssue = '';
+                if (pd.seo_issues) {
+                    for (var i = 0; i < pd.seo_issues.length; i++) {
+                        if (pd.seo_issues[i].indexOf('Alt') >= 0) { altIssue = pd.seo_issues[i]; break; }
+                    }
+                }
+                document.getElementById('perfAltMissing').textContent = altIssue || '없음';
+                // 타이틀 + 메타
+                var titleMetaParts = [];
+                if (pd.seo_issues) {
+                    for (var i = 0; i < pd.seo_issues.length; i++) {
+                        if (pd.seo_issues[i].indexOf('타이틀') >= 0) titleMetaParts.push(pd.seo_issues[i]);
+                        if (pd.seo_issues[i].indexOf('메타') >= 0) titleMetaParts.push(pd.seo_issues[i]);
+                    }
+                }
+                document.getElementById('perfTitleMeta').textContent = titleMetaParts.length > 0 ? titleMetaParts.join(' / ') : '양호';
+                // 이슈 종합
+                var issuesEl = document.getElementById('perfIssues');
+                if (pd.seo_issues && pd.seo_issues.length > 0) {
+                    issuesEl.innerHTML = pd.seo_issues.map(function(i){ return '- ' + i; }).join('<br>');
+                }
             }
             
             // 서브 스코어바 갱신

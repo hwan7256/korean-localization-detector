@@ -159,7 +159,7 @@ def get_audit(audit_id: int):
         
     r = dict(row)
     # JSON 문자열 필드를 객체로 복원
-    for field in ["friction_points", "action_checklist", "ab_test_suggestions", "elements"]:
+    for field in ["friction_points", "action_checklist", "ab_test_suggestions", "elements", "performance_detail"]:
         if r.get(field) and isinstance(r[field], str):
             try:
                 r[field] = json.loads(r[field])
