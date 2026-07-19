@@ -1756,8 +1756,8 @@
             actionListEl.innerHTML = sortedActionChecklist.map((item, idx) => `
                 <div class="check-item" onclick="this.classList.toggle('checked')">
                     <div class="check-box"></div>
-                    <span class="check-text">${item.task}</span>
-                    <span class="check-priority ${item.priority.toLowerCase()}">${item.priority}</span>
+                    <span class="check-text">${escapeHtml(item.task)}</span>
+                    <span class="check-priority ${escapeHtml(item.priority.toLowerCase())}">${escapeHtml(item.priority)}</span>
                 </div>
             `).join('');
             
@@ -1771,11 +1771,11 @@
             const frictionListEl = document.getElementById('frictionList');
             frictionListEl.innerHTML = sortedFrictionPoints.map(item => `
                 <div class="friction-item">
-                    <div class="friction-badge ${item.severity.toLowerCase()}">${item.severity}</div>
+                    <div class="friction-badge ${escapeHtml(item.severity.toLowerCase())}">${escapeHtml(item.severity)}</div>
                     <div class="friction-content">
-                        <div class="friction-issue">${item.issue}</div>
-                        <div class="friction-sol">${item.solution}</div>
-                        <span class="friction-tag">#${item.category}</span>
+                        <div class="friction-issue">${escapeHtml(item.issue)}</div>
+                        <div class="friction-sol">${escapeHtml(item.solution)}</div>
+                        <span class="friction-tag">#${escapeHtml(item.category)}</span>
                     </div>
                 </div>
             `).join('');

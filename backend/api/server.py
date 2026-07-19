@@ -1,16 +1,68 @@
-"""KLD FastAPI Server — REST API"""
 import os
 import json
-from fastapi import FastAPI, Query, HTTPException, Response
+import time
+import ipaddress
+from urllib.parse import urlparse
+from fastapi import FastAPI, Query, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from backend.db import get_db, init_db
 from backend.crawlers.web_scraper import scrape_with_coordinates
 from backend.analyzer.convert_analyzer import analyze_conversion_potential
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "backend", "static")
+
+# Rate limiter: IP별 분당 최대 5회
+_rate_limit_store: dict[str, list[float]] = {}
+
+def _check_rate_limit(ip: str, max_req: int = 5, window: int = 60) -> None:
+    now = time.time()
+    if ip not in _rate_limit_store:
+        _rate_limit_store[ip] = []
+    _rate_limit_store[ip] = [t for t in _rate_limit_store[ip] if now - t < window]
+    if len(_rate_limit_store[ip]) >= max_req:
+        raise HTTPException(status_code=429, detail="너무 많은 요청입니다. 잠시 후 다시 시도해주세요.")
+    _rate_limit_store[ip].append(now)
+
+# SSRF 차단: 내부/예약 IP 블록리스트
+SSRF_BLOCKED_NETS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("0.0.0.0/8"),
+]
+
+def _validate_url(raw_url: str) -> str:
+    """SSRF 방어: URL 검증 및 정규화"""
+    parsed = urlparse(raw_url if "://" in raw_url else f"https://{raw_url}")
+    
+    # 프로토콜 제한
+    if parsed.scheme not in ("http", "https"):
+        raise HTTPException(status_code=400, detail="http/https URL만 허용됩니다")
+    
+    # 파일/내부 스킴 차단
+    hostname = parsed.hostname
+    if not hostname:
+        raise HTTPException(status_code=400, detail="유효하지 않은 URL입니다")
+    
+    # IP 주소 체크
+    try:
+        ip = ipaddress.ip_address(hostname)
+        for net in SSRF_BLOCKED_NETS:
+            if ip in net:
+                raise HTTPException(status_code=400, detail="내부 네트워크 주소는 허용되지 않습니다")
+    except ValueError:
+        pass  # hostname이 IP가 아니면 DNS resolve 전이므로 통과
+    
+    # localhost 문자열 차단
+    if hostname in ("localhost", "127.0.0.1", "0.0.0.0", "[::1]", "::1"):
+        raise HTTPException(status_code=400, detail="내부 네트워크 주소는 허용되지 않습니다")
+    
+    return parsed.geturl() if "://" in raw_url else f"https://{raw_url}"
 
 app = FastAPI(title="KLD - Korean Localization Detector", version="0.1.0")
 
@@ -52,15 +104,14 @@ def dashboard():
 
 
 class AuditRequest(BaseModel):
-    url: str
-    target_audience: str = ""
+    url: str = Field(..., min_length=4, max_length=2048)
+    target_audience: str = Field(default="", max_length=500)
 
 @app.post("/api/analyze")
-def run_audit(request: AuditRequest):
+def run_audit(request: AuditRequest, req: Request):
     """실시간 웹사이트 크롤링 및 전환율 분석 수행"""
-    url = request.url
-    if not (url.startswith("http://") or url.startswith("https://")):
-        url = "https://" + url
+    _check_rate_limit(req.client.host if req.client else "unknown")
+    url = _validate_url(request.url)
 
     try:
         # 1. 크롤링 및 좌표 수집
@@ -130,9 +181,7 @@ def run_audit(request: AuditRequest):
             "performance_detail": analysis.get("performance_detail", {})
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"분석 실패: {str(e)}")
+        raise HTTPException(status_code=500, detail="분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
 
 @app.get("/api/history")
 def get_history(limit: int = Query(20, ge=1, le=100)):
