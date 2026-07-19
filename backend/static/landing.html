@@ -3,168 +3,1491 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLD — 해외 SaaS, 한국에서 통할까?</title>
-    <link rel="stylesheet" href="/static/css/landing.css?v=20260712">
+    <title>ConvertRadar 🚀 — 1분 랜딩페이지 전환율 & UX 진단기</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tippy.js (Premium Tooltips) -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    
+    <style>
+        :root {
+            --bg: #07070b;
+            --surface: #0e0f17;
+            --surface-hover: #161825;
+            --primary: #00ffb2;
+            --primary-glow: rgba(0, 255, 178, 0.15);
+            --danger: #ff4a6b;
+            --danger-glow: rgba(255, 74, 107, 0.15);
+            --warning: #ffb700;
+            --warning-glow: rgba(255, 183, 0, 0.15);
+            --info: #00b2ff;
+            --text-main: #f3f4f6;
+            --text-muted: #8e93ad;
+            --border: rgba(255, 255, 255, 0.05);
+            --border-glow: rgba(0, 255, 178, 0.3);
+            --font-display: 'Outfit', 'Plus Jakarta Sans', 'Noto Sans KR', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-display);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 178, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 178, 255, 0.04) 0%, transparent 40%);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(14, 15, 23, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .btn-pricing {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: #07070b;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-pricing:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero / Input Section */
+        .hero-section {
+            text-align: center;
+            max-width: 800px;
+            margin: 60px auto 80px auto;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge-main {
+            display: inline-block;
+            padding: 6px 14px;
+            background-color: var(--primary-glow);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 178, 0.2);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .input-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .input-card::after {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 178, 0.1), transparent);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group label span {
+            color: var(--primary);
+        }
+
+        .input-field {
+            background-color: #05060a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            padding: 14px 18px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 178, 0.1);
+        }
+
+        .btn-analyze {
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            border: none;
+            border-radius: 10px;
+            color: #07070b;
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 178, 0.4);
+        }
+
+        /* Loading Screen */
+        .loading-container {
+            display: none;
+            max-width: 600px;
+            margin: 80px auto;
+            text-align: center;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 255, 178, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 30px auto;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .loading-steps {
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .step-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .step-item.done {
+            color: var(--text-main);
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .step-item.active .step-icon {
+            border-color: var(--primary);
+            background-color: var(--primary-glow);
+        }
+
+        .step-item.done .step-icon {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: #07070b;
+        }
+
+        /* History (Recent Scans) */
+        .history-section {
+            margin-top: 60px;
+            text-align: left;
+        }
+
+        .history-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .history-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .history-url {
+            font-weight: 700;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .history-score {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        /* Dashboard (Result View) */
+        .dashboard-view {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .btn-back-home {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-back-home:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .dashboard-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .dashboard-url {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+            word-break: break-all;
+            max-width: 100%;
+            line-height: 1.25;
+        }
+
+        .dashboard-audience {
+            font-size: 1rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-audience span {
+            background-color: var(--border);
+            color: var(--text-main);
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Common */
+        .panel {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            border-left: 3px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        /* Score Grade Ring */
+        .grade-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grade-ring {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #0e0f17 55%, transparent 58%), 
+                        conic-gradient(var(--primary) 0%, var(--border) 0%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .grade-letter {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .grade-score {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .grade-desc {
+            flex: 1;
+        }
+
+        .grade-desc h3 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .grade-desc p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Sub scores progress bars */
+        .sub-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sub-score-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sub-score-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .sub-score-label {
+            color: var(--text-muted);
+        }
+
+        .sub-score-val {
+            color: #fff;
+        }
+
+        .progress-track {
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 100px;
+            width: 0;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Radar Chart Wrapper */
+        .chart-wrapper {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 320px;
+            width: 100%;
+        }
+
+        /* Visual Inspector Overlay */
+        .inspector-scroll-container {
+            max-height: 650px;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: #05060a;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .inspector-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .inspector-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .browser-header {
+            display: flex;
+            align-items: center;
+            background-color: #121320;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .browser-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .browser-dots .dot.red { background-color: #ff5f56; }
+        .browser-dots .dot.yellow { background-color: #ffbd2e; }
+        .browser-dots .dot.green { background-color: #27c93f; }
+
+        .browser-address {
+            background-color: #07070b;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            padding: 4px 12px;
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: monospace;
+        }
+
+        .visual-inspector {
+            position: relative;
+            width: 100%;
+        }
+
+        .screenshot-img {
+            width: 100%;
+            display: block;
+        }
+
+        .overlay-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .audit-pin {
+            position: absolute;
+            pointer-events: auto;
+            cursor: pointer;
+            border: 2px solid var(--danger);
+            background-color: var(--danger-glow);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 74, 107, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .audit-pin:hover {
+            background-color: rgba(255, 74, 107, 0.35);
+            box-shadow: 0 0 20px var(--danger);
+            transform: scale(1.02);
+        }
+
+        .audit-pin::after {
+            content: "⚠️";
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            font-size: 14px;
+            background: #12121e;
+            border: 1px solid var(--danger);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* Friction list */
+        .friction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .friction-item {
+            background-color: #121320;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .friction-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .friction-badge.high {
+            background-color: var(--danger-glow);
+            color: var(--danger);
+            border: 1px solid rgba(255, 74, 107, 0.2);
+        }
+
+        .friction-badge.medium {
+            background-color: var(--warning-glow);
+            color: var(--warning);
+            border: 1px solid rgba(255, 183, 0, 0.2);
+        }
+
+        .friction-badge.low {
+            background-color: rgba(0, 178, 255, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(0, 178, 255, 0.2);
+        }
+
+        .friction-content {
+            flex: 1;
+        }
+
+        .friction-issue {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .friction-sol {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .friction-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            color: var(--primary);
+            background-color: var(--primary-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* Action Checklist */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .check-item {
+            background-color: #121320;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .check-item:hover {
+            background-color: var(--surface-hover);
+        }
+
+        .check-box {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .check-item.checked .check-box {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #07070b;
+        }
+
+        .check-item.checked .check-box::after {
+            content: "✓";
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .check-text {
+            flex: 1;
+            font-size: 0.92rem;
+            color: var(--text-main);
+            transition: color 0.2s;
+        }
+
+        .check-item.checked .check-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .check-priority {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .check-priority.critical {
+            background-color: var(--danger-glow);
+            color: var(--danger);
+        }
+
+        .check-priority.recommended {
+            background-color: var(--warning-glow);
+            color: var(--warning);
+        }
+
+        .check-priority.optional {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+        }
+
+        /* A/B Test suggestions */
+        .ab-test-card {
+            background-color: #121320;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .ab-item {
+            margin-bottom: 16px;
+        }
+
+        .ab-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ab-label.alt-a { color: var(--primary); }
+        .ab-label.alt-b { color: var(--info); }
+
+        .ab-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+            padding: 10px 14px;
+            background-color: #07070b;
+            border-radius: 6px;
+            border-left: 3px solid var(--border);
+        }
+
+        .ab-label.alt-a + .ab-text { border-left-color: var(--primary); }
+        .ab-label.alt-b + .ab-text { border-left-color: var(--info); }
+
+        .ab-reason {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+
+        /* Tippy custom theme styling */
+        .tippy-box[data-theme~='dark-neon'] {
+            background-color: #12121e;
+            color: var(--text-main);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 5px 20px rgba(0, 255, 178, 0.2);
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            padding: 8px 12px;
+            line-height: 1.5;
+        }
+        
+        .tippy-box[data-theme~='dark-neon'] strong {
+            color: var(--primary);
+        }
+    </style>
 </head>
 <body>
 
-<!-- Hero -->
-<section class="hero" id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-particles">
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
-    </div>
-    <div class="hero-content">
-        <h1 class="hero-title">
-            <span class="line" data-reveal>해외에서 검증된 SaaS,</span>
-            <span class="line" data-reveal>한국 시장에 통할까?</span>
-        </h1>
-        <p class="hero-sub" data-reveal>
-            KLD는 Product Hunt, Hacker News 등에서 떠오르는 마이크로 SaaS를 실시간 추적해<br>
-            한국 시장 로컬라이징 가능성을 분석 리포트로 제공합니다.
-        </p>
-        <div class="hero-cta" data-reveal>
-            <button class="btn-primary" onclick="document.getElementById('dashboard-frame').src='/dashboard'; document.getElementById('hero').style.display='none'; document.getElementById('app').style.display='flex';">
-                분석 시작하기
-            </button>
+    <!-- Header -->
+    <header>
+        <a href="/" class="logo">Convert<span>Radar</span> 🚀</a>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">자가 진단</a>
+            <a href="#" class="nav-link" onclick="alert('준비 중입니다. Pro 플랜 출시 후 자동 알림을 받으시겠습니까?')">경쟁사 추적</a>
+            <button class="btn-pricing" onclick="alert('PRO 라이선스 출시 특가!\n월 $29 -> $19 (평생 할인 혜택)\n\n문의: contact@convertradar.io')">Pro 멤버십</button>
         </div>
-        <div class="hero-stats" data-reveal>
-            <div class="hero-stat"><span class="num" id="landing-total">43</span><span class="label">서비스 수집</span></div>
-            <div class="hero-stat"><span class="num" id="landing-analyzed">43</span><span class="label">분석 완료</span></div>
-            <div class="hero-stat accent"><span class="num" id="landing-high">0</span><span class="label">진입 가능</span></div>
-        </div>
-    </div>
-    <div class="scroll-hint">
-        <span>스크롤</span>
-        <div class="scroll-arrow"></div>
-    </div>
-</section>
+    </header>
 
-<!-- Features -->
-<section class="features" id="features">
-    <div class="section-inner">
-        <h2 class="section-title" data-reveal>이렇게 작동합니다</h2>
+    <div class="container">
 
-        <div class="feature-grid">
-            <div class="feature-card" data-reveal>
-                <div class="feature-icon">
-                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                        <circle cx="24" cy="24" r="22" stroke="#22c55e" stroke-width="2" stroke-dasharray="4 4"/>
-                        <path d="M24 12v12l8 5" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
-                    </svg>
+        <!-- 1. Hero / Input View -->
+        <div id="inputView" class="hero-section">
+            <span class="badge-main">KLD 실패 교훈 기반 신규 피벗 프로젝트</span>
+            <h1 class="hero-title">당신의 랜딩페이지는<br>왜 고객을 놓치고 있을까요?</h1>
+            <p class="hero-desc">
+                URL만 입력하세요. 플레이라이트 동적 크롤러가 사이트를 정밀 스캔하고,<br>
+                DeepSeek AI가 1분 만에 시각적 전환율 마찰 요인과 대안 카피를 찾아드립니다.
+            </p>
+
+            <div class="input-card">
+                <div class="input-group">
+                    <label>검사할 랜딩페이지 URL <span>*</span></label>
+                    <input type="text" id="targetUrl" class="input-field" placeholder="https://my-saas.com" value="">
                 </div>
-                <h3>24시간 자동 추적</h3>
-                <p>Product Hunt, Hacker News, Reddit 등 해외 인디 해커 커뮤니티에서 떠오르는 서비스를 실시간으로 수집합니다.</p>
+                <div class="input-group">
+                    <label>타겟 오디언스 (선택)</label>
+                    <input type="text" id="targetAudience" class="input-field" placeholder="예: 20대 여성 쇼핑몰 고객, 인디 해커, B2B 마케터 등">
+                </div>
+                <button class="btn-analyze" onclick="startAnalysis()">
+                    실시간 AI 전환율 진단 시작
+                </button>
             </div>
 
-            <div class="feature-card" data-reveal>
-                <div class="feature-icon">
-                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                        <rect x="8" y="10" width="32" height="28" rx="3" stroke="#3b82f6" stroke-width="2"/>
-                        <line x1="16" y1="20" x2="32" y2="20" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="16" y1="26" x2="28" y2="26" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <h3>AI 분석 리포트</h3>
-                <p>DeepSeek가 각 서비스의 한국 시장 적합도를 분석합니다. 로컬 API, 규제, 경쟁사까지 한눈에.</p>
-            </div>
-
-            <div class="feature-card" data-reveal>
-                <div class="feature-icon">
-                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                        <path d="M8 36l10-10 8 6L38 16" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="38" cy="16" r="3" fill="#f59e0b"/>
-                        <line x1="8" y1="40" x2="40" y2="40" stroke="#27272a" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>로컬라이징 점수</h3>
-                <p>0-100점 척도로 국내 진입 가능성을 수치화합니다. 점수 기준으로 우선순위를 정하세요.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How it works -->
-<section class="how" id="how">
-    <div class="section-inner">
-        <h2 class="section-title" data-reveal>10초면 충분합니다</h2>
-
-        <div class="steps">
-            <div class="step" data-reveal>
-                <div class="step-num">01</div>
-                <div class="step-content">
-                    <h3>해외 서비스가 자동 수집됩니다</h3>
-                    <p>KLD가 6시간마다 Product Hunt, Hacker News의 신규 서비스를 자동으로 탐지합니다. 당신은 그냥 결과만 확인하면 됩니다.</p>
-                </div>
-            </div>
-            <div class="step-connector"></div>
-            <div class="step" data-reveal>
-                <div class="step-num">02</div>
-                <div class="step-content">
-                    <h3>AI가 한국 시장 적합도를 분석합니다</h3>
-                    <p>각 서비스마다 필요한 국내 API(토스페이먼츠, 카카오 알림톡, PASS 인증 등), 규제 리스크, 경쟁사 현황을 분석 리포트로 제공합니다.</p>
-                </div>
-            </div>
-            <div class="step-connector"></div>
-            <div class="step" data-reveal>
-                <div class="step-num">03</div>
-                <div class="step-content">
-                    <h3>당신은 실행만 하면 됩니다</h3>
-                    <p>가장 적합한 서비스를 골라 로컬라이징을 시작하세요. 연동 템플릿 코드까지 제공합니다.</p>
+            <!-- History Scans -->
+            <div class="history-section">
+                <h3 class="history-title">🕒 최근 진단 이력</h3>
+                <div id="historyGrid" class="history-grid">
+                    <!-- Dynamic Loading -->
+                    <p style="color: var(--text-muted)">로딩 중...</p>
                 </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Target -->
-<section class="target" id="target">
-    <div class="section-inner">
-        <h2 class="section-title" data-reveal>이런 분들을 위해 만들었습니다</h2>
-
-        <div class="target-grid">
-            <div class="target-card" data-reveal>
-                <h3>해외 BM을 국내에<br>가져오고 싶은 1인 개발자</h3>
-                <p>검증된 비즈니스 모델을 빠르게 한국 시장에 적용하고 싶다면, KLD가 가장 효율적인 지름길이 되어드립니다.</p>
-            </div>
-            <div class="target-card" data-reveal>
-                <h3>사이드 프로젝트 아이디어를<br>찾는 직장인 개발자</h3>
-                <p>퇴근 후 2시간으로 런칭 가능한 틈새 마이크로 SaaS를 찾아드립니다. 실패 확률은 낮추고, 성공 가능성은 높이세요.</p>
-            </div>
-            <div class="target-card" data-reveal>
-                <h3>국내 시장 진출을 고민하는<br>글로벌 스타트업</h3>
-                <p>한국 시장의 로컬 API, 규제 장벽, 경쟁 구도를 사전에 파악해 진출 전략을 세워보세요.</p>
+        <!-- 2. Loading Screen -->
+        <div id="loadingView" class="loading-container">
+            <div class="spinner"></div>
+            <h2 class="loading-title">랜딩페이지 정밀 진단 중...</h2>
+            <div class="loading-steps">
+                <div class="step-item active" id="step1">
+                    <div class="step-icon">1</div>
+                    <span>Playwright 동적 브라우저 실행...</span>
+                </div>
+                <div class="step-item" id="step2">
+                    <div class="step-icon">2</div>
+                    <span>메타데이터 및 H1/H2 텍스트 추출...</span>
+                </div>
+                <div class="step-item" id="step3">
+                    <div class="step-icon">3</div>
+                    <span>핵심 UI 요소들의 절대 좌표 측정...</span>
+                </div>
+                <div class="step-item" id="step4">
+                    <div class="step-icon">4</div>
+                    <span>DeepSeek AI 전환 최적화 심사 진행...</span>
+                </div>
+                <div class="step-item" id="step5">
+                    <div class="step-icon">5</div>
+                    <span>진단 리포트 및 카피 대안 컴파일 완료!</span>
+                </div>
             </div>
         </div>
+
+        <!-- 3. Dashboard View -->
+        <div id="dashboardView" class="dashboard-view">
+            <button class="btn-back-home" onclick="backToHome()">← 다른 페이지 진단하기</button>
+            
+            <div class="dashboard-header">
+                <h1 class="dashboard-url" id="resUrl">https://example.com</h1>
+                <p class="dashboard-audience">타겟 고객: <span id="resAudience">Solopreneurs</span></p>
+            </div>
+
+            <div class="grid-layout">
+                <!-- Left Column (Scores) -->
+                <div>
+                    <!-- Overall Score -->
+                    <div class="panel">
+                        <div class="panel-title">종합 평가 등급</div>
+                        <div class="grade-wrapper">
+                            <div class="grade-ring" id="gradeRing">
+                                <div class="grade-letter" id="resGrade">B+</div>
+                                <div class="grade-score" id="resScore">84</div>
+                            </div>
+                            <div class="grade-desc">
+                                <h3 id="gradeComment">전환 잠재력이 높습니다!</h3>
+                                <p id="valPropSummary">가치 제안이 준수하며 몇 가지 마찰 요인을 해결하면 유입 고객의 구매 전환율이 크게 오를 수 있습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bars -->
+                        <div class="sub-scores">
+                            <div class="sub-score-item">
+                                <div class="sub-score-info">
+                                    <span class="sub-score-label">가치 명확성 (Clarity)</span>
+                                    <span class="sub-score-val" id="valClarity">80 / 100</span>
+                                </div>
+                                <div class="progress-track"><div class="progress-bar" id="barClarity"></div></div>
+                            </div>
+                            <div class="sub-score-item">
+                                <div class="sub-score-info">
+                                    <span class="sub-score-label">행동 촉구 (CTA Friction)</span>
+                                    <span class="sub-score-val" id="valCta">80 / 100</span>
+                                </div>
+                                <div class="progress-track"><div class="progress-bar" id="barCta"></div></div>
+                            </div>
+                            <div class="sub-score-item">
+                                <div class="sub-score-info">
+                                    <span class="sub-score-label">정보 계층 구조 (Hierarchy)</span>
+                                    <span class="sub-score-val" id="valHierarchy">80 / 100</span>
+                                </div>
+                                <div class="progress-track"><div class="progress-bar" id="barHierarchy"></div></div>
+                            </div>
+                            <div class="sub-score-item">
+                                <div class="sub-score-info">
+                                    <span class="sub-score-label">신뢰도 지표 (Social Proof)</span>
+                                    <span class="sub-score-val" id="valSocial">80 / 100</span>
+                                </div>
+                                <div class="progress-track"><div class="progress-bar" id="barSocial"></div></div>
+                            </div>
+                            <div class="sub-score-item">
+                                <div class="sub-score-info">
+                                    <span class="sub-score-label">최초 로딩 성능 (Performance)</span>
+                                    <span class="sub-score-val" id="valPerf">80 / 100</span>
+                                </div>
+                                <div class="progress-track"><div class="progress-bar" id="barPerf"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radar Chart -->
+                    <div class="panel">
+                        <div class="panel-title">전환율 최적화 오각형</div>
+                        <div class="chart-wrapper">
+                            <canvas id="radarChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- H1 Suggestions -->
+                    <div class="panel">
+                        <div class="panel-title">AI 대안 카피 처방전</div>
+                        <div class="ab-test-card">
+                            <div class="ab-item">
+                                <div class="ab-label">기존 헤드라인</div>
+                                <div class="ab-text" id="originalH1">Fast CRM for Solopreneurs</div>
+                            </div>
+                            <div class="ab-item">
+                                <div class="ab-label alt-a">대안 A (직관적 혜택)</div>
+                                <div class="ab-text" id="altA">Manage Clients in 5 Minutes a Day</div>
+                            </div>
+                            <div class="ab-item">
+                                <div class="ab-label alt-b">대안 B (손실 회피 자극)</div>
+                                <div class="ab-text" id="altB">Stop Juggling Spreadsheets. Automate Your SaaS.</div>
+                            </div>
+                            <div class="ab-reason" id="abReason">
+                                A안은 매일 아침 행정 업무에 지친 솔로프리너들에게 직관적인 시간 절약 수치를 제공하며, B안은 엑셀 수동 작업의 두려움과 페인포인트를 공략합니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Visual and suggestions) -->
+                <div>
+                    <!-- Visual Audit Screenshot overlay -->
+                    <div class="panel">
+                        <div class="panel-title">시각적 레이아웃 진단 (마우스 오버 툴팁)</div>
+                        <div class="inspector-scroll-container">
+                            <div class="browser-header">
+                                <div class="browser-dots">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                </div>
+                                <div class="browser-address" id="browserAddressBar">https://example.com</div>
+                            </div>
+                            <div class="visual-inspector">
+                                <img id="screenshotImage" src="" alt="Landing Page Screenshot" class="screenshot-img">
+                                <div id="overlayLayer" class="overlay-layer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Checklist -->
+                    <div class="panel">
+                        <div class="panel-title">즉시 개선 액션 체크리스트</div>
+                        <div id="actionChecklist" class="checklist">
+                            <!-- Dynamic checklist items -->
+                        </div>
+                    </div>
+
+                    <!-- Detailed Friction Points -->
+                    <div class="panel">
+                        <div class="panel-title">식별된 전환 방해 요소</div>
+                        <div id="frictionList" class="friction-list">
+                            <!-- Dynamic friction items -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-</section>
 
-<!-- CTA -->
-<section class="cta-section" id="cta">
-    <div class="section-inner">
-        <h2 class="cta-title" data-reveal>지금 바로 시작하세요</h2>
-        <p class="cta-sub" data-reveal>43개 서비스가 이미 분석을 기다리고 있습니다</p>
-        <button class="btn-primary btn-large" data-reveal onclick="document.getElementById('dashboard-frame').src='/dashboard'; document.getElementById('hero').style.display='none'; document.getElementById('app').style.display='flex'; document.getElementById('landing').scrollIntoView({behavior:'smooth'});">
-            무료로 분석 시작하기
-        </button>
-        <p class="cta-note" data-reveal>별도 가입 없이 바로 이용 가능합니다</p>
-    </div>
-</section>
+    <script>
+        let radarChartInstance = null;
+        let crawledElements = [];
+        let frictionPoints = [];
 
-<footer class="footer">
-    <span>KLD — Korean Localization Detector</span>
-    <span>© 2026</span>
-</footer>
+        // 페이지 진입 시 과거 이력 로드
+        window.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
 
-<!-- Hidden App Frame -->
-<div id="app" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:200; background:var(--bg-deep);">
-    <div style="position:absolute; top:1rem; right:2rem; z-index:300;">
-        
-    </div>
-    <iframe id="dashboard-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
-</div>
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/history');
+                const data = await res.json();
+                const grid = document.getElementById('historyGrid');
+                
+                if (!data.history || data.history.length === 0) {
+                    grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">아직 등록된 진단 이력이 없습니다. 첫 번째 웹사이트를 입력해보세요!</p>';
+                    return;
+                }
+                
+                grid.innerHTML = data.history.map(item => {
+                    const grade = calculateGrade(item.score_overall);
+                    const formattedDate = new Date(item.created_at).toLocaleDateString('ko-KR', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div class="history-card" onclick="loadAudit(${item.id})">
+                            <div class="history-url">${escapeHtml(item.url)}</div>
+                            <div class="history-meta">
+                                <span>${formattedDate}</span>
+                                <span class="history-score">${grade} (${item.score_overall}점)</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error("이력 로딩 실패:", e);
+                document.getElementById('historyGrid').innerHTML = '<p style="color: var(--danger)">이력을 불러오는 중 오류가 발생했습니다.</p>';
+            }
+        }
 
-<script src="/static/js/landing.js"></script>
+        function calculateGrade(score) {
+            if (score >= 90) return "A";
+            if (score >= 80) return "B+";
+            if (score >= 70) return "B";
+            if (score >= 60) return "C";
+            return "F";
+        }
+
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"']/g, function (s) {
+                return {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[s];
+            });
+        }
+
+        function backToHome() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('inputView').style.display = 'block';
+            loadHistory();
+        }
+
+        // 특정 과거 진단 클릭 시 상세 데이터 불러오기
+        async function loadAudit(auditId) {
+            document.getElementById('inputView').style.display = 'none';
+            document.getElementById('loadingView').style.display = 'block';
+            
+            // 로딩 표시 속도감 연출
+            updateLoadingStep(1, 'active');
+            
+            try {
+                setTimeout(() => updateLoadingStep(2, 'active'), 300);
+                setTimeout(() => updateLoadingStep(3, 'active'), 600);
+                setTimeout(() => updateLoadingStep(4, 'active'), 900);
+                
+                const res = await fetch(`/api/audit/${auditId}`);
+                if (!res.ok) throw new Error("데이터 수신 오류");
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    displayResult(data);
+                }, 1200);
+            } catch (e) {
+                alert("리포트를 가져오는데 실패했습니다: " + e.message);
+                backToHome();
+            }
+        }
+
+        function updateLoadingStep(stepNum, status) {
+            const stepEl = document.getElementById(`step${stepNum}`);
+            if (status === 'active') {
+                // 이전 스텝 완료
+                for (let i = 1; i < stepNum; i++) {
+                    const prevEl = document.getElementById(`step${i}`);
+                    prevEl.className = 'step-item done';
+                }
+                stepEl.className = 'step-item active';
+            }
+        }
+
+        // 실시간 진단 시작
+        async function startAnalysis() {
+            const urlInput = document.getElementById('targetUrl').value.trim();
+            const audienceInput = document.getElementById('targetAudience').value.trim();
+            
+            if (!urlInput) {
+                alert("진단할 웹사이트 URL을 입력해주세요.");
+                return;
+            }
+            
+            document.getElementById('inputView').style.display = 'none';
+            document.getElementById('loadingView').style.display = 'block';
+            
+            // 시각적 단계 연출 타이머
+            let currentStep = 1;
+            const loadingInterval = setInterval(() => {
+                currentStep++;
+                if (currentStep <= 4) {
+                    updateLoadingStep(currentStep, 'active');
+                }
+            }, 3000); // 실제 API 완료 시점 전까지 가짜 단계 상승
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput, target_audience: audienceInput })
+                });
+                
+                clearInterval(loadingInterval);
+                
+                if (!res.ok) {
+                    const errDetail = await res.json();
+                    throw new Error(errDetail.detail || "알 수 없는 백엔드 에러");
+                }
+                
+                const data = await res.json();
+                updateLoadingStep(5, 'active');
+                
+                setTimeout(() => {
+                    displayResult(data);
+                }, 1000);
+            } catch (e) {
+                clearInterval(loadingInterval);
+                alert("진단 실패: " + e.message);
+                backToHome();
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('loadingView').style.display = 'none';
+            document.getElementById('dashboardView').style.display = 'block';
+            
+            // 데이터 매핑
+            document.getElementById('resUrl').textContent = data.url;
+            document.getElementById('browserAddressBar').textContent = data.url;
+            document.getElementById('resAudience').textContent = data.target_audience || "일반 대중";
+            
+            // 점수 및 링 차트 갱신
+            const overallScore = data.overall_score || data.score_overall;
+            const clarity = data.scores ? data.scores.clarity : data.score_clarity;
+            const cta = data.scores ? data.scores.cta : data.score_cta;
+            const hierarchy = data.scores ? data.scores.hierarchy : data.score_hierarchy;
+            const socialProof = data.scores ? data.scores.social_proof : data.score_social_proof;
+            const performance = data.scores ? data.scores.performance : data.score_performance;
+            
+            const grade = calculateGrade(overallScore);
+            document.getElementById('resGrade').textContent = grade;
+            document.getElementById('resScore').textContent = overallScore;
+            
+            // 링 차트 색상 보정
+            const gradeRing = document.getElementById('gradeRing');
+            gradeRing.style.background = `radial-gradient(circle, #0e0f17 55%, transparent 58%), conic-gradient(var(--primary) ${overallScore}%, var(--border) ${overallScore}%)`;
+            
+            // 종합 등급 한줄 평
+            const commentEl = document.getElementById('gradeComment');
+            if (overallScore >= 85) {
+                commentEl.textContent = "최고 수준의 랜딩페이지입니다! 🚀";
+            } else if (overallScore >= 70) {
+                commentEl.textContent = "전환 잠재력이 훌륭합니다. 👍";
+            } else if (overallScore >= 55) {
+                commentEl.textContent = "일부 치명적인 수정이 필요합니다. ⚠️";
+            } else {
+                commentEl.textContent = "구조적인 전면 개편이 시급합니다. 🚨";
+            }
+            
+            document.getElementById('valPropSummary').textContent = data.value_proposition || data.value_proposition_analysis;
+            
+            // 서브 스코어바 갱신
+            updateProgressBar('barClarity', 'valClarity', clarity);
+            updateProgressBar('barCta', 'valCta', cta);
+            updateProgressBar('barHierarchy', 'valHierarchy', hierarchy);
+            updateProgressBar('barSocial', 'valSocial', socialProof);
+            updateProgressBar('barPerf', 'valPerf', performance);
+            
+            // 카피 제안 갱신
+            const ab = data.ab_test_suggestions;
+            document.getElementById('originalH1').textContent = ab.original_h1 || "(수집 실패 또는 없음)";
+            document.getElementById('altA').textContent = ab.alternative_h1_A;
+            document.getElementById('altB').textContent = ab.alternative_h1_B;
+            document.getElementById('abReason').innerHTML = `💡 <strong>AI 처방 배경:</strong> ${ab.reasoning}`;
+            
+            // 액션 리스트 렌더링
+            const actionListEl = document.getElementById('actionChecklist');
+            actionListEl.innerHTML = data.action_checklist.map((item, idx) => `
+                <div class="check-item" onclick="this.classList.toggle('checked')">
+                    <div class="check-box"></div>
+                    <span class="check-text">${item.task}</span>
+                    <span class="check-priority ${item.priority.toLowerCase()}">${item.priority}</span>
+                </div>
+            `).join('');
+            
+            // 이탈 장벽 목록 렌더링
+            const frictionListEl = document.getElementById('frictionList');
+            frictionListEl.innerHTML = data.friction_points.map(item => `
+                <div class="friction-item">
+                    <div class="friction-badge ${item.severity.toLowerCase()}">${item.severity}</div>
+                    <div class="friction-content">
+                        <div class="friction-issue">${item.issue}</div>
+                        <div class="friction-sol">${item.solution}</div>
+                        <span class="friction-tag">#${item.category}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 캡처 이미지 로드
+            const img = document.getElementById('screenshotImage');
+            img.src = data.screenshot_url || data.screenshot_path;
+            
+            // 좌표 오버레이 렌더링
+            crawledElements = data.elements;
+            frictionPoints = data.friction_points;
+            
+            renderVisualAnnotations(crawledElements, frictionPoints);
+            
+            // 오각형 레이더 차트 갱신
+            renderRadarChart([clarity, cta, hierarchy, socialProof, performance]);
+        }
+
+        function updateProgressBar(barId, valId, val) {
+            const bar = document.getElementById(barId);
+            const label = document.getElementById(valId);
+            label.textContent = `${val} / 100`;
+            setTimeout(() => {
+                bar.style.width = `${val}%`;
+                // 점수별 색상 분기
+                if (val >= 80) bar.style.backgroundColor = 'var(--primary)';
+                else if (val >= 60) bar.style.backgroundColor = 'var(--warning)';
+                else bar.style.backgroundColor = 'var(--danger)';
+            }, 100);
+        }
+
+        function renderRadarChart(scores) {
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+            
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['명확성(Clarity)', '행동유도(CTA)', '정보구조(Hierarchy)', '신뢰도(Social Proof)', '성능(Performance)'],
+                    datasets: [{
+                        label: '랜딩페이지 CRO 점수',
+                        data: scores,
+                        backgroundColor: 'rgba(0, 255, 178, 0.15)',
+                        borderColor: 'rgba(0, 255, 178, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(0, 178, 255, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(0, 255, 178, 1)'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                            pointLabels: { color: '#8e93ad', font: { size: 11, family: 'Outfit, Noto Sans KR' } },
+                            ticks: { display: false },
+                            min: 0,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 반응형 시각적 진단 오버레이 렌더링
+        function renderVisualAnnotations(elements, frictionPoints, originalWidth = 1280) {
+            const img = document.getElementById('screenshotImage');
+            const overlayLayer = document.getElementById('overlayLayer');
+            overlayLayer.innerHTML = '';
+            
+            const applyOverlay = () => {
+                const renderedWidth = img.clientWidth;
+                const scale = renderedWidth / originalWidth;
+                
+                frictionPoints.forEach(point => {
+                    if (point.matched_element_id === null || point.matched_element_id === undefined) return;
+                    
+                    const element = elements.find(el => el.id === point.matched_element_id);
+                    if (!element) return;
+                    
+                    const pin = document.createElement('div');
+                    pin.className = 'audit-pin';
+                    
+                    // 좌표 비례식 적용 배치
+                    pin.style.left = `${element.x * scale}px`;
+                    pin.style.top = `${element.y * scale}px`;
+                    pin.style.width = `${element.w * scale}px`;
+                    pin.style.height = `${element.h * scale}px`;
+                    
+                    // 티피 툴팁 매핑 속성 주입
+                    pin.setAttribute('data-tippy-content', `
+                        <strong>[${escapeHtml(point.category)}]</strong> ${escapeHtml(point.issue)}<br/><br/>
+                        💡 <strong>개선 방안:</strong> ${escapeHtml(point.solution)}
+                    `);
+                    
+                    overlayLayer.appendChild(pin);
+                });
+                
+                // Tippy.js 호버 실행
+                tippy('.audit-pin', {
+                    allowHTML: true,
+                    theme: 'dark-neon',
+                    placement: 'top',
+                    interactive: true
+                });
+            };
+            
+            if (img.complete) {
+                applyOverlay();
+            } else {
+                img.onload = applyOverlay;
+            }
+            
+            // resize 리액티브
+            window.removeEventListener('resize', applyOverlay);
+            window.addEventListener('resize', applyOverlay);
+        }
+    </script>
 </body>
 </html>

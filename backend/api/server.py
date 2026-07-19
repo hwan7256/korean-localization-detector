@@ -5,7 +5,10 @@ from fastapi import FastAPI, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 from backend.db import get_db, init_db
+from backend.crawlers.web_scraper import scrape_with_coordinates
+from backend.analyzer.convert_analyzer import analyze_conversion_potential
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "backend", "static")
 
@@ -48,102 +51,106 @@ def dashboard():
     return HTMLResponse("<h1>Dashboard not found</h1>", status_code=404)
 
 
-@app.get("/api/stats")
-def get_stats():
-    """대시보드 통계"""
-    db = get_db()
-    total = db.execute("SELECT COUNT(*) FROM discovered_services").fetchone()[0]
-    analyzed = db.execute("SELECT COUNT(*) FROM analysis_reports").fetchone()[0]
-    avg_score = db.execute("SELECT AVG(localization_score) FROM analysis_reports").fetchone()[0] or 0
-    high = db.execute("SELECT COUNT(*) FROM analysis_reports WHERE localization_score >= 70").fetchone()[0]
-    db.close()
-    return {
-        "total_services": total,
-        "total_analyzed": analyzed,
-        "avg_localization_score": round(avg_score, 1),
-        "high_potential_count": high
-    }
+class AuditRequest(BaseModel):
+    url: str
+    target_audience: str = ""
 
+@app.post("/api/analyze")
+def run_audit(request: AuditRequest):
+    """실시간 웹사이트 크롤링 및 전환율 분석 수행"""
+    url = request.url
+    if not (url.startswith("http://") or url.startswith("https://")):
+        url = "https://" + url
 
-@app.get("/api/services")
-def list_services(
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    source: str = Query(None),
-    min_score: int = Query(0, ge=0, le=100),
-    free_only: bool = Query(False)
-):
-    """서비스 목록 + 분석 결과"""
-    db = get_db()
-    conds = ["1=1", "s.is_saas != 0"]
-    params = []
-
-    if source:
-        conds.append("s.source = ?")
-        params.append(source)
-    if min_score > 0:
-        conds.append("a.localization_score >= ?")
-        params.append(min_score)
-    if free_only:
-        conds.append("a.free_tier = 1")
-
-    where = " AND ".join(conds)
-    query = f"""
-        SELECT s.*, a.localization_score, a.summary_ko, a.localization_reason,
-               a.confidence, a.upside, a.boldness, a.competition_level,
-               a.localization_value,
-               a.free_tier, a.created_at as analyzed_at, s.is_saas
-        FROM discovered_services s
-        LEFT JOIN analysis_reports a ON s.id = a.service_id
-        WHERE {where}
-        ORDER BY a.localization_score DESC NULLS LAST, s.discovered_at DESC
-        LIMIT ? OFFSET ?
-    """
-    params.extend([limit, offset])
-    rows = db.execute(query, params).fetchall()
-    db.close()
-    return {"services": [dict(r) for r in rows], "count": len(rows)}
-
-
-@app.get("/api/report/{service_id}")
-def get_report(service_id: int):
-    """서비스 상세 분석 보고서"""
-    db = get_db()
-    svc = db.execute("SELECT * FROM discovered_services WHERE id=?", (service_id,)).fetchone()
-    if not svc:
+    try:
+        # 1. 크롤링 및 좌표 수집
+        crawled_data = scrape_with_coordinates(url)
+        
+        # 2. DeepSeek AI 분석
+        analysis = analyze_conversion_potential(crawled_data, request.target_audience)
+        
+        # 3. DB 저장
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("""
+            INSERT INTO page_audits (
+                url, target_audience, screenshot_path,
+                score_overall, score_clarity, score_cta, score_hierarchy, score_social_proof, score_performance,
+                value_proposition, friction_points, action_checklist, ab_test_suggestions, elements
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            url,
+            request.target_audience,
+            crawled_data["screenshot_url"],
+            analysis["score_overall"],
+            analysis["scores"]["clarity"],
+            analysis["scores"]["cta"],
+            analysis["scores"]["hierarchy"],
+            analysis["scores"]["social_proof"],
+            analysis["scores"]["performance"],
+            analysis["value_proposition_analysis"],
+            json.dumps(analysis["friction_points"], ensure_ascii=False),
+            json.dumps(analysis["action_checklist"], ensure_ascii=False),
+            json.dumps(analysis["ab_test_suggestions"], ensure_ascii=False),
+            json.dumps(crawled_data["elements"], ensure_ascii=False)
+        ))
+        db.commit()
+        audit_id = cursor.lastrowid
         db.close()
-        raise HTTPException(404, "Service not found")
+        
+        # 4. 결과 반환
+        return {
+            "id": audit_id,
+            "success": True,
+            "url": url,
+            "target_audience": request.target_audience,
+            "overall_score": analysis["score_overall"],
+            "scores": analysis["scores"],
+            "value_proposition": analysis["value_proposition_analysis"],
+            "friction_points": analysis["friction_points"],
+            "action_checklist": analysis["action_checklist"],
+            "ab_test_suggestions": analysis["ab_test_suggestions"],
+            "screenshot_url": crawled_data["screenshot_url"],
+            "elements": crawled_data["elements"]
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"분석 실패: {str(e)}")
 
-    report = db.execute("SELECT * FROM analysis_reports WHERE service_id=?", (service_id,)).fetchone()
+@app.get("/api/history")
+def get_history(limit: int = Query(20, ge=1, le=100)):
+    """과거 분석 이력 조회"""
+    db = get_db()
+    rows = db.execute("""
+        SELECT id, url, target_audience, score_overall, created_at
+        FROM page_audits
+        ORDER BY created_at DESC
+        LIMIT ?
+    """, (limit,)).fetchall()
     db.close()
+    return {"history": [dict(r) for r in rows]}
 
-    if not report:
-        return {"service": dict(svc), "report": None, "message": "아직 분석되지 않았습니다."}
-
-    r = dict(report)
-    # JSON 필드 파싱
-    for field in ["required_korean_apis", "template_code"]:
+@app.get("/api/audit/{audit_id}")
+def get_audit(audit_id: int):
+    """특정 분석 상세 리포트 조회"""
+    db = get_db()
+    row = db.execute("SELECT * FROM page_audits WHERE id=?", (audit_id,)).fetchone()
+    db.close()
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="해당 분석 리포트를 찾을 수 없습니다.")
+        
+    r = dict(row)
+    # JSON 문자열 필드를 객체로 복원
+    for field in ["friction_points", "action_checklist", "ab_test_suggestions", "elements"]:
         if r.get(field) and isinstance(r[field], str):
             try:
                 r[field] = json.loads(r[field])
-            except json.JSONDecodeError:
+            except Exception:
                 pass
-
-    return {"service": dict(svc), "report": r}
-
-
-@app.get("/api/apis")
-def list_korean_apis(category: str = Query(None)):
-    """국내 API 레퍼런스"""
-    db = get_db()
-    if category:
-        rows = db.execute(
-            "SELECT * FROM korean_apis WHERE category=? ORDER BY name", (category,)
-        ).fetchall()
-    else:
-        rows = db.execute("SELECT * FROM korean_apis ORDER BY category, name").fetchall()
-    db.close()
-    return {"apis": [dict(r) for r in rows]}
+                
+    return r
 
 
 @app.get("/robots.txt")
@@ -161,17 +168,6 @@ def sitemap():
     if os.path.exists(fp):
         return Response(open(fp).read(), media_type="application/xml")
     raise HTTPException(404)
-
-
-@app.get("/api/sources")
-def get_sources():
-    """소스별 통계"""
-    db = get_db()
-    rows = db.execute(
-        "SELECT source, COUNT(*) as count FROM discovered_services GROUP BY source ORDER BY count DESC"
-    ).fetchall()
-    db.close()
-    return {"sources": [dict(r) for r in rows]}
 
 
 if __name__ == "__main__":

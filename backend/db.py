@@ -20,55 +20,32 @@ def init_db():
     """테이블 생성"""
     conn = get_db()
     conn.executescript("""
-    CREATE TABLE IF NOT EXISTS discovered_services (
+    CREATE TABLE IF NOT EXISTS page_audits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
         url TEXT NOT NULL,
-        description TEXT,
-        source TEXT NOT NULL,
-        source_url TEXT,
-        revenue_estimate TEXT,
-        monthly_traffic TEXT,
-        category TEXT DEFAULT 'unknown',
-        discovered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(name, url)
+        target_audience TEXT,
+        screenshot_path TEXT,
+        score_overall INTEGER NOT NULL,
+        score_clarity INTEGER NOT NULL,
+        score_cta INTEGER NOT NULL,
+        score_hierarchy INTEGER NOT NULL,
+        score_social_proof INTEGER NOT NULL,
+        score_performance INTEGER NOT NULL,
+        value_proposition TEXT,
+        friction_points TEXT,
+        action_checklist TEXT,
+        ab_test_suggestions TEXT,
+        elements TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE IF NOT EXISTS analysis_reports (
+    CREATE TABLE IF NOT EXISTS audit_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        service_id INTEGER NOT NULL,
-        localization_score INTEGER CHECK(localization_score BETWEEN 0 AND 100),
-        summary_ko TEXT,
-        localization_reason TEXT,
-        required_korean_apis TEXT,
-        regulatory_risks TEXT,
-        competitor_analysis TEXT,
-        estimated_dev_time TEXT,
-        monetization_ko TEXT,
-        template_code TEXT,
-        free_tier INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(service_id) REFERENCES discovered_services(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS korean_apis (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
-        category TEXT,
-        description TEXT,
-        docs_url TEXT,
-        pricing_info TEXT
-    );
-
-    CREATE TABLE IF NOT EXISTS crawl_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        source TEXT NOT NULL,
-        items_found INTEGER DEFAULT 0,
-        new_items INTEGER DEFAULT 0,
-        status TEXT,
+        url TEXT NOT NULL,
+        status TEXT NOT NULL,
         error_msg TEXT,
-        crawled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        duration_sec REAL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
     conn.commit()
