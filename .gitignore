@@ -4,3 +4,5 @@ __pycache__/
 .env
 data/kld.db
 *.log
+scripts/indexing-sa.json
+backend/static/screenshots/
