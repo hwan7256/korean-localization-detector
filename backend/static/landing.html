@@ -247,6 +247,44 @@
             box-shadow: 0 8px 25px rgba(0, 255, 178, 0.4);
         }
 
+        /* Features Section */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 64px;
+            text-align: left;
+        }
+        @media (max-width: 768px) {
+            .features-section { grid-template-columns: 1fr; }
+        }
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 24px;
+            transition: border-color 0.2s;
+        }
+        .feature-card:hover { border-color: var(--primary); }
+        .feature-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
         /* Loading Screen */
         .loading-container {
             display: none;
@@ -1238,12 +1276,22 @@
                 </button>
             </div>
 
-            <!-- History Scans -->
-            <div class="history-section">
-                <h3 class="history-title">최근 진단 이력</h3>
-                <div id="historyGrid" class="history-grid">
-                    <!-- Dynamic Loading -->
-                    <p style="color: var(--text-muted)">로딩 중...</p>
+            <!-- Features Section -->
+            <div class="features-section">
+                <div class="feature-card">
+                    <div class="feature-num">01</div>
+                    <h3>실시간 크롤링 진단</h3>
+                    <p>Playwright가 실제 브라우저처럼 페이지를 렌더링하고 모든 UI 요소의 좌표와 텍스트를 정밀 수집합니다.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-num">02</div>
+                    <h3>AI 전환율 분석</h3>
+                    <p>DeepSeek LLM이 수집된 데이터를 5개 축(명확성, CTA, 계층구조, 신뢰도, 성능)으로 평가하고 구체적 개선안을 제시합니다.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-num">03</div>
+                    <h3>A/B 카피 처방</h3>
+                    <p>분석 결과를 바탕으로 전환율을 높일 수 있는 대안 헤드라인을 2종 생성해 즉시 테스트할 수 있습니다.</p>
                 </div>
             </div>
         </div>
@@ -1467,7 +1515,7 @@
 
         // 페이지 진입 시 과거 이력 로드
         window.addEventListener('DOMContentLoaded', () => {
-            loadHistory();
+            // 히스토리 제거됨 — 랜딩페이지로 전환
         });
 
         // 브라우저 뒤로가기 처리: 대시보드 → 홈
@@ -1476,7 +1524,6 @@
             if (dv && dv.style.display === 'block') {
                 document.getElementById('dashboardView').style.display = 'none';
                 document.getElementById('inputView').style.display = 'block';
-                loadHistory();
             }
         });
 
@@ -1545,7 +1592,6 @@
             document.getElementById('dashboardView').style.display = 'none';
             document.getElementById('inputView').style.display = 'block';
             history.replaceState({view: 'home'}, '', '/');
-            loadHistory();
         }
 
         // 특정 과거 진단 클릭 시 상세 데이터 불러오기
