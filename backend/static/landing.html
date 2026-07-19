@@ -1527,47 +1527,6 @@
             }
         });
 
-        async function loadHistory() {
-            try {
-                const res = await fetch('/api/history');
-                const data = await res.json();
-                const grid = document.getElementById('historyGrid');
-                
-                if (!data.history || data.history.length === 0) {
-                    grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">아직 등록된 진단 이력이 없습니다. 첫 번째 웹사이트를 입력해보세요!</p>';
-                    return;
-                }
-                
-                grid.innerHTML = data.history.map(item => {
-                    const grade = calculateGrade(item.score_overall);
-                    const formattedDate = new Date(item.created_at).toLocaleDateString('ko-KR', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    
-                    // F등급(60점 미만)은 점수/등급 대신 '리포트 확인'으로 우회 표시하여 신뢰도 유지
-                    const scoreDisplay = item.score_overall >= 60 
-                        ? `${grade} (${item.score_overall}점)` 
-                        : '리포트 확인';
-                    
-                    return `
-                        <div class="history-card" onclick="loadAudit(${item.id})">
-                            <div class="history-url">${escapeHtml(item.url)}</div>
-                            <div class="history-meta">
-                                <span>${formattedDate}</span>
-                                <span class="history-score" style="${item.score_overall < 60 ? 'color: var(--text-muted); font-weight: 600;' : ''}">${scoreDisplay}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (e) {
-                console.error("이력 로딩 실패:", e);
-                document.getElementById('historyGrid').innerHTML = '<p style="color: var(--danger)">이력을 불러오는 중 오류가 발생했습니다.</p>';
-            }
-        }
-
         function calculateGrade(score) {
             if (score >= 90) return "A";
             if (score >= 80) return "B+";
@@ -1592,32 +1551,6 @@
             document.getElementById('dashboardView').style.display = 'none';
             document.getElementById('inputView').style.display = 'block';
             history.replaceState({view: 'home'}, '', '/');
-        }
-
-        // 특정 과거 진단 클릭 시 상세 데이터 불러오기
-        async function loadAudit(auditId) {
-            document.getElementById('inputView').style.display = 'none';
-            document.getElementById('loadingView').style.display = 'block';
-            
-            // 로딩 표시 속도감 연출
-            updateLoadingStep(1, 'active');
-            
-            try {
-                setTimeout(() => updateLoadingStep(2, 'active'), 300);
-                setTimeout(() => updateLoadingStep(3, 'active'), 600);
-                setTimeout(() => updateLoadingStep(4, 'active'), 900);
-                
-                const res = await fetch(`/api/audit/${auditId}`);
-                if (!res.ok) throw new Error("데이터 수신 오류");
-                const data = await res.json();
-                
-                setTimeout(() => {
-                    displayResult(data);
-                }, 1200);
-            } catch (e) {
-                alert("리포트를 가져오는데 실패했습니다: " + e.message);
-                backToHome();
-            }
         }
 
         function updateLoadingStep(stepNum, status) {
