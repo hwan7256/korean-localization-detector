@@ -250,7 +250,11 @@ def terms_page():
     return HTMLResponse(open(fp).read())
 
 @app.exception_handler(404)
-async def custom_404(request, exc):
+async def spa_fallback(request, exc):
+    """SPA 폴백 — 알 수 없는 경로는 landing.html 제공 (클라이언트 라우팅)"""
+    fp = os.path.join(STATIC_DIR, "landing.html")
+    if os.path.exists(fp):
+        return HTMLResponse(open(fp).read(), status_code=200)
     return HTMLResponse("""<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>404 — ConvertRadar</title><style>:root{--bg:#07070b;--text-muted:#888;--primary:#00ffb2}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;flex-direction:column}h1{font-size:4rem;color:var(--primary);margin-bottom:12px}p{color:var(--text-muted);font-size:1rem;margin-bottom:24px}a{color:var(--primary);text-decoration:none;font-size:0.95rem}a:hover{text-decoration:underline}</style></head><body><h1>404</h1><p>페이지를 찾을 수 없습니다</p><a href="/">ConvertRadar 홈으로</a></body></html>""", status_code=404)
 
 
