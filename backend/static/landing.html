@@ -1841,6 +1841,7 @@
             grid-template-columns: 1fr 2fr;
             gap: 24px;
             margin-bottom: 30px;
+            align-items: start;
         }
         @media (max-width: 900px) {
             .summary-dashboard-wrapper {
@@ -1924,11 +1925,10 @@
             background-color: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 140px;
+            gap: 8px;
             transition: border-color 0.2s;
         }
         .metric-card-semrush:hover {
