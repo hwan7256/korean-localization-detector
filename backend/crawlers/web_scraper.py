@@ -5,7 +5,8 @@ import uuid
 from playwright.sync_api import sync_playwright
 
 def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screenshots") -> dict:
-    """웹페이지를 크롤링하고 핵심 UI 요소들의 좌표와 텍스트를 추출하며 스크린샷을 찍음"""
+    """웹페이지를 크롤링하고 핵심 UI 요소들의 좌표와 텍스트를 추출하며 스크린샷을 찍음 (30초 제한 최적화)"""
+    start_time = time.time()
     full_output_dir = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
         output_dir
@@ -33,6 +34,8 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
     
     browser = None
     with sync_playwright() as p:
+        if time.time() - start_time > 28:
+            return result
         browser = p.chromium.launch(headless=True)
         try:
             context = browser.new_context(
@@ -41,37 +44,40 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
             )
             page = context.new_page()
             
-            # 페이지 로딩 + 타임아웃 15초
-            start_time = time.time()
+            # 페이지 로딩 타임아웃 계산 (남은 시간 기반, 최소 2초, 최대 15초)
+            elapsed = time.time() - start_time
+            goto_timeout = min(15000, max(2000, int((25 - elapsed) * 1000)))
+            
             try:
-                page.goto(url, wait_until="load", timeout=15000)
+                page.goto(url, wait_until="load", timeout=goto_timeout)
             except Exception as e:
-                print(f"Playwright navigation timeout, proceeding: {e}")
+                print(f"Playwright navigation timeout/error, proceeding: {e}")
             result["load_time_ms"] = int((time.time() - start_time) * 1000)
             
-            # 스크롤 (최대 8초 + 최대 40회)
-            try:
-                page.evaluate("""
-                    async () => {
-                        await new Promise((resolve) => {
-                            let totalHeight = 0, count = 0;
-                            const distance = 300, maxScrolls = 40;
-                            const timer = setInterval(() => {
-                                window.scrollBy(0, distance);
-                                totalHeight += distance; count++;
-                                if (totalHeight >= document.body.scrollHeight || totalHeight > 6000 || count >= maxScrolls) {
-                                    clearInterval(timer);
-                                    window.scrollTo(0, 0);
-                                    resolve();
-                                }
-                            }, 50);
-                            setTimeout(() => { clearInterval(timer); window.scrollTo(0, 0); resolve(); }, 8000);
-                        });
-                    }
-                """)
-                page.wait_for_timeout(500)
-            except Exception as e:
-                print(f"Scroll skipped: {e}")
+            # 스크롤 최적화 (최대 1.5초, viewport 로딩 자극 용도)
+            if time.time() - start_time < 28:
+                try:
+                    page.evaluate("""
+                        async () => {
+                            await new Promise((resolve) => {
+                                let totalHeight = 0, count = 0;
+                                const distance = 300, maxScrolls = 5;
+                                const timer = setInterval(() => {
+                                    window.scrollBy(0, distance);
+                                    totalHeight += distance; count++;
+                                    if (totalHeight >= document.body.scrollHeight || totalHeight > 1500 || count >= maxScrolls) {
+                                        clearInterval(timer);
+                                        window.scrollTo(0, 0);
+                                        resolve();
+                                    }
+                                }, 50);
+                                setTimeout(() => { clearInterval(timer); window.scrollTo(0, 0); resolve(); }, 1500);
+                            });
+                        }
+                    """)
+                    page.wait_for_timeout(200)
+                except Exception as e:
+                    print(f"Scroll skipped: {e}")
             
             # 기본 정보
             result["title"] = page.title()
@@ -105,32 +111,49 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
                 "has_canonical": has_canonical
             }
             
-            # 스크린샷
-            page.screenshot(path=screenshot_path, full_page=True)
-            dims = page.evaluate("() => ({ w: window.innerWidth, h: document.body.scrollHeight })")
+            # 스크린샷 (full_page=True 대신 viewport 캡처 사용)
+            page.screenshot(path=screenshot_path, full_page=False)
+            dims = page.evaluate("() => ({ w: window.innerWidth, h: window.innerHeight })")
             result["page_width"] = dims["w"]
             result["page_height"] = dims["h"]
+            viewport_h = dims["h"]
             
-            # 요소 좌표
+            # 요소 좌표 추출 (is_visible 대신 bounding_box 유무로 빠른 필터링, Viewport 내 요소만 타겟팅)
             element_id = 0
             for selector in target_selectors:
+                if time.time() - start_time > 27:
+                    print("Timeout approaching, stopping element coordinates extraction early.")
+                    break
                 for loc in page.locator(selector).all():
+                    if time.time() - start_time > 27:
+                        break
                     try:
-                        if not loc.is_visible(): continue
                         box = loc.bounding_box()
+                        if not box:
+                            continue
+                        
+                        # 1) Viewport 세로 밖 영역(y가 viewport_h 초과)에 위치한 요소는 제외
+                        if box["y"] < 0 or box["y"] > viewport_h:
+                            continue
+                        
+                        # 2) 극도로 작은 요소 제외
+                        if box["width"] <= 10 or box["height"] <= 10:
+                            continue
+                            
                         text = loc.inner_text().strip()
                         tag = loc.evaluate("el => el.tagName.toLowerCase()")
-                        if box and box["width"] > 10 and box["height"] > 10:
-                            element_id += 1
-                            result["elements"].append({
-                                "id": element_id, "tag": tag, "text": text[:100],
-                                "x": box["x"], "y": box["y"],
-                                "w": box["width"], "h": box["height"]
-                            })
-                            if element_id >= 60: break
+                        element_id += 1
+                        result["elements"].append({
+                            "id": element_id, "tag": tag, "text": text[:100],
+                            "x": box["x"], "y": box["y"],
+                            "w": box["width"], "h": box["height"]
+                        })
+                        if element_id >= 60:
+                            break
                     except Exception:
                         continue
-                if element_id >= 60: break
+                if element_id >= 60:
+                    break
         finally:
             if browser:
                 browser.close()
