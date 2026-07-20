@@ -2016,28 +2016,137 @@
             box-shadow: 0 4px 15px var(--primary-glow);
         }
         @media print {
-            @page { margin: 15mm; size: A4; }
-            header, .btn-back-home, .pricing-overlay, footer, #inputView, #loadingView, .no-print { display:none !important; }
-            body { background:#fff !important; color:#111 !important; font-size:11pt; }
-            .dashboard-view { max-width:100% !important; padding:0 !important; }
-            * { color:#111 !important; text-shadow:none !important; box-shadow:none !important; }
-            .summary-top-card, .metric-card-semrush, .semrush-accordion-panel, .section-card { 
-                border:1px solid #ddd !important; background:#fff !important; 
+            :root {
+                --bg: #ffffff !important;
+                --surface: #ffffff !important;
+                --text-main: #111111 !important;
+                --text-muted: #555555 !important;
+                --border: #cccccc !important;
+                --primary: #008f5d !important;
+                --info: #0077aa !important;
+                --danger: #cc2244 !important;
+                --warning: #cc8800 !important;
             }
-            .semrush-gauge-text span { color:#111 !important; }
-            .summary-score-val, .summary-grade, .metric-card-value, h1, h2, h3, h4 { color:#111 !important; }
-            .badge-main, .hero-glow-bg, .feature-card-glow { display:none !important; }
-            .semrush-gauge-circle.val { stroke:#111 !important; }
-            .semrush-gauge-circle.bg { stroke:#e5e5e5 !important; }
-            .progress-bar { background:#111 !important; }
-            .progress-track { background:#e5e5e5 !important; }
-            .accordion-body { display:block !important; max-height:none !important; }
-            a { color:#555 !important; }
-            /* 페이지 나눔 */
-            .summary-dashboard-wrapper { page-break-inside:avoid; }
-            .semrush-accordion-panel { page-break-inside:avoid; }
-            .bottom-report-layout { page-break-before:auto; }
-            .section-card { page-break-inside:avoid; }
+            @page { margin: 15mm; size: A4; }
+            header, footer, .btn-back-home, .pricing-overlay, .pricing-banner-panel, .bottom-cta-banner-container, #inputView, #loadingView, .no-print, .btn-pricing-upgrade {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #111111 !important;
+                font-size: 11pt;
+                font-family: sans-serif;
+            }
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .dashboard-view {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+            }
+            * {
+                color: #111111 !important;
+                text-shadow: none !important;
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .panel, .health-ring-panel, .metric-card-semrush, .summary-top-card, .semrush-accordion-panel {
+                background: #ffffff !important;
+                border: 1px solid #cccccc !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 20px !important;
+            }
+            .semrush-accordion-header {
+                background: #f8f9fa !important;
+                border-bottom: 1px solid #cccccc !important;
+                color: #111111 !important;
+            }
+            .semrush-accordion-header.active {
+                background: #f8f9fa !important;
+            }
+            .semrush-accordion-body {
+                display: block !important;
+                background: #ffffff !important;
+                padding: 20px !important;
+            }
+            .accordion-arrow {
+                display: none !important;
+            }
+            .semrush-audit-item {
+                background: #ffffff !important;
+                border: 1px solid #e5e5e5 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .semrush-icon.pass { border-color: #008f5d !important; color: #008f5d !important; background: rgba(0, 143, 93, 0.05) !important; }
+            .semrush-icon.warn { border-color: #cc8800 !important; color: #cc8800 !important; background: rgba(204, 136, 0, 0.05) !important; }
+            .semrush-icon.err { border-color: #cc2244 !important; color: #cc2244 !important; background: rgba(208, 34, 68, 0.05) !important; }
+            
+            .accordion-badge.pass { border-color: #008f5d !important; color: #008f5d !important; background: rgba(0, 143, 93, 0.05) !important; }
+            .accordion-badge.warn { border-color: #cc8800 !important; color: #cc8800 !important; background: rgba(204, 136, 0, 0.05) !important; }
+            .accordion-badge.err { border-color: #cc2244 !important; color: #cc2244 !important; background: rgba(208, 34, 68, 0.05) !important; }
+            
+            /* 그리드 레이아웃 1열로 해제하여 잘림 및 좁아짐 방지 */
+            .summary-dashboard-wrapper {
+                display: block !important;
+            }
+            .health-ring-panel {
+                width: 100% !important;
+            }
+            .summary-metrics-grid {
+                width: 100% !important;
+                margin-top: 20px !important;
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 15px !important;
+            }
+            .report-grid-layout {
+                display: block !important;
+            }
+            .report-left-column, .report-right-column {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .ab-test-card {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .chart-wrapper {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                text-align: center !important;
+            }
+            .inspector-scroll-container {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border: 1px solid #cccccc !important;
+            }
+            .semrush-gauge-text span, .semrush-gauge-num {
+                color: #111111 !important;
+            }
+            .semrush-gauge-circle.val {
+                stroke: #008f5d !important;
+            }
+            .semrush-gauge-circle.bg {
+                stroke: #e5e5e5 !important;
+            }
+            .progress-bar {
+                background: #008f5d !important;
+            }
+            .progress-track {
+                background: #e5e5e5 !important;
+            }
+            a {
+                color: #005588 !important;
+                text-decoration: underline !important;
+            }
         }
     </style>
 </head>
