@@ -44,12 +44,14 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
             )
             page = context.new_page()
             
-            # 페이지 로딩 타임아웃 계산 (남은 시간 기반, 최소 10초, 최대 15초)
+            # 페이지 로딩 — commit만 기다림 (가장 빠름, 10초 제한)
             elapsed = time.time() - start_time
-            goto_timeout = min(15000, max(10000, int((25 - elapsed) * 1000)))
+            goto_timeout = min(10000, max(5000, int((22 - elapsed) * 1000)))
             
             try:
-                page.goto(url, wait_until="domcontentloaded", timeout=goto_timeout)
+                page.goto(url, wait_until="commit", timeout=goto_timeout)
+                # commit 후 추가 렌더링 대기
+                page.wait_for_timeout(1500)
             except Exception as e:
                 print(f"Playwright navigation timeout/error, proceeding: {e}")
             result["load_time_ms"] = int((time.time() - start_time) * 1000)
@@ -113,7 +115,7 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
             
             # 스크린샷 (전체 페이지, 최대 5000px 높이로 clip 제한)
             dims = page.evaluate("() => ({ w: window.innerWidth, h: document.body.scrollHeight })")
-            clip_h = min(dims["h"], 5000)
+            clip_h = min(dims["h"], 3000)
             try:
                 page.screenshot(path=screenshot_path, full_page=True, clip={"x":0,"y":0,"width":1280,"height":clip_h})
             except Exception:
