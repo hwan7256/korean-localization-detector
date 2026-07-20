@@ -49,29 +49,29 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
             goto_timeout = min(15000, max(10000, int((25 - elapsed) * 1000)))
             
             try:
-                page.goto(url, wait_until="load", timeout=goto_timeout)
+                page.goto(url, wait_until="domcontentloaded", timeout=goto_timeout)
             except Exception as e:
                 print(f"Playwright navigation timeout/error, proceeding: {e}")
             result["load_time_ms"] = int((time.time() - start_time) * 1000)
             
-            # 스크롤 최적화 (최대 1.5초, viewport 로딩 자극 용도)
+            # 스크롤 최적화 (최대 5초)
             if time.time() - start_time < 28:
                 try:
                     page.evaluate("""
                         async () => {
                             await new Promise((resolve) => {
                                 let totalHeight = 0, count = 0;
-                                const distance = 300, maxScrolls = 5;
+                                const distance = 300, maxScrolls = 20;
                                 const timer = setInterval(() => {
                                     window.scrollBy(0, distance);
                                     totalHeight += distance; count++;
-                                    if (totalHeight >= document.body.scrollHeight || totalHeight > 1500 || count >= maxScrolls) {
+                                    if (totalHeight >= document.body.scrollHeight || totalHeight > 6000 || count >= maxScrolls) {
                                         clearInterval(timer);
                                         window.scrollTo(0, 0);
                                         resolve();
                                     }
                                 }, 50);
-                                setTimeout(() => { clearInterval(timer); window.scrollTo(0, 0); resolve(); }, 1500);
+                                setTimeout(() => { clearInterval(timer); window.scrollTo(0, 0); resolve(); }, 5000);
                             });
                         }
                     """)
