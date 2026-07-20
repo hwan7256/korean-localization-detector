@@ -235,6 +235,25 @@ def sitemap():
     raise HTTPException(404)
 
 
+@app.get("/privacy", response_class=HTMLResponse)
+@app.get("/privacy.html", response_class=HTMLResponse)
+def privacy_page():
+    fp = os.path.join(STATIC_DIR, "privacy.html")
+    if not os.path.exists(fp): raise HTTPException(404)
+    return HTMLResponse(open(fp).read())
+
+@app.get("/terms", response_class=HTMLResponse)
+@app.get("/terms.html", response_class=HTMLResponse)
+def terms_page():
+    fp = os.path.join(STATIC_DIR, "terms.html")
+    if not os.path.exists(fp): raise HTTPException(404)
+    return HTMLResponse(open(fp).read())
+
+@app.exception_handler(404)
+async def custom_404(request, exc):
+    return HTMLResponse("""<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>404 — ConvertRadar</title><style>:root{--bg:#07070b;--text-muted:#888;--primary:#00ffb2}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;flex-direction:column}h1{font-size:4rem;color:var(--primary);margin-bottom:12px}p{color:var(--text-muted);font-size:1rem;margin-bottom:24px}a{color:var(--primary);text-decoration:none;font-size:0.95rem}a:hover{text-decoration:underline}</style></head><body><h1>404</h1><p>페이지를 찾을 수 없습니다</p><a href="/">ConvertRadar 홈으로</a></body></html>""", status_code=404)
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.api.server:app", host="127.0.0.1", port=8733, reload=True)

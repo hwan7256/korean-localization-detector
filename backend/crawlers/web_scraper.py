@@ -44,9 +44,9 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
             )
             page = context.new_page()
             
-            # 페이지 로딩 타임아웃 계산 (남은 시간 기반, 최소 2초, 최대 15초)
+            # 페이지 로딩 타임아웃 계산 (남은 시간 기반, 최소 10초, 최대 15초)
             elapsed = time.time() - start_time
-            goto_timeout = min(15000, max(2000, int((25 - elapsed) * 1000)))
+            goto_timeout = min(15000, max(10000, int((25 - elapsed) * 1000)))
             
             try:
                 page.goto(url, wait_until="load", timeout=goto_timeout)
