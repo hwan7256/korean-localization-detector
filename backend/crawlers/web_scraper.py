@@ -111,12 +111,15 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
                 "has_canonical": has_canonical
             }
             
-            # 스크린샷 (full_page=True 대신 viewport 캡처 사용)
-            page.screenshot(path=screenshot_path, full_page=False)
-            dims = page.evaluate("() => ({ w: window.innerWidth, h: window.innerHeight })")
+            # 스크린샷 (전체 페이지, 최대 5000px 높이로 clip 제한)
+            dims = page.evaluate("() => ({ w: window.innerWidth, h: document.body.scrollHeight })")
+            clip_h = min(dims["h"], 5000)
+            try:
+                page.screenshot(path=screenshot_path, full_page=True, clip={"x":0,"y":0,"width":1280,"height":clip_h})
+            except Exception:
+                page.screenshot(path=screenshot_path, full_page=False)
             result["page_width"] = dims["w"]
             result["page_height"] = dims["h"]
-            viewport_h = dims["h"]
             
             # 요소 좌표 추출 (is_visible 대신 bounding_box 유무로 빠른 필터링, Viewport 내 요소만 타겟팅)
             element_id = 0
@@ -132,11 +135,7 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
                         if not box:
                             continue
                         
-                        # 1) Viewport 세로 밖 영역(y가 viewport_h 초과)에 위치한 요소는 제외
-                        if box["y"] < 0 or box["y"] > viewport_h:
-                            continue
-                        
-                        # 2) 극도로 작은 요소 제외
+                        # 극도로 작은 요소 제외
                         if box["width"] <= 10 or box["height"] <= 10:
                             continue
                             
@@ -159,7 +158,6 @@ def scrape_with_coordinates(url: str, output_dir: str = "backend/static/screensh
                 browser.close()
     
     return result
-
 
 if __name__ == "__main__":
     test_url = "https://news.ycombinator.com"
