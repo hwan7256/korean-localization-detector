@@ -2016,11 +2016,28 @@
             box-shadow: 0 4px 15px var(--primary-glow);
         }
         @media print {
-            header, .btn-back-home, .pricing-overlay, footer, #inputView, #loadingView { display:none !important; }
-            body { background:#fff; color:#111; -webkit-print-color-adjust:exact; }
-            .dashboard-view { max-width:100%; padding:20px; }
-            .summary-top-card, .metric-card-semrush, .semrush-accordion-panel, .section-card { border:1px solid #ccc; }
-            .semrush-gauge-text span { color:#000 !important; }
+            @page { margin: 15mm; size: A4; }
+            header, .btn-back-home, .pricing-overlay, footer, #inputView, #loadingView, .no-print { display:none !important; }
+            body { background:#fff !important; color:#111 !important; font-size:11pt; }
+            .dashboard-view { max-width:100% !important; padding:0 !important; }
+            * { color:#111 !important; text-shadow:none !important; box-shadow:none !important; }
+            .summary-top-card, .metric-card-semrush, .semrush-accordion-panel, .section-card { 
+                border:1px solid #ddd !important; background:#fff !important; 
+            }
+            .semrush-gauge-text span { color:#111 !important; }
+            .summary-score-val, .summary-grade, .metric-card-value, h1, h2, h3, h4 { color:#111 !important; }
+            .badge-main, .hero-glow-bg, .feature-card-glow { display:none !important; }
+            .semrush-gauge-circle.val { stroke:#111 !important; }
+            .semrush-gauge-circle.bg { stroke:#e5e5e5 !important; }
+            .progress-bar { background:#111 !important; }
+            .progress-track { background:#e5e5e5 !important; }
+            .accordion-body { display:block !important; max-height:none !important; }
+            a { color:#555 !important; }
+            /* 페이지 나눔 */
+            .summary-dashboard-wrapper { page-break-inside:avoid; }
+            .semrush-accordion-panel { page-break-inside:avoid; }
+            .bottom-report-layout { page-break-before:auto; }
+            .section-card { page-break-inside:avoid; }
         }
     </style>
 </head>
@@ -2224,6 +2241,7 @@
         <div id="dashboardView" class="dashboard-view">
             <button class="btn-back-home" onclick="backToHome()">← 다른 페이지 진단하기</button>
             <button class="btn-back-home" onclick="window.print()" style="margin-left:8px;background:var(--primary);color:#000">리포트 PDF 저장</button>
+            <button class="btn-back-home no-print" onclick="copyReportUrl()" style="margin-left:8px">링크 복사</button>
             
             <!-- 1. 상단: URL + 종합 점수 + 신뢰도를 한 줄 요약 카드로 -->
             <div class="summary-top-card">
@@ -2556,6 +2574,13 @@
         function closePricing() {
             document.getElementById('pricingOverlay').classList.remove('open');
             document.body.style.overflow = '';
+        }
+        function copyReportUrl() {
+            navigator.clipboard.writeText(location.href).then(function(){
+                alert('리포트 URL이 클립보드에 복사되었습니다.');
+            }).catch(function(){
+                prompt('리포트 URL:', location.href);
+            });
         }
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closePricing();
